@@ -1,0 +1,20 @@
+schema_version: v3_download_targets_1
+targets:
+  - dataset_id: evtx_attack_samples
+    url: https://codeload.github.com/sbousseaden/EVTX-ATTACK-SAMPLES/zip/refs/heads/master
+    filename: EVTX-ATTACK-SAMPLES.zip
+    archive: zip
+    max_bytes: 200000000
+    output_dir: /root/autodl-tmp/semantic-graph-apt/downloads/evtx
+  - dataset_id: sandworm_flow
+    url: https://zenodo.org/records/16911636/files/SandwormAPT_flow_labelled.csv?download=1
+    filename: SandwormAPT_flow_labelled.csv
+    archive: none
+    max_bytes: 5000000
+    output_dir: /root/autodl-tmp/semantic-graph-apt/data/replacement_sources/sandworm
+  - dataset_id: cam_lds_filtered
+    url: https://zenodo.org/records/18861762/files/manifestations_filtered.zip?download=1
+    filename: manifestations_filtered.zip
+    archive: zip
+    max_bytes: 400000000
+    output_dir: /root/autodl-tmp/semantic-graph-apt/data/replacement_sources/cam_lds_filtered
