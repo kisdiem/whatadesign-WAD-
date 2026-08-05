@@ -1,0 +1,1 @@
+"""Registered source data adapters."""
