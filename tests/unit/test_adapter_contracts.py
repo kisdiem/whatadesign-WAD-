@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from src.data.adapters import LogHubTextAdapter, SandwormFlowAdapter, adapter_for
+from src.data.adapters import LanlEventAdapter, LogHubTextAdapter, SandwormFlowAdapter, adapter_for
 
 
 def test_loghub_adapter_preserves_source_identity(tmp_path: Path):
@@ -18,6 +18,18 @@ def test_sandworm_adapter_reads_csv_payload(tmp_path: Path):
     result = SandwormFlowAdapter().read(path)
     assert result.records[0].raw_payload["src"] == "a"
     assert result.records[0].raw_timestamp.startswith("2025-")
+
+
+def test_lanl_adapter_reads_gzipped_typed_events(tmp_path: Path):
+    import gzip
+
+    path = tmp_path / "auth.txt.gz"
+    with gzip.open(path, "wt", encoding="utf-8") as stream:
+        stream.write("1,U1@DOM,U2@DOM,C1,C2,Negotiate,Batch,LogOn,Success\n")
+    result = LanlEventAdapter().read(path)
+    assert result.status == "ok"
+    assert result.records[0].raw_payload["source_user"] == "U1@DOM"
+    assert result.records[0].raw_timestamp == "1"
 
 
 def test_unknown_adapter_is_rejected():
