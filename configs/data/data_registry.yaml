@@ -1,0 +1,80 @@
+schema_version: v3_data_registry_1
+datasets:
+  loghub_2_0:
+    display_name: LogHub-2.0
+    role: m0_template_source
+    tier: 0
+    official_url: https://zenodo.org/records/8275861
+    status: verified
+    local_path: /root/autodl-tmp/ait-garnet-demo-external/data/external_raw/loghub_2.0
+    allowed_label_usage: template_and_sequence_only
+    prohibited_usage: apt_supervised_label
+    notes: official archives uploaded and SHA256 verified; raw full.log subset is 6682987178 bytes
+  ocsf_schema:
+    display_name: OCSF schema
+    role: semantic_taxonomy
+    tier: 0
+    official_url: https://github.com/ocsf/ocsf-schema
+    status: verified
+    local_path: /root/autodl-tmp/ait-garnet-demo-external/data/external_subsets/ocsf-schema
+    allowed_label_usage: schema_and_examples
+    prohibited_usage: target_label_generation
+  hdfs_bgl:
+    display_name: HDFS and BGL
+    role: sequence_pretraining_and_baseline
+    tier: 0
+    official_url: https://zenodo.org/records/8275861
+    status: verified
+    local_path: /root/autodl-tmp/ait-garnet-demo-external/data/external_raw/loghub_2.0/extracted
+    allowed_label_usage: system_anomaly_pretraining_only
+    prohibited_usage: apt_label
+    notes: anomaly labels are not treated as APT labels
+  splunk_attack_data:
+    display_name: Splunk Attack Data
+    role: semantic_and_event_source
+    tier: 0
+    official_url: https://github.com/splunk/attack_data
+    status: unavailable
+    allowed_label_usage: source_domain_only
+    prohibited_usage: none_until_verified
+    notes: not present on server; no silent mirror substitution
+  otrf_security_datasets:
+    display_name: OTRF Security Datasets
+    role: semantic_source
+    tier: 0
+    official_url: https://github.com/OTRF/Security-Datasets
+    status: unavailable
+    allowed_label_usage: source_domain_only
+    prohibited_usage: none_until_verified
+  lanl_comprehensive:
+    display_name: LANL Comprehensive Multi-Source
+    role: entity_graph_and_source_head
+    tier: 1
+    official_url: https://csr.lanl.gov/data/cyber1/
+    status: unavailable
+    allowed_label_usage: source_domain_training_only
+    prohibited_usage: ait_label_or_target_tuning
+  darpa_tc:
+    display_name: DARPA Transparent Computing
+    role: graph_and_long_horizon_source
+    tier: 1
+    official_url: https://github.com/darpa-i2o/Transparent-Computing
+    status: unavailable
+    allowed_label_usage: source_domain_training_only
+    prohibited_usage: ait_label_or_target_tuning
+  ait_lds_v2:
+    display_name: AIT-LDSv2.0
+    role: target_test
+    tier: target
+    official_url: https://zenodo.org/records/5789064
+    status: not_accessed
+    allowed_label_usage: evaluation_only_p1
+    prohibited_usage: training_early_stop_threshold_or_rework
+  ait_ads:
+    display_name: AIT-ADS
+    role: target_test
+    tier: target
+    official_url: https://zenodo.org/records/8263181
+    status: not_accessed
+    allowed_label_usage: evaluation_only_p1
+    prohibited_usage: training_early_stop_threshold_or_rework
