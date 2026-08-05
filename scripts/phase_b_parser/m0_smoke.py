@@ -17,7 +17,7 @@ def main() -> None:
     rows = list(parser.parse_lines("loghub_2_0", path, limit=2000))
     output = root / "outputs/source_validation/m0_smoke.json"
     output.parent.mkdir(parents=True, exist_ok=True)
-    result = {"status": "passed", "rows": len(rows), "templates": parser.catalog()["templates"], "ait_accessed": False}
+    result = {"smoke_status": "passed", "rows": len(rows), "templates": parser.catalog()["templates"], "ait_accessed": False}
     output.write_text(json.dumps(result, indent=2), encoding="utf-8")
     append_operation(root / "logs/operations.jsonl", "m0_smoke", "completed", **result, input_path=str(path))
     print(json.dumps(result))

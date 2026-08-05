@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Iterable
 
 from drain3 import TemplateMiner
+from drain3.template_miner_config import TemplateMinerConfig
 
 from src.common.schema import RawRecord, SyntaxParse, stable_record_id
 
@@ -12,18 +13,19 @@ class M0DrainParser:
     VERSION = "m0_drain_v1"
 
     def __init__(self) -> None:
-        # Drain3's default configuration is version-compatible and can be
-        # overridden later through a checked-in config file.
-        self.miner = TemplateMiner(config=None)
-        self.miner.config.drain_sim_th = 0.4
-        self.miner.config.drain_depth = 4
+        # Construct the config object directly so execution does not depend
+        # on a process working directory or an untracked drain3.ini file.
+        config = TemplateMinerConfig()
+        config.drain_sim_th = 0.4
+        config.drain_depth = 4
+        self.miner = TemplateMiner(config=config)
 
     def parse(self, record: RawRecord) -> SyntaxParse:
         record_id = stable_record_id(record.dataset_id, record.source_file, record.source_line)
         payload = record.raw_payload if isinstance(record.raw_payload, str) else str(record.raw_payload)
         result = self.miner.add_log_message(payload)
-        cluster = result.get("cluster")
-        template_id = f"drain:{cluster.cluster_id}" if cluster else "drain:unknown"
+        cluster_id = result.get("cluster_id")
+        template_id = f"drain:{cluster_id}" if cluster_id is not None else "drain:unknown"
         return SyntaxParse(
             dataset_id=record.dataset_id,
             record_id=record_id,
