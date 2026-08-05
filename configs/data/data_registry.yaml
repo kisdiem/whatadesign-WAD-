@@ -118,10 +118,11 @@ datasets:
     role: network_source_held_out_validation
     tier: 1
     official_url: https://doi.org/10.5281/zenodo.16911636
-    status: not_accessed
+    status: downloaded
+    local_path: /root/autodl-tmp/semantic-graph-apt/data/replacement_sources/sandworm/SandwormAPT_flow_labelled.csv
     allowed_label_usage: source_domain_validation_only
     prohibited_usage: target_label_generation_or_full_campaign_claim
-    notes: use labelled flow CSV only; PCAP is intentionally excluded
+    notes: use labelled flow CSV only; PCAP is intentionally excluded; SHA256 c2669e324fe94076a148d2942e86be97acfd7f39322e89bf267c554c530330b4
   cam_lds_filtered:
     display_name: CAM-LDS manifestations filtered
     role: enhanced_same_organization_external_source
