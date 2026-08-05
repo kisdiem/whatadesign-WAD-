@@ -1,11 +1,11 @@
 {
-  "git_commit": "ba814236102f02dde4d4fc7d0182e33033a7ac09",
+  "git_commit": "ade44de4a05c4d30eedd3a4ba847034c1a184e72",
   "full_test_command": ".venv/bin/python -m pytest -q",
-  "full_test_result": "23 passed, 3 warnings",
+  "full_test_result": "25 passed, 3 warnings",
   "collected_test_files": 11,
   "source_modules": [
     "src/parsers/m0_drain.py", "src/semantic/m1_normalizer.py", "src/entities/m2_resolver.py",
-    "src/graph/m3_graph.py", "src/models/m4_qformer.py", "src/temporal/m5_long_horizon.py",
+    "src/graph/m3_graph.py", "src/models/m4_qformer.py", "src/temporal/m5_long_horizon.py", "src/parsers/m0_metrics.py",
     "src/fusion/m6_hierarchical.py", "src/training/splits.py", "src/training/leakage_audit.py",
     "src/training/v3_runner.py", "src/data/adapters.py", "src/pipeline/source_preprocess.py"
   ],

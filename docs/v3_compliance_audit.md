@@ -2,13 +2,13 @@
 
 Audit source: `C:\Users\sixth\Desktop\跨域语义图APT检测_完整Codex执行报告_V3.txt`  
 Audit instruction: `C:\Users\sixth\Desktop\1.txt`  
-Commit: `ba814236102f02dde4d4fc7d0182e33033a7ac09`  
+Commit: `ade44de4a05c4d30eedd3a4ba847034c1a184e72`  
 Command: `.venv/bin/python -m pytest -q`  
-Result: `23 passed, 3 warnings`
+Result: `25 passed, 3 warnings`
 
 ## Executive finding
 
-The repository contains contract-level M0-M6 modules, source splitting, leakage checks, data adapters and a generic M4-M6 runner. It does not contain the original V3 trained system, real M0-M6 checkpoints, source-domain metrics, AIT predictions, locked release gates, baseline results or ablations.
+The repository contains contract-level M0-M6 modules, source splitting, leakage checks, data adapters, a generic M4-M6 runner, and a partially strengthened M0 parser with masking/fingerprint/cache primitives. It does not contain the original V3 trained system, real M0-M6 checkpoints, source-domain metrics, AIT predictions, locked release gates, baseline results or ablations.
 
 The detailed ten-field evidence for every required item is in `outputs/audit/v3_compliance_matrix.json`. The implementation inventory is in `outputs/audit/implementation_inventory.json`.
 
@@ -44,6 +44,6 @@ The detailed ten-field evidence for every required item is in `outputs/audit/v3_
 - No train, validation or test metric files were found.
 - No AIT data or labels were accessed; `run_state/completed_steps.json` records `ait_accessed=false`.
 - Existing strict/enhanced manifests are not locked releases.
-- The 23 passing tests are contract/smoke tests, not the required 80-unit/10-integration V3 suite.
+- The 25 passing tests are contract/smoke tests, not the required 80-unit/10-integration V3 suite.
 
 The current project report must therefore say: “核心模块接口和 smoke/contract 测试已建立；真实 M0-M6 训练、锁定发布和 AIT 评估尚未完成。”
