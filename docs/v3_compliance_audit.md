@@ -2,9 +2,9 @@
 
 Audit source: `C:\Users\sixth\Desktop\跨域语义图APT检测_完整Codex执行报告_V3.txt`  
 Audit instruction: `C:\Users\sixth\Desktop\1.txt`  
-Commit: `ade44de4a05c4d30eedd3a4ba847034c1a184e72`  
+Commit: `5219dee`  
 Command: `.venv/bin/python -m pytest -q`  
-Result: `25 passed, 3 warnings`
+Result: `26 passed, 3 warnings`
 
 ## Executive finding
 
@@ -44,6 +44,6 @@ The detailed ten-field evidence for every required item is in `outputs/audit/v3_
 - No train, validation or test metric files were found.
 - No AIT data or labels were accessed; `run_state/completed_steps.json` records `ait_accessed=false`.
 - Existing strict/enhanced manifests are not locked releases.
-- The 25 passing tests are contract/smoke tests, not the required 80-unit/10-integration V3 suite.
+- The 26 passing tests are contract/smoke tests, not the required 80-unit/10-integration V3 suite.
 
 The current project report must therefore say: “核心模块接口和 smoke/contract 测试已建立；真实 M0-M6 训练、锁定发布和 AIT 评估尚未完成。”

@@ -1,7 +1,7 @@
 {
-  "git_commit": "ade44de4a05c4d30eedd3a4ba847034c1a184e72",
+  "git_commit": "5219dee",
   "full_test_command": ".venv/bin/python -m pytest -q",
-  "full_test_result": "25 passed, 3 warnings",
+  "full_test_result": "26 passed, 3 warnings",
   "collected_test_files": 11,
   "source_modules": [
     "src/parsers/m0_drain.py", "src/semantic/m1_normalizer.py", "src/entities/m2_resolver.py",
@@ -10,7 +10,7 @@
     "src/training/v3_runner.py", "src/data/adapters.py", "src/pipeline/source_preprocess.py"
   ],
   "real_checkpoints": [],
-  "metric_files": [],
+  "metric_files": ["outputs/source_validation/m0_heldout.json"],
   "prediction_files": [],
   "release_manifests": ["outputs/release_strict/release_manifest.json", "outputs/release_enhanced/release_manifest.json"],
   "ait_accessed": false,

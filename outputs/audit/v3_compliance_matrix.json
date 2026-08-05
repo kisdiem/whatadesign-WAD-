@@ -2,9 +2,9 @@
   "audit_version": "v3_compliance_audit_2026-08-06",
   "source_spec": "C:/Users/sixth/Desktop/跨域语义图APT检测_完整Codex执行报告_V3.txt",
   "audit_instruction": "C:/Users/sixth/Desktop/1.txt",
-  "git_commit": "ade44de4a05c4d30eedd3a4ba847034c1a184e72",
+  "git_commit": "5219dee",
   "test_command": ".venv/bin/python -m pytest -q",
-  "test_result": "25 passed, 3 warnings",
+  "test_result": "26 passed, 3 warnings",
   "items": [
     {"id":"M0","status":"PARTIAL","requirement":"Drain3 baseline/main parser, masking, fingerprint/cache, held-out evaluation and EPS/accuracy metrics.","implementation":"Drain3 parser now includes safe masking, template fingerprints, versioned cache save/load and metric primitives; held-out fixture, variable-span scoring and persistent EPS report are still incomplete.","code_files":["src/parsers/m0_drain.py","src/parsers/m0_metrics.py","src/common/schema.py"],"symbols":["M0DrainParser","safe_mask","template_fingerprint","save_cache","load_cache","evaluate_m0","RawRecord","SyntaxParse"],"configs":[],"tests":["tests/unit/test_m0_contract.py"],"commands":[".venv/bin/python -m pytest -q tests/unit/test_m0_contract.py",".venv/bin/python -m pytest -q"],"outputs":["outputs/source_validation/m0_smoke.json","outputs/source_validation/m0_template_cache.json"],"missing":"M0 held-out system test, variable-span F1 and durable EPS/accuracy report.","fix":"Add gold-template fixture, held-out command and metric artifact writer."},
     {"id":"M1","status":"DEVIATED","requirement":"DeBERTa multi-task semantic encoder with BIO, roles, outcomes, prototypes and OOD metrics.","implementation":"Rule/keyword normalizer with optional TaxonomyProvider; no DeBERTa, BIO, prototype/OOD training or source-held-out semantic metrics.","code_files":["src/semantic/m1_normalizer.py","src/common/schema.py"],"symbols":["M1SemanticNormalizer","TaxonomyProvider","EventFrame"],"configs":[],"tests":["tests/unit/test_m1_contract.py"],"commands":[".venv/bin/python -m pytest -q"],"outputs":[],"missing":"Required learned semantic encoder and metric artifacts.","fix":"Either implement the specified multi-task model or maintain a formal reduced protocol."},
