@@ -67,6 +67,10 @@ class M3EventGraphBuilder:
             self._add_edge(edges, event_id, action_id, "has_action", frame)
         return EventGraph(window_id, self._format(start), self._format(end), tuple(nodes.values()), tuple(edges.values()))
 
+    def build_before_current_event(self, frames: Iterable[tuple[EventFrame, list[ResolvedEntity]]], current_record_id: str) -> EventGraph:
+        """Build history graph with the current event excluded by record ID."""
+        return self.build((row for row in frames if row[0].record_id != current_record_id))
+
     def _add_edge(self, edges: dict[tuple[str, str, str], GraphEdge], source: str, target: str, relation: str, frame: EventFrame) -> None:
         key = (source, target, relation)
         old = edges.get(key)
