@@ -83,10 +83,11 @@ datasets:
     role: windows_semantic_and_entity_source
     tier: 0
     official_url: https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES
-    status: not_accessed
+    status: downloaded
+    local_path: /root/autodl-tmp/semantic-graph-apt/data/replacement_sources/evtx
     allowed_label_usage: technique_candidate_only_source_domain
     prohibited_usage: direct_ait_label_or_campaign_label
-    notes: selected Windows EVTX samples; ATT&CK folder names are weak candidates, not labels
+    notes: selected six tactic directories; 214 EVTX files extracted; archive SHA256 d46ac602147758aba047b0276590a672f125ebde8f7a61a757dd3580be4a21ad; ATT&CK folder names are weak candidates, not labels
   lid_ds_selected:
     display_name: LID-DS selected scenarios
     role: linux_entity_sequence_and_source_head
