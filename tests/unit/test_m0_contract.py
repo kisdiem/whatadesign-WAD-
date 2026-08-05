@@ -23,3 +23,21 @@ def test_parse_lines_skips_empty_lines(tmp_path: Path):
     path.write_text("a\n\n b\n", encoding="utf-8")
     rows = list(M0DrainParser().parse_lines("d", path))
     assert len(rows) == 2
+
+
+def test_safe_mask_preserves_security_constants():
+    masked = M0DrainParser.safe_mask("EventID=4624 status=Success from 10.0.0.1 id=123")
+    assert "EventID=4624" in masked
+    assert "status=Success" in masked
+    assert "<IP>" in masked
+    assert "id=<NUM>" in masked
+
+
+def test_template_fingerprint_and_cache_round_trip(tmp_path: Path):
+    parser = M0DrainParser()
+    parsed = parser.parse(RawRecord("d", "f.log", 1, None, "login from 10.0.0.1", parser.VERSION))
+    assert parsed.fields["template_fingerprint"] == M0DrainParser.template_fingerprint(parsed.fields["template"])
+    path = tmp_path / "cache.json"
+    parser.save_cache(path)
+    loaded = M0DrainParser.load_cache(path)
+    assert loaded["templates"] == parser.catalog()["templates"]
