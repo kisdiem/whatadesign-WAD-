@@ -1,0 +1,15 @@
+schema_version: v3-models-1
+cache_root: ${MODEL_CACHE_ROOT}
+models:
+  m1:
+    id: microsoft/deberta-v3-base
+    mode: finetune
+    expected_hidden_size: 768
+  m4:
+    id: Qwen/Qwen3-1.7B-Base
+    mode: frozen
+    expected_hidden_size: 2048
+  m4_smoke:
+    id: Qwen/Qwen3-0.6B-Base
+    mode: frozen
+    release_eligible: false
