@@ -1,143 +1,203 @@
-schema_version: v3_data_registry_1
+schema_version: v3_data_registry_2
+generated_at: '2026-08-06T14:43:09.947601+00:00'
 datasets:
   loghub_2_0:
+    dataset_id: loghub_2_0
     display_name: LogHub-2.0
     role: m0_template_source
     tier: 0
-    official_url: https://zenodo.org/records/8275861
+    official_url: https://github.com/logpai/loghub-2.0
+    repository_url: https://github.com/logpai/loghub-2.0
+    version: unfixed-source-observation
+    license: see_official_source
+    expected_files: []
+    expected_size: null
+    checksum: 0e51c532c9b82b49234f5691ed96d7b584eaeef9f35839b9c365769a80294705
+    download_method: official_source_only
+    requires_manual_acceptance: false
+    allowed_label_usage: template_only
+    prohibited_usage: no_apt_labels
+    parser: drain3
     status: verified
-    local_path: /root/autodl-tmp/ait-garnet-demo-external/data/external_raw/loghub_2.0
-    allowed_label_usage: template_and_sequence_only
-    prohibited_usage: apt_supervised_label
-    notes: official archives uploaded and SHA256 verified; raw full.log subset is 6682987178 bytes
-  ocsf_schema:
-    display_name: OCSF schema
+    local_path: /root/autodl-tmp/ait-garnet-demo-external/data/external_raw/Apache_2k.log
+    notes: 2k smoke subset only
+  ocsf:
+    dataset_id: ocsf
+    display_name: OCSF schema and examples
     role: semantic_taxonomy
     tier: 0
     official_url: https://github.com/ocsf/ocsf-schema
+    repository_url: https://github.com/ocsf/ocsf-schema
+    version: unfixed-source-observation
+    license: see_official_source
+    expected_files: []
+    expected_size: null
+    checksum: null
+    download_method: official_source_only
+    requires_manual_acceptance: false
+    allowed_label_usage: schema_only
+    prohibited_usage: no_target_labels
+    parser: git_schema
     status: verified
     local_path: /root/autodl-tmp/ait-garnet-demo-external/data/external_subsets/ocsf-schema
-    allowed_label_usage: schema_and_examples
-    prohibited_usage: target_label_generation
-  hdfs_bgl:
-    display_name: HDFS and BGL
-    role: sequence_pretraining_and_baseline
-    tier: 0
-    official_url: https://zenodo.org/records/8275861
-    status: verified
-    local_path: /root/autodl-tmp/ait-garnet-demo-external/data/external_raw/loghub_2.0/extracted
-    allowed_label_usage: system_anomaly_pretraining_only
-    prohibited_usage: apt_label
-    notes: anomaly labels are not treated as APT labels
+    notes: ''
   splunk_attack_data:
+    dataset_id: splunk_attack_data
     display_name: Splunk Attack Data
-    role: semantic_and_event_source
+    role: semantic_event_source
     tier: 0
     official_url: https://github.com/splunk/attack_data
-    status: unavailable
-    allowed_label_usage: source_domain_only
-    prohibited_usage: none_until_verified
-    notes: not present on server; no silent mirror substitution
-  otrf_security_datasets:
-    display_name: OTRF Security Datasets
-    role: semantic_source
+    repository_url: https://github.com/splunk/attack_data
+    version: unfixed-source-observation
+    license: see_official_source
+    expected_files: []
+    expected_size: null
+    checksum: null
+    download_method: official_source_only
+    requires_manual_acceptance: false
+    allowed_label_usage: weak_source_domain
+    prohibited_usage: no_ait_labels
+    parser: splunk_yaml_log
+    status: downloaded
+    local_path: /root/autodl-tmp/semantic-graph-apt/data/processed_available/splunk_attack_data
+    notes: ''
+  hdfs_bgl:
+    dataset_id: hdfs_bgl
+    display_name: HDFS and BGL
+    role: sequence_pretraining
     tier: 0
-    official_url: https://github.com/OTRF/Security-Datasets
-    status: unavailable
+    official_url: https://github.com/logpai/loghub-2.0
+    repository_url: https://github.com/logpai/loghub-2.0
+    version: unfixed-source-observation
+    license: see_official_source
+    expected_files: []
+    expected_size: null
+    checksum: null
+    download_method: official_source_only
+    requires_manual_acceptance: false
+    allowed_label_usage: system_anomaly_pretraining_only
+    prohibited_usage: not_apt_labels
+    parser: loghub_text
+    status: verified
+    local_path: /root/autodl-tmp/ait-garnet-demo-external/data/external_raw
+    notes: ''
+  ctu13_selected:
+    dataset_id: ctu13_selected
+    display_name: CTU-13 selected flows
+    role: network_source
+    tier: 1
+    official_url: https://mcfp.felk.cvut.cz/publicDatasets/CTU-Normal-13/
+    repository_url: https://mcfp.felk.cvut.cz/publicDatasets/CTU-Normal-13/
+    version: unfixed-source-observation
+    license: see_official_source
+    expected_files: []
+    expected_size: null
+    checksum: null
+    download_method: official_source_only
+    requires_manual_acceptance: false
     allowed_label_usage: source_domain_only
-    prohibited_usage: none_until_verified
+    prohibited_usage: no_ait_labels
+    parser: ctu13_csv
+    status: downloaded
+    local_path: /root/autodl-tmp/semantic-graph-apt/data/ctu13_full_extracted
+    notes: full archive extraction in progress
+  sandworm_flow:
+    dataset_id: sandworm_flow
+    display_name: Sandworm labelled flow
+    role: network_validation_source
+    tier: 1
+    official_url: https://doi.org/10.5281/zenodo.16911636
+    repository_url: https://doi.org/10.5281/zenodo.16911636
+    version: unfixed-source-observation
+    license: see_official_source
+    expected_files: []
+    expected_size: null
+    checksum: null
+    download_method: official_source_only
+    requires_manual_acceptance: false
+    allowed_label_usage: source_validation_only
+    prohibited_usage: no_target_label_generation
+    parser: sandworm_csv
+    status: downloaded
+    local_path: /root/autodl-tmp/semantic-graph-apt/data/replacement_sources/sandworm
+    notes: ''
   lanl_comprehensive:
+    dataset_id: lanl_comprehensive
     display_name: LANL Comprehensive Multi-Source
-    role: entity_graph_and_source_head
+    role: entity_graph_source
     tier: 1
     official_url: https://csr.lanl.gov/data/cyber1/
+    repository_url: https://csr.lanl.gov/data/cyber1/
+    version: unfixed-source-observation
+    license: see_official_source
+    expected_files: []
+    expected_size: null
+    checksum: null
+    download_method: official_source_only
+    requires_manual_acceptance: false
+    allowed_label_usage: source_domain_only
+    prohibited_usage: no_ait_labels
+    parser: lanl_stream
     status: unavailable
-    allowed_label_usage: source_domain_training_only
-    prohibited_usage: ait_label_or_target_tuning
+    local_path: ''
+    notes: official files not obtained
   darpa_tc:
+    dataset_id: darpa_tc
     display_name: DARPA Transparent Computing
-    role: graph_and_long_horizon_source
+    role: graph_long_horizon_source
     tier: 1
     official_url: https://github.com/darpa-i2o/Transparent-Computing
+    repository_url: https://github.com/darpa-i2o/Transparent-Computing
+    version: unfixed-source-observation
+    license: see_official_source
+    expected_files: []
+    expected_size: null
+    checksum: null
+    download_method: official_source_only
+    requires_manual_acceptance: false
+    allowed_label_usage: source_domain_only
+    prohibited_usage: no_ait_labels
+    parser: darpa_cdm
     status: unavailable
-    allowed_label_usage: source_domain_training_only
-    prohibited_usage: ait_label_or_target_tuning
+    local_path: ''
+    notes: manual download required
   ait_lds_v2:
+    dataset_id: ait_lds_v2
     display_name: AIT-LDSv2.0
     role: target_test
     tier: target
     official_url: https://zenodo.org/records/5789064
-    status: not_accessed
+    repository_url: https://zenodo.org/records/5789064
+    version: unfixed-source-observation
+    license: see_official_source
+    expected_files: []
+    expected_size: null
+    checksum: null
+    download_method: official_source_only
+    requires_manual_acceptance: false
     allowed_label_usage: evaluation_only_p1
-    prohibited_usage: training_early_stop_threshold_or_rework
+    prohibited_usage: training_or_tuning
+    parser: ait_sealed_adapter
+    status: metadata_only
+    local_path: ''
+    notes: AIT not accessed
   ait_ads:
+    dataset_id: ait_ads
     display_name: AIT-ADS
     role: target_test
     tier: target
     official_url: https://zenodo.org/records/8263181
-    status: not_accessed
+    repository_url: https://zenodo.org/records/8263181
+    version: unfixed-source-observation
+    license: see_official_source
+    expected_files: []
+    expected_size: null
+    checksum: null
+    download_method: official_source_only
+    requires_manual_acceptance: false
     allowed_label_usage: evaluation_only_p1
-    prohibited_usage: training_early_stop_threshold_or_rework
-  evtx_attack_samples:
-    display_name: EVTX ATTACK SAMPLES
-    role: windows_semantic_and_entity_source
-    tier: 0
-    official_url: https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES
-    status: downloaded
-    local_path: /root/autodl-tmp/semantic-graph-apt/data/replacement_sources/evtx
-    allowed_label_usage: technique_candidate_only_source_domain
-    prohibited_usage: direct_ait_label_or_campaign_label
-    notes: selected six tactic directories; 214 EVTX files extracted; archive SHA256 d46ac602147758aba047b0276590a672f125ebde8f7a61a757dd3580be4a21ad; ATT&CK folder names are weak candidates, not labels
-  lid_ds_selected:
-    display_name: LID-DS selected scenarios
-    role: linux_entity_sequence_and_source_head
-    tier: 1
-    official_url: https://www.lid-ds.com/
-    status: not_accessed
-    allowed_label_usage: source_domain_training_only
-    prohibited_usage: ait_label_or_target_tuning
-    notes: select chronological normal and attack runs; preserve run and scenario scope
-  streamspot:
-    display_name: StreamSpot
-    role: graph_smoke_baseline
-    tier: 1
-    official_url: https://sbustreamspot.github.io/
-    status: not_accessed
-    allowed_label_usage: graph_baseline_only
-    prohibited_usage: darpa_provenance_claim_or_ait_label
-  ctu13_selected:
-    display_name: CTU-13 selected bidirectional NetFlow
-    role: network_entity_and_long_horizon_source
-    tier: 1
-    official_url: https://mcfp.felk.cvut.cz/publicDatasets/CTU-Normal-13/
-    status: not_accessed
-    allowed_label_usage: source_domain_training_only
-    prohibited_usage: full_apt_campaign_claim_or_ait_label
-    notes: select three scenarios and chronological flow ranges; do not use raw PCAP
-  sandworm_flow:
-    display_name: APT Sandworm labelled flow CSV
-    role: network_source_held_out_validation
-    tier: 1
-    official_url: https://doi.org/10.5281/zenodo.16911636
-    status: downloaded
-    local_path: /root/autodl-tmp/semantic-graph-apt/data/replacement_sources/sandworm/SandwormAPT_flow_labelled.csv
-    allowed_label_usage: source_domain_validation_only
-    prohibited_usage: target_label_generation_or_full_campaign_claim
-    notes: use labelled flow CSV only; PCAP is intentionally excluded; SHA256 c2669e324fe94076a148d2942e86be97acfd7f39322e89bf267c554c530330b4
-  cam_lds_filtered:
-    display_name: CAM-LDS manifestations filtered
-    role: enhanced_same_organization_external_source
-    tier: external_enhanced
-    official_url: https://doi.org/10.5281/zenodo.18861762
-    status: not_accessed
-    allowed_label_usage: p1_e_external_supplement_only
-    prohibited_usage: p1_s_strict_result_or_ait_target_tuning
-    notes: must be reported separately as P1-E because of same-organization and sensor overlap risk
-  adfa_ld:
-    display_name: ADFA-LD
-    role: small_sequence_baseline
-    tier: 2
-    official_url: https://research.unsw.edu.au/projects/adfa-ids-datasets
-    status: not_accessed
-    allowed_label_usage: baseline_only
-    prohibited_usage: semantic_graph_or_ait_label
+    prohibited_usage: training_or_tuning
+    parser: ait_sealed_adapter
+    status: metadata_only
+    local_path: ''
+    notes: AIT not accessed

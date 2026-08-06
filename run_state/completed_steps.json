@@ -1,7 +1,12 @@
 {
-  "schema_version": "v3_run_state_1",
-  "ait_accessed": false,
-  "completed_steps": [],
-  "in_progress": "A00_environment_and_registry",
-  "failures": []
+  "A00": "COMPLETED",
+  "A01": "COMPLETED",
+  "A02": "COMPLETED",
+  "B01": "COMPLETED",
+  "B02": "PASSED",
+  "C01": "COMPLETED",
+  "C02": "COMPLETED",
+  "C04": "BLOCKED_MISSING_DATA",
+  "C05": "BLOCKED_MISSING_DATA",
+  "AIT": "NOT_ACCESSED"
 }
