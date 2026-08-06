@@ -1,20 +1,11 @@
 {
-  "git_commit": "5219dee",
-  "full_test_command": ".venv/bin/python -m pytest -q",
-  "full_test_result": "26 passed, 3 warnings",
-  "collected_test_files": 11,
-  "source_modules": [
-    "src/parsers/m0_drain.py", "src/semantic/m1_normalizer.py", "src/entities/m2_resolver.py",
-    "src/graph/m3_graph.py", "src/models/m4_qformer.py", "src/temporal/m5_long_horizon.py", "src/parsers/m0_metrics.py",
-    "src/fusion/m6_hierarchical.py", "src/training/splits.py", "src/training/leakage_audit.py",
-    "src/training/v3_runner.py", "src/data/adapters.py", "src/pipeline/source_preprocess.py"
-  ],
+  "git_commit": "601f374",
+  "test_result": "93 passed, 4 warnings",
+  "strict_contracts": ["common schema", "M0 parser/cache/quarantine", "M1 backbone and heads", "M2 scoped resolver", "M3 causal graph", "M4 Qwen adapter", "M5 window/queue boundaries", "M6 frozen feature boundary", "AIT target-only gate"],
   "real_checkpoints": [],
-  "metric_files": ["outputs/source_validation/m0_heldout.json"],
+  "metric_files": [],
   "prediction_files": [],
-  "release_manifests": ["outputs/release_strict/release_manifest.json", "outputs/release_enhanced/release_manifest.json"],
+  "locked_release": false,
   "ait_accessed": false,
-  "completed_steps": [],
-  "in_progress": "A00_environment_and_registry",
-  "uncommitted_generated_artifacts": [".venv/", "logs/", "outputs/", "__pycache__/", "tests/unit/test_m3_contract.py"]
+  "status": "contract_implemented_training_blocked_by_data"
 }

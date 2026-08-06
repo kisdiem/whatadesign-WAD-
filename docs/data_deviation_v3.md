@@ -1,11 +1,9 @@
 # V3 Data Deviation Record
 
-| Original source | Status | Current substitute/status | Compensated capability | Uncompensated capability | Impact |
-|---|---|---|---|---|---|
-| Splunk Attack Data | unavailable | EVTX ATTACK SAMPLES | Windows event semantics | Splunk sourcetype/attack metadata diversity | M1 reduced |
-| OTRF Security-Datasets | unavailable | LogHub/EVTX/Sandworm where applicable | Basic event-source coverage | Original OTRF provenance and metadata | M1/M3 reduced |
-| LANL Comprehensive | unavailable | CERT planned; LANL adapter only | Long-horizon behavior may be partially covered by CERT | Unified enterprise auth/proc/DNS/flow identity space | M2/M5 reduced |
-| DARPA Transparent Computing | unavailable | CTU-13 planned plus EVTX/Sandworm | Network continuity and endpoint events | Provenance graph and DARPA attack timeline semantics | M3/M5 reduced |
-| AIT LDS/ADS | not accessed | none; remains target | none yet | Target evaluation unavailable | P1 blocked by data |
+Current protocol remains `P1-S-reduced-development`. This code-only round did not download or read datasets and did not train models.
 
-The release must be named `P1-S-reduced` or `V3-fallback`, never full V3 source release.
+The planned source route is the replacement combination already agreed for the current project: CERT long-term behavior, existing EVTX entity relations, CTU-13 network continuity, and Sandworm attack-window validation. AIT LDS v2 remains target-only and is excluded from training, threshold selection, calibration, feature selection, model selection, and ablation selection.
+
+LANL is not part of the current training route. Any LANL adapter retained in the repository is historical compatibility code only and must not be interpreted as current training evidence.
+
+No dataset deviation is being silently promoted to a result: the data status remains `BLOCKED_BY_DATA` until manifests, licenses, checksums, source-held-out splits, and real records are supplied.

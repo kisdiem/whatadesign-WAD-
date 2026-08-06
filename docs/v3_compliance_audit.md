@@ -1,49 +1,35 @@
 # V3 Compliance Audit
 
-Audit source: `C:\Users\sixth\Desktop\跨域语义图APT检测_完整Codex执行报告_V3.txt`  
-Audit instruction: `C:\Users\sixth\Desktop\1.txt`  
-Commit: `5219dee`  
-Command: `.venv/bin/python -m pytest -q`  
-Result: `26 passed, 3 warnings`
+Audit sources: `1.txt` and `跨域语义图APT检测_完整Codex执行报告_V3.txt`.
 
-## Executive finding
+Audit commit: `601f374`  
+Test command: `.venv/bin/python -m pytest -q`  
+Result: `93 passed, 4 warnings` (`83` unit, `10` integration).
 
-The repository contains contract-level M0-M6 modules, source splitting, leakage checks, data adapters, a generic M4-M6 runner, and a partially strengthened M0 parser with masking/fingerprint/cache primitives. It does not contain the original V3 trained system, real M0-M6 checkpoints, source-domain metrics, AIT predictions, locked release gates, baseline results or ablations.
+## Current truth
 
-The detailed ten-field evidence for every required item is in `outputs/audit/v3_compliance_matrix.json`. The implementation inventory is in `outputs/audit/implementation_inventory.json`.
+This change completes the requested code contracts, module boundaries, strict protocol interfaces, and synthetic tests. It does **not** complete real training, real checkpoint production, source-domain metrics, or AIT evaluation. No fake checkpoint, metric, prediction, or AIT result was generated.
 
-## Status summary
+`current_protocol=P1-S-reduced-development`  
+`complete_v3=false`  
+`real_training_completed=false`  
+`real_checkpoints_available=false`  
+`locked_release_available=false`  
+`ait_status=TARGET_EVALUATION_PENDING`
 
-| Area | Status |
-|---|---|
-| M0 | PARTIAL |
-| M1 | DEVIATED |
-| M2 | PARTIAL |
-| Graph construction | PARTIAL |
-| M3 graph training | INTERFACE_ONLY |
-| M4 | DEVIATED |
-| M5 | PARTIAL |
-| M6 | PARTIAL |
-| Data | DEVIATED |
-| source-held-out | IMPLEMENTED_AND_TESTED |
-| leakage | PARTIAL |
-| threshold/calibration | MISSING |
-| locked release | PARTIAL |
-| AIT P1 | BLOCKED_BY_DATA |
-| baselines | MISSING |
-| ablations | MISSING |
-| metrics | MISSING |
-| unit tests | IMPLEMENTED_NOT_TESTED |
-| integration tests | MISSING |
-| output files | PARTIAL |
-| raw evidence traceability | PARTIAL |
+## Key implementation changes
 
-## Evidence limits
+- Versioned `RawRecord`, `SyntaxParse`, `EventFrame`, `EntityRecord`, `GraphRecord`, and `FrozenFeatureRecord` contracts with provenance and compatibility aliases.
+- M0 adapter/parser/cache/quarantine interfaces; parsing failures are explicit and traceable.
+- M1 DeBERTa adapter and multitask-head boundary; mock mode is explicit and never claims a loaded model.
+- Dataset-scoped M2 IDs, typed normalization, pair resolver, and entity memory.
+- Global graph vocabularies and causal history builder ordered by timestamp, source file, source line, and record ID.
+- Qwen3 adapter boundary with explicit mock/pretrained/frozen/lora modes and hard load failures.
+- M5 stage boundaries for windows, candidates, evidence, hard negatives, queue management, and exports.
+- M6 frozen-feature exporter, feature validation, source-only calibration/threshold interfaces, and M6-only runner.
+- Independent stage scripts and target-only AIT adapter/guard/scorer interfaces.
+- 83 unit and 10 integration tests covering the strict synthetic path and protocol failures.
 
-- No real checkpoint files were found.
-- No train, validation or test metric files were found.
-- No AIT data or labels were accessed; `run_state/completed_steps.json` records `ait_accessed=false`.
-- Existing strict/enhanced manifests are not locked releases.
-- The 26 passing tests are contract/smoke tests, not the required 80-unit/10-integration V3 suite.
+## Remaining blocked work
 
-The current project report must therefore say: “核心模块接口和 smoke/contract 测试已建立；真实 M0-M6 训练、锁定发布和 AIT 评估尚未完成。”
+Real source data, dependency weights, training batches, source-held-out metrics, calibration/threshold artifacts, real checkpoints, locked release, and post-seal AIT inference/scoring remain blocked until data and model training are intentionally supplied.
