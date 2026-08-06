@@ -60,6 +60,20 @@ def main() -> None:
             ctu = next((item for item in config.get("data_sources", []) if item.get("adapter") == "ctu13"), None)
             if ctu and ctu.get("enabled") and not _readable_path(str(ctu.get("root", ""))):
                 reasons.append("CTU-13 stable conversion prerequisite is unavailable")
+            if ctu and ctu.get("enabled"):
+                ctu_root = Path(str(ctu.get("root", "")))
+                manifests = [
+                    ctu_root / "ctu13_conversion_manifest.json",
+                    ctu_root.parent / "ctu13_conversion_manifest.json",
+                    Path("outputs/data/ctu13_conversion_manifest.json"),
+                ]
+                if not any(path.is_file() for path in manifests):
+                    reasons.append("CTU-13 full stable conversion manifest is missing")
+            if not Path("outputs/source/source_smoke_run/splits.json").is_file():
+                reasons.append("source split evidence is missing")
+            if not Path("outputs/source/source_smoke_run/labels.jsonl").is_file():
+                reasons.append("source label-contract evidence is missing")
+            reasons.append("formal source stage contracts/calibration/release preflight are not complete")
 
         if reasons:
             status = "BLOCKED_MISSING_DATA" if missing_sources else "BLOCKED_INCOMPLETE_PREPROCESSING"
