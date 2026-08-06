@@ -48,7 +48,7 @@ def main():
         expected = spec.get("expected_hidden_size")
         if expected is not None and hidden != expected:
             raise RuntimeError(f"{repo_id}: hidden_size={hidden}, expected={expected}")
-        files = {str(path.relative_to(target)): sha256(path) for path in target.rglob("*") if path.is_file()}
+        files = {str(path.relative_to(target)): sha256(path) for path in target.rglob("*") if path.is_file() and ".cache" not in path.parts}
         result["models"][name] = {"id": repo_id, "revision": info.sha, "mode": spec["mode"], "hidden_size": hidden, "files": files, "release_eligible": spec.get("release_eligible", False)}
     (root / "model_download_manifest.json").write_text(json.dumps(result, indent=2, sort_keys=True), encoding="utf-8")
     print(json.dumps({"status": result["status"], "models": {key: {"id": value["id"], "revision": value["revision"], "hidden_size": value["hidden_size"]} for key, value in result["models"].items()}}, indent=2))
