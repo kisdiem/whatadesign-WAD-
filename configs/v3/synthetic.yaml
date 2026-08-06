@@ -1,0 +1,6 @@
+schema_version: v3-config-1
+execution_mode: synthetic
+seed: 42
+device: cpu
+model_cache: ""
+data_sources: []

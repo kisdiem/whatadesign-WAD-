@@ -1,0 +1,21 @@
+schema_version: v3-config-1
+execution_mode: source
+seed: 42
+device: cuda
+model_cache: ${MODEL_CACHE}
+data_sources:
+  - id: evtx_attack_samples
+    adapter: evtx
+    root: ${EVTX_ROOT}
+    enabled: true
+    label_source: technique_candidate_only
+  - id: ctu13_selected
+    adapter: ctu13
+    root: ${CTU13_ROOT}
+    enabled: true
+    label_source: source_domain_only
+  - id: sandworm_flow
+    adapter: sandworm
+    root: ${SANDWORM_ROOT}
+    enabled: true
+    label_source: source_domain_validation_only

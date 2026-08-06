@@ -1,0 +1,6 @@
+schema_version: v3-config-1
+execution_mode: source
+seed: 42
+device: cpu
+model_cache: ${MODEL_CACHE}
+data_sources: []

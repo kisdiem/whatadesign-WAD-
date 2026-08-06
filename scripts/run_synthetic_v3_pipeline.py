@@ -25,6 +25,7 @@ from src.semantic.m1_pipeline import M1RulePipeline
 from src.temporal.m5_long_horizon import M5Config, M5LongHorizonLinker, build_attack_queues
 from src.temporal.window_aggregation import WindowAggregator
 from src.training.m6_development import train_development
+from src.pipeline.pipeline_config import load_config
 
 
 def manifest(work: Path, stage: str, inputs: list[Path], outputs: list[Path], count: int, rejected: int = 0, trained: bool = False):
@@ -37,9 +38,18 @@ def write_objects(path: Path, rows):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--config", default=None)
     parser.add_argument("--work-dir", required=True)
-    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--seed", type=int, default=None)
     args = parser.parse_args()
+    if args.config:
+        config, _ = load_config(args.config)
+        if config.get("execution_mode") != "synthetic":
+            raise ValueError("synthetic pipeline requires execution_mode=synthetic")
+        if args.seed is None:
+            args.seed = int(config.get("seed", 42))
+    if args.seed is None:
+        args.seed = 42
     random.seed(args.seed); torch.manual_seed(args.seed)
     work = Path(args.work_dir); work.mkdir(parents=True, exist_ok=True)
     fixture = Path(__file__).resolve().parents[1] / "tests/fixtures/synthetic/source.log"
