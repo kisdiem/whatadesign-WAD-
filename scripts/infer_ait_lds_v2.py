@@ -1,3 +1,4 @@
+import _bootstrap
 import argparse
 from pathlib import Path
 from src.evaluation.protocol_gates import require_locked_release

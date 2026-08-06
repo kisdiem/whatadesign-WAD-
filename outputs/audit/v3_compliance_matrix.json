@@ -1,12 +1,12 @@
 {
   "audit_version": "v3_compliance_audit_2026-08-06",
-  "git_commit": "601f374",
-  "test_result": "93 passed, 4 warnings",
+  "git_commit": "pending",
+  "test_result": "97 passed, 4 warnings",
   "statuses": {
-    "M0": "IMPLEMENTED_AND_TESTED",
+    "M0": "PARTIAL",
     "M1": "PARTIAL",
-    "M2": "IMPLEMENTED_AND_TESTED",
-    "GRAPH": "IMPLEMENTED_AND_TESTED",
+    "M2": "PARTIAL",
+    "GRAPH": "PARTIAL",
     "M3": "PARTIAL",
     "M4": "PARTIAL",
     "M5": "PARTIAL",

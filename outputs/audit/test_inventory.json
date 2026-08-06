@@ -1,8 +1,8 @@
 {
-  "git_commit": "601f374",
+  "git_commit": "pending",
   "command": ".venv/bin/python -m pytest -q",
-  "result": "93 passed, 4 warnings",
-  "unit_tests_collected": 83,
+  "result": "97 passed, 4 warnings",
+  "unit_tests_collected": 87,
   "integration_tests_collected": 10,
   "real_data_used": false,
   "fake_checkpoints_generated": false,

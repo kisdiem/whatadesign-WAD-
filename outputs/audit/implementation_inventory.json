@@ -1,6 +1,6 @@
 {
-  "git_commit": "601f374",
-  "test_result": "93 passed, 4 warnings",
+  "git_commit": "pending",
+  "test_result": "97 passed, 4 warnings",
   "strict_contracts": ["common schema", "M0 parser/cache/quarantine", "M1 backbone and heads", "M2 scoped resolver", "M3 causal graph", "M4 Qwen adapter", "M5 window/queue boundaries", "M6 frozen feature boundary", "AIT target-only gate"],
   "real_checkpoints": [],
   "metric_files": [],

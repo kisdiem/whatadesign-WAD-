@@ -12,6 +12,8 @@ from src.models.m4_backbone_adapter import QwenBackboneAdapter
 from src.parsers.m0_parser import M0Parser
 from src.fusion.thresholds import fit_threshold
 from src.protocol.target_access_guard import TargetAccessGuard
+from src.protocol.state_machine import ProtocolState, ProtocolStateMachine
+from src.common.manifest import StageManifest
 
 
 def _event(record_id, ts, action="read"):
@@ -99,6 +101,30 @@ def test_target_guard_rejects_label_attributes():
 
 def test_target_guard_accepts_raw_record():
     TargetAccessGuard().assert_unlabeled(RawRecord("ait", "x", 1, None, "x", "target", "adapter"))
+
+
+def test_protocol_state_machine_requires_order():
+    machine = ProtocolStateMachine()
+    machine.transition(ProtocolState.SOURCE_FROZEN)
+    with pytest.raises(ValueError): machine.transition(ProtocolState.TARGET_INFERENCE_STARTED)
+
+
+def test_protocol_state_machine_reaches_label_gate_only_after_seal():
+    machine = ProtocolStateMachine()
+    for state in (ProtocolState.SOURCE_FROZEN, ProtocolState.RELEASE_LOCKED, ProtocolState.TARGET_INFERENCE_STARTED, ProtocolState.PREDICTIONS_SEALED, ProtocolState.LABEL_SCORING_ALLOWED):
+        machine.transition(state)
+    machine.require(ProtocolState.LABEL_SCORING_ALLOWED)
+
+
+def test_manifest_serialization_has_provenance(tmp_path):
+    path = StageManifest("m0", "COMPLETED", "abc", real_data_used=True).write(tmp_path / "manifest.json")
+    payload = path.read_text(encoding="utf-8")
+    assert "abc" in payload and "schema_version" in payload and "real_data_used" in payload
+
+
+def test_m4_strict_batch_rejects_current_history():
+    from src.models.m4_batch import M4StrictBatch
+    with pytest.raises(ValueError): M4StrictBatch("r", "d", ({"record_id": "r"},), None, {"record_id": "r"}, None, {}, None)
 
 
 @pytest.mark.parametrize("module_name", ["m0", "m1", "m2", "m3", "m4", "m5", "m6", "schema", "graph", "entity", "window", "fusion", "release", "ait", "source", "cache", "audit", "manifest", "provenance", "serialization"])

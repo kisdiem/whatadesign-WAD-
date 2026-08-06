@@ -1,3 +1,4 @@
+import _bootstrap
 import argparse
 from src.evaluation.protocol_gates import seal_predictions
 def main():

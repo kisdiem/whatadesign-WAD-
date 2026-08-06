@@ -2,9 +2,9 @@
 
 Audit sources: `1.txt` and `跨域语义图APT检测_完整Codex执行报告_V3.txt`.
 
-Audit commit: `601f374`  
+Audit commit: pending (strict execution round)  
 Test command: `.venv/bin/python -m pytest -q`  
-Result: `93 passed, 4 warnings` (`83` unit, `10` integration).
+Result: `97 passed, 4 warnings` (`87` unit, `10` integration).
 
 ## Current truth
 
@@ -28,7 +28,8 @@ This change completes the requested code contracts, module boundaries, strict pr
 - M5 stage boundaries for windows, candidates, evidence, hard negatives, queue management, and exports.
 - M6 frozen-feature exporter, feature validation, source-only calibration/threshold interfaces, and M6-only runner.
 - Independent stage scripts and target-only AIT adapter/guard/scorer interfaces.
-- 83 unit and 10 integration tests covering the strict synthetic path and protocol failures.
+- Directly executable stage scripts with input/output hashes and manifests; missing prerequisites fail explicitly.
+- 87 unit and 10 integration tests covering the strict synthetic path and protocol failures.
 
 ## Remaining blocked work
 
