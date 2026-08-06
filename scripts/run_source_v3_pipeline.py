@@ -42,6 +42,10 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def artifact_hashes(work: Path) -> dict[str, str]:
+    return {str(path.relative_to(work)): sha256(path) for path in sorted(work.rglob("*")) if path.is_file() and path.name != "run_manifest.json"}
+
+
 def stage(work: Path, name: str, inputs: list[Path], outputs: list[Path], count: int, **extra) -> None:
     payload = {
         "stage": name,
@@ -187,6 +191,13 @@ def main() -> None:
     config, config_hash = load_config(args.config)
     if config.get("execution_mode") != "source": raise ValueError("source pipeline requires execution_mode=source")
     work = Path(args.work_dir); work.mkdir(parents=True, exist_ok=True)
+    prior_manifest = work / "run_manifest.json"
+    if args.resume and prior_manifest.is_file():
+        prior = json.loads(prior_manifest.read_text(encoding="utf-8"))
+        current_hashes = artifact_hashes(work)
+        if prior.get("status") == "COMPLETED" and prior.get("config_hash") == config_hash and prior.get("artifact_hashes") == current_hashes:
+            print(json.dumps({"status": "SKIPPED_HASH_MATCH", "work_dir": str(work), "config_hash": config_hash}, indent=2))
+            return
     cache = Path(str(config.get("model_cache", "")))
     if not cache.is_dir(): raise RuntimeError("resolved MODEL_CACHE is unavailable")
     records, labels, errors = discover_records(config, work, args.max_records_per_source)
@@ -247,6 +258,7 @@ def main() -> None:
     m6 = train_development(frozen, label_values, work / "m6_development", args.seed, max(1, args.epochs_per_module))
     stage(work, "m6_train", [frozen_path, label_path], [Path(m6["checkpoint"]), work / "m6_development" / "train_history.json"], len(frozen), mode=args.mode, real_training_completed=True)
     manifest = {"status": "COMPLETED", "execution_mode": "source", "mode": args.mode, "config_hash": config_hash, "record_count": len(records), "train_count": len(split["train"]), "validation_count": len(split["validation"]), "test_count": len(split["test"]), "model_smoke": model_result, "ait_accessed": False, "release_eligible": False, "formal_metrics": False, "errors": errors}
+    manifest["artifact_hashes"] = artifact_hashes(work)
     (work / "run_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8"); print(json.dumps(manifest, indent=2))
 
 

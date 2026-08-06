@@ -65,6 +65,7 @@ def main() -> None:
                 manifests = [
                     ctu_root / "ctu13_conversion_manifest.json",
                     ctu_root.parent / "ctu13_conversion_manifest.json",
+                    ctu_root.parent / "ctu13_processed_full" / "ctu13_conversion_manifest.json",
                     Path("outputs/data/ctu13_conversion_manifest.json"),
                 ]
                 if not any(path.is_file() for path in manifests):
