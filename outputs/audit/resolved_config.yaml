@@ -1,0 +1,21 @@
+data_sources:
+- adapter: evtx
+  enabled: true
+  id: evtx_attack_samples
+  label_source: technique_candidate_only
+  root: /root/autodl-tmp/semantic-graph-apt/data/replacement_sources/evtx
+- adapter: ctu13
+  enabled: true
+  id: ctu13_selected
+  label_source: source_domain_only
+  root: /root/autodl-tmp/semantic-graph-apt/data/ctu13_full_extracted
+- adapter: sandworm
+  enabled: true
+  id: sandworm_flow
+  label_source: source_domain_validation_only
+  root: /root/autodl-tmp/semantic-graph-apt/data/replacement_sources/sandworm
+device: cuda
+execution_mode: source
+model_cache: ''
+schema_version: v3-config-1
+seed: 42

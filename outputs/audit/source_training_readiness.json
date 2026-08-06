@@ -1,0 +1,5 @@
+{
+  "config_hash": "e660d15546980b19ecbf06b5209a3b2a06d4dba7e1ba696c2b4f5d27451de3d1",
+  "missing_weights": "MODEL_CACHE is unset",
+  "status": "BLOCKED_MISSING_WEIGHTS"
+}

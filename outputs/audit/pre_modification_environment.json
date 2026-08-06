@@ -1,0 +1,11 @@
+{
+  "git_commit": "2e6abe2e5c795b914013afb88ac54d5a310899c8",
+  "python": "3.12.3 | packaged by Anaconda, Inc. | (main, May  6 2024, 19:46:43) [GCC 11.2.0]",
+  "torch": "2.13.0+cu130",
+  "cuda": "13.0",
+  "cuda_available": true,
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "data_root_exists": true,
+  "model_cache": "/root/semantic-graph-apt/models",
+  "model_cache_exists": false
+}
