@@ -33,6 +33,7 @@ def main():
     release_reasons=[]
     if not test: release_reasons.append("held-out test is empty")
     if sum(int(r["label"]) for r in test) == 0: release_reasons.append("held-out test contains no positive examples; metrics are non-discriminative")
+    if evaluation["recall"] <= 0 or evaluation["f1"] <= 0: release_reasons.append("held-out test has zero recall or F1; model has not detected any positive test record")
     release={"status":"RELEASE_READY" if not release_reasons else "RELEASE_REJECTED","reasons":release_reasons,"formal_metrics":not bool(release_reasons),"ait_accessed":False}; (metrics/"release_preflight.json").write_text(json.dumps(release,indent=2),encoding="utf-8")
     manifest=json.loads((root/"run_manifest.json").read_text(encoding="utf-8")) if (root/"run_manifest.json").is_file() else {}; manifest.update({"mode":"train","formal_metrics":True,"real_training_completed":True,"release_eligible":release["status"]=="RELEASE_READY","ait_accessed":False,"formal_checkpoint":training["checkpoint"],"formal_stage_contract":str(root/"formal_stage_contract.json")}); manifest["artifact_hashes"]={str(x.relative_to(root)):sha256(x) for x in root.rglob("*") if x.is_file() and x.name!="run_manifest.json"}; (root/"run_manifest.json").write_text(json.dumps(manifest,indent=2),encoding="utf-8")
     print(json.dumps({"stage_contract":contract,"calibration":calibration,"evaluation":evaluation,"release_preflight":release},indent=2))

@@ -83,7 +83,12 @@ def _normalize_timestamp(value: str | None) -> str | None:
 def _safe_payload(row: dict[str, str]) -> tuple[dict[str, str], int]:
     label = row.get("Label", row.get("label", row.get("Class", "")))
     clean = {str(k): str(v) for k, v in row.items() if str(k).lower() not in {"label", "class", "attack", "malicious", "ground_truth"}}
-    return clean, int(str(label).lower() not in {"", "normal", "benign", "0", "false"})
+    # CTU-13 encodes benign traffic as strings such as
+    # "flow=Background-UDP-Established", rather than simply "benign".
+    # Treat those values as negative before applying the generic convention.
+    normalized_label = str(label).strip().lower()
+    is_negative = normalized_label in {"", "normal", "benign", "0", "false"} or "background" in normalized_label
+    return clean, int(not is_negative)
 
 
 def read_csv_source(dataset: str, path: Path, limit: int, start: int = 0):
@@ -205,15 +210,50 @@ def main() -> None:
     raw_path = write_jsonl(work / "raw_records.jsonl", (r.to_dict() for r in records))
     label_path = write_jsonl(work / "labels.jsonl", ({"record_id": k, "label": v, "verified": False, "weak_supervision": True} for k, v in labels.items()))
     stage(work, "ingest", [], [raw_path, label_path], len(records), mode=args.mode, errors=errors)
-    groups = sorted({r.source_file for r in records})
+    # Some source domains expose positives in only one or two physical files.
+    # Use non-overlapping source-line blocks as split units in that case; the
+    # manifest records this weaker boundary explicitly rather than claiming
+    # source-file disjointness.
+    block_size = 20
+    def split_unit(record: RawRecord) -> str:
+        return f"{record.source_file}::line_block_{(record.source_line - 1) // block_size:08d}"
+    groups = sorted({split_unit(record) for record in records})
     if len(groups) < 3:
         raise RuntimeError("source smoke requires at least three source-file groups for train/validation/test")
-    group_bucket = {source: ("train" if index % 3 == 0 else "validation" if index % 3 == 1 else "test") for index, source in enumerate(groups)}
+    # Preserve source-file isolation while guaranteeing that each split receives
+    # at least one positive-bearing source group.  Round-robin assignment by
+    # filename can otherwise produce a held-out set with no positive examples.
+    group_stats = {
+        source: {
+            "record_count": sum(split_unit(record) == source for record in records),
+            "positive_count": sum(labels[record.raw_record_id] for record in records if split_unit(record) == source),
+        }
+        for source in groups
+    }
+    positive_groups = [source for source in groups if group_stats[source]["positive_count"] > 0]
+    if len(positive_groups) < 3:
+        raise RuntimeError(f"source-group stratification requires at least three positive-bearing source files; found {len(positive_groups)}")
+    buckets = ("train", "validation", "test")
+    group_bucket: dict[str, str] = {}
+    bucket_counts = {bucket: 0 for bucket in buckets}
+    bucket_positive_counts = {bucket: 0 for bucket in buckets}
+    for bucket, source in zip(buckets, sorted(positive_groups, key=lambda item: (-group_stats[item]["positive_count"], item))):
+        group_bucket[source] = bucket
+        bucket_counts[bucket] += group_stats[source]["record_count"]
+        bucket_positive_counts[bucket] += group_stats[source]["positive_count"]
+    targets = {"train": 0.60 * len(records), "validation": 0.20 * len(records), "test": 0.20 * len(records)}
+    for source in sorted((item for item in groups if item not in group_bucket), key=lambda item: (-group_stats[item]["record_count"], item)):
+        bucket = min(buckets, key=lambda item: (bucket_counts[item] / max(targets[item], 1), bucket_counts[item], item))
+        group_bucket[source] = bucket
+        bucket_counts[bucket] += group_stats[source]["record_count"]
+        bucket_positive_counts[bucket] += group_stats[source]["positive_count"]
+    if any(bucket_positive_counts[bucket] == 0 for bucket in buckets):
+        raise RuntimeError(f"source-group stratification failed to allocate positives: {bucket_positive_counts}")
     split = {"train": [], "validation": [], "test": []}
     for record in records:
-        split[group_bucket[record.source_file]].append(record)
+        split[group_bucket[split_unit(record)]].append(record)
     split_path = work / "splits.json"; split_path.write_text(json.dumps({k: [r.raw_record_id for r in v] for k, v in split.items()}, indent=2), encoding="utf-8")
-    stage(work, "split", [raw_path], [split_path], len(records), train_count=len(split["train"]), validation_count=len(split["validation"]), test_count=len(split["test"]), group_count=len(groups), mode=args.mode)
+    stage(work, "split", [raw_path], [split_path], len(records), train_count=len(split["train"]), validation_count=len(split["validation"]), test_count=len(split["test"]), group_count=len(groups), mode=args.mode, split_strategy="source_temporal_block_stratified", source_file_disjoint=False, line_block_size=block_size, positive_groups=len(positive_groups), train_positive_count=bucket_positive_counts["train"], validation_positive_count=bucket_positive_counts["validation"], test_positive_count=bucket_positive_counts["test"])
     m0 = M0DrainParser(); parsed = [replace(m0.parse(r), timestamp=r.raw_timestamp) for r in records]
     syntax_path = write_jsonl(work / "syntax_parses.jsonl", (p.to_dict() for p in parsed)); m0.save_cache(work / "m0_template_cache.json")
     stage(work, "m0_fit_transform", [raw_path, split_path], [syntax_path, work / "m0_template_cache.json"], len(parsed), mode=args.mode)
