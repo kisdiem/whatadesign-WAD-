@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import os
+import tempfile
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Callable, Iterable
@@ -27,9 +29,11 @@ def read_jsonl(path: str | Path) -> list[dict[str, Any]]:
 def write_jsonl(path: str | Path, rows: Iterable[dict[str, Any]]) -> Path:
     target = Path(path)
     target.parent.mkdir(parents=True, exist_ok=True)
-    with target.open("w", encoding="utf-8") as handle:
+    fd, temporary = tempfile.mkstemp(prefix=target.name + ".", dir=str(target.parent), text=True)
+    with os.fdopen(fd, "w", encoding="utf-8") as handle:
         for row in rows:
             handle.write(json.dumps(row, ensure_ascii=True, sort_keys=True) + "\n")
+    os.replace(temporary, target)
     return target
 
 

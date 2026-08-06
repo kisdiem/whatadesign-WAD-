@@ -150,12 +150,13 @@ class FrozenFeatureRecord(_Serializable):
     source_record_ref: str = ""
     feature_schema_version: str = SCHEMA_VERSION
     producer_checkpoint_hashes: dict[str, str] = field(default_factory=dict)
+    producer_artifact_hashes: dict[str, str] = field(default_factory=dict)
 
     def model_features(self) -> dict[str, Any]:
         """Return only model inputs; provenance and split metadata stay out."""
         return {k: v for k, v in asdict(self).items() if k not in {
             "record_id", "dataset_id", "timestamp", "source_record_ref",
-            "feature_schema_version", "producer_checkpoint_hashes",
+            "feature_schema_version", "producer_checkpoint_hashes", "producer_artifact_hashes",
         }}
 
 

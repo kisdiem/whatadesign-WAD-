@@ -40,6 +40,15 @@ class StageManifest:
     created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     real_data_used: bool = False
     real_training_completed: bool = False
+    execution_mode: str = "real"
+    config_hash: str = ""
+    input_paths: tuple[str, ...] = ()
+    output_paths: tuple[str, ...] = ()
+    record_count: int = 0
+    rejected_count: int = 0
+    started_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    completed_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    release_eligible: bool = False
 
     def write(self, path: str | Path) -> Path:
         target = Path(path)
