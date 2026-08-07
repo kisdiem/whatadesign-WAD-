@@ -3,4 +3,7 @@ execution_mode: source
 seed: 42
 device: cpu
 model_cache: ${MODEL_CACHE}
+storage:
+  backend: postgresql
+  database_url_env: DATABASE_URL
 data_sources: []
