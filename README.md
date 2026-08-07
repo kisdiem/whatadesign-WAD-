@@ -4,7 +4,24 @@ This repository contains the current code architecture for a multi-source APT/lo
 
 ## Pipeline
 
-`M0` parsing -> `M1` semantic normalization -> `M2` entity resolution -> `M3` temporal event graph -> `M4` current-event-conditioned Q-Former -> `M5` long-horizon window linking -> `M6` frozen-feature hierarchical fusion.
+`M0` parsing -> `M1` single-event semantic normalization -> `M2` entity resolution -> `M3` causal 30-minute event graph -> `M4` multi-scale current-event-conditioned anomaly detection -> `M5` long-horizon linking -> `M6` frozen-feature hierarchical fusion.
+
+### M4 temporal boundary
+
+M4 performs `single-event -> 5min -> 30min`, while M5 performs only
+cross-30-minute/hour-level linking. For a current event at `t`, M3 and M4
+accept only history satisfying `t-30min <= event_time < t` and exclude the
+current record ID. The default 5-minute micro windows stride by 2.5 minutes;
+a complete 30-minute history produces 11 windows, but the count is calculated
+from configuration and partial history yields fewer complete windows.
+
+Each micro window combines parallel inputs: M1/DeBERTa EventFrame semantic
+embeddings for individual events, and a Qwen3 embedding of time-ordered,
+normalized EventFrame fields. The current event conditions Q-Former query
+tokens before cross-attention. A masked temporal transformer then aggregates
+micro-context embeddings without summing overlapping window scores. Qwen
+serialization excludes labels, split information, ground truth, and post-hoc
+results by construction.
 
 ## Current status
 

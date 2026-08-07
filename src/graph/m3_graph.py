@@ -58,7 +58,12 @@ class M3EventGraphBuilder:
         edges: dict[tuple[str, str, str], GraphEdge] = {}
         for frame, entities in rows:
             event_id = f"event:{frame.record_id}"
-            nodes[event_id] = GraphNode(event_id, "event", frame.action, {"outcome": frame.outcome})
+            # Preserve M1 output on the event node. GraphTensor consumes this
+            # before falling back to legacy byte features.
+            nodes[event_id] = GraphNode(event_id, "event", frame.action, {
+                "outcome": frame.outcome,
+                "semantic_embedding": frame.semantic_embedding,
+            })
             for entity in entities:
                 nodes.setdefault(entity.entity_id, GraphNode(entity.entity_id, entity.entity_type, entity.canonical_value))
                 self._add_edge(edges, entity.entity_id, event_id, "participates", frame)
@@ -70,6 +75,25 @@ class M3EventGraphBuilder:
     def build_before_current_event(self, frames: Iterable[tuple[EventFrame, list[ResolvedEntity]]], current_record_id: str) -> EventGraph:
         """Build history graph with the current event excluded by record ID."""
         return self.build((row for row in frames if row[0].record_id != current_record_id))
+
+    def build_history_before_current_event(self, frames: Iterable[tuple[EventFrame, list[ResolvedEntity]]], current_record_id: str, current_timestamp: str) -> tuple[EventGraph, list[dict[str, str]]]:
+        """Strictly retain only parseable history in [t-window, t), excluding current."""
+        current = self._parse_timestamp(current_timestamp)
+        if current is None:
+            raise ValueError("current event timestamp is required for strict M3 history")
+        lower = current.timestamp() - self.window_seconds
+        accepted, rejected = [], []
+        for frame, entities in frames:
+            value = frame.timestamp or frame.attributes.get("timestamp")
+            stamp = self._parse_timestamp(value)
+            if frame.record_id == current_record_id:
+                rejected.append({"record_id": frame.record_id, "reason": "current_event"}); continue
+            if stamp is None:
+                rejected.append({"record_id": frame.record_id, "reason": "missing_or_invalid_timestamp"}); continue
+            if not (lower <= stamp.timestamp() < current.timestamp()):
+                rejected.append({"record_id": frame.record_id, "reason": "outside_strict_history_window"}); continue
+            accepted.append((frame, entities))
+        return self.build(accepted), rejected
 
     def _add_edge(self, edges: dict[tuple[str, str, str], GraphEdge], source: str, target: str, relation: str, frame: EventFrame) -> None:
         key = (source, target, relation)

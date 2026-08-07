@@ -17,15 +17,24 @@ class GraphTensor:
     node_type: Tensor
 
     @classmethod
-    def from_event_graph(cls, graph: EventGraph, feature_dim: int = 128) -> "GraphTensor":
+    def from_event_graph(cls, graph: EventGraph, feature_dim: int = 128, event_embeddings: dict[str, list[float] | Tensor] | None = None) -> "GraphTensor":
         nodes = list(graph.nodes)
         index = {node.node_id: i for i, node in enumerate(nodes)}
         features = torch.zeros(len(nodes), feature_dim)
         node_type = torch.zeros(len(nodes), dtype=torch.long)
         for i, node in enumerate(nodes):
-            digest = torch.tensor(list((node.node_type + "|" + node.value).encode()), dtype=torch.float32)
-            if digest.numel():
-                features[i, :min(feature_dim, digest.numel())] = digest[:feature_dim] / 255.0
+            semantic = None
+            if node.node_type == "event":
+                semantic = (event_embeddings or {}).get(node.node_id.removeprefix("event:"))
+                if semantic is None:
+                    semantic = node.attributes.get("semantic_embedding")
+            if semantic is not None:
+                vector = torch.as_tensor(semantic, dtype=torch.float32).flatten()
+                features[i, :min(feature_dim, vector.numel())] = vector[:feature_dim]
+            else:
+                # Explicit reduced baseline for entity/action nodes and legacy events.
+                digest = torch.tensor(list((node.node_type + "|" + node.value).encode()), dtype=torch.float32)
+                if digest.numel(): features[i, :min(feature_dim, digest.numel())] = digest[:feature_dim] / 255.0
             node_type[i] = int(hashlib.sha256(node.node_type.encode()).hexdigest()[:8], 16) % 32
         edges = []
         edge_type = []
