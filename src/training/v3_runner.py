@@ -25,6 +25,14 @@ class TrainBatch:
     micro_label: Tensor
     macro_label: Tensor
     padding_mask: Tensor | None = None
+    # Strict M4 path. These are source-derived features only; labels remain
+    # separate loss inputs above and cannot be serialized into Qwen windows.
+    micro_event_embeddings: Tensor | None = None
+    qwen_window_embeddings: Tensor | None = None
+    current_event_embedding: Tensor | None = None
+    micro_event_valid_mask: Tensor | None = None
+    micro_window_mask: Tensor | None = None
+    micro_graph_embeddings: Tensor | None = None
 
 
 @dataclass(frozen=True)
@@ -49,7 +57,22 @@ class V3Runner:
         return list(self.m4.parameters()) + list(self.m5.parameters()) + list(self.m6.parameters())
 
     def _forward_loss(self, batch: TrainBatch) -> tuple[Tensor, dict[str, float]]:
-        m4_out = self.m4(batch.sequence, batch.padding_mask)
+        strict_fields = (batch.micro_event_embeddings, batch.qwen_window_embeddings, batch.current_event_embedding)
+        if any(value is not None for value in strict_fields):
+            if not all(value is not None for value in strict_fields):
+                raise ValueError("strict M4 batch requires event, Qwen, and current-event embeddings together")
+            m4_out = self.m4.forward_micro_windows(
+                batch.micro_event_embeddings,
+                batch.qwen_window_embeddings,
+                batch.current_event_embedding,
+                event_valid_mask=batch.micro_event_valid_mask,
+                micro_window_mask=batch.micro_window_mask,
+                graph_embeddings=batch.micro_graph_embeddings,
+            )
+        else:
+            # Legacy/synthetic runner compatibility only. Formal source jobs
+            # must supply the strict multiscale fields above.
+            m4_out = self.m4(batch.sequence, batch.padding_mask)
         link_logit = self.m5(batch.source_embedding, batch.target_embedding, batch.delta_seconds)
         m6_out = self.m6(m4_out["embedding"], batch.graph_score, link_logit)
         losses = {

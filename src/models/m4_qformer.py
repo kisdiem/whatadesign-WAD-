@@ -184,7 +184,7 @@ class M4QFormerDecoder(nn.Module):
             macro = self.macro_aggregator(empty, current, micro_window_mask)
             joint = torch.tanh(self.slot_context(torch.cat([macro["macro_context_embedding"], current], dim=-1)))
             logit = self.raw_event_head(joint).squeeze(-1)
-            return {**macro, "micro_context_embeddings": empty, "event_embedding": joint, "raw_event_logit": logit, "score_logit": logit, "micro_window_scores": empty.new_zeros((batch, 0)), "macro_window_score": logit}
+            return {**macro, "micro_context_embeddings": empty, "event_embedding": joint, "embedding": joint, "raw_event_logit": logit, "score_logit": logit, "micro_window_scores": empty.new_zeros((batch, 0)), "macro_window_score": logit}
 
         events = self.input_projection(event_embeddings)
         qwen = self.qwen_projection(qwen_window_embeddings).unsqueeze(2)
@@ -217,6 +217,8 @@ class M4QFormerDecoder(nn.Module):
             "micro_attention": attention.reshape(batch, windows, attention.shape[-2], attention.shape[-1]),
             "micro_window_scores": micro_scores,
             "event_embedding": joint,
+            # Compatibility alias consumed by existing M6 runner code.
+            "embedding": joint,
             "slot_logits": slot_logits,
             "raw_event_logit": logit,
             "score_logit": logit,
