@@ -23,6 +23,48 @@ micro-context embeddings without summing overlapping window scores. Qwen
 serialization excludes labels, split information, ground truth, and post-hoc
 results by construction.
 
+## Storage architecture
+
+Formal storage uses **PostgreSQL as the system of record**. The former SQLite
+`FeatureRepository` prototype is retired. PostgreSQL stores normalized events,
+dynamically updated entity state plus append-only entity observations,
+event/entity and explicit event/event relations, model-versioned detection
+results, attack chains, and audit/provenance metadata.
+
+Raw logs, large embedding batches, tensors, checkpoints, and model weights stay
+as immutable file artifacts. PostgreSQL references them through URI, SHA-256,
+size, schema version, and lineage instead of duplicating large payloads in the
+database.
+
+Core business tables:
+
+- `entities`
+- `entity_aliases`
+- `entity_observations`
+- `events`
+- `event_entities`
+- `event_relations`
+- `context_windows`
+- `window_events`
+- `detection_results`
+- `window_detection_results`
+- `window_links`
+- `attack_chains`
+- `attack_chain_windows`
+- `attack_chain_events`
+
+Engineering audit tables:
+
+- `pipeline_runs`
+- `artifacts`
+- `lineage`
+- `operation_logs`
+- `schema_migrations`
+
+There is intentionally no generic `stage_records(payload_json)` fact table in
+the formal schema. See `docs/storage_architecture.md` and
+`migrations/postgres/`.
+
 ## Current status
 
 The repository contains implementation contracts, smoke/unit tests, source-held-out and leakage-audit utilities, release protocol gates, and reduced M3-M6 model components. It does not contain real training data, model checkpoints, final source-domain metrics, or AIT predictions.
@@ -37,5 +79,6 @@ The current data fallback route is CERT long-term behavior, EVTX endpoint/entity
 - AIT labels may only be read after predictions are sealed.
 - A locked release requires real checkpoints, thresholds, calibration and model hashes.
 - Generated data, virtual environments, logs and temporary outputs are intentionally excluded.
+- Security business tables reject label/split fields and keep source-training labels outside model-queryable facts.
 
-See `docs/v3_compliance_audit.md`, `docs/data_deviation_v3.md`, and `outputs/audit/` for the strict audit status.
+See `docs/v3_compliance_audit.md`, `docs/data_deviation_v3.md`, `docs/storage_architecture.md`, and `outputs/audit/` for the strict audit status.
