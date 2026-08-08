@@ -106,7 +106,8 @@
 }
 
 .window-card.severity-critical .window-card-head .ant-tag,
-.ant-tag-red {
+.ant-tag.ant-tag-red,
+.ant-table .ant-tag.ant-tag-red {
   background: #d92d20 !important;
   border-color: #d92d20 !important;
   color: #ffffff !important;
@@ -114,7 +115,8 @@
 }
 
 .window-card.severity-high .window-card-head .ant-tag,
-.ant-tag-orange {
+.ant-tag.ant-tag-orange,
+.ant-table .ant-tag.ant-tag-orange {
   background: #f79009 !important;
   border-color: #f79009 !important;
   color: #ffffff !important;
@@ -122,7 +124,8 @@
 }
 
 .window-card.severity-medium .window-card-head .ant-tag,
-.ant-tag-gold {
+.ant-tag.ant-tag-gold,
+.ant-table .ant-tag.ant-tag-gold {
   background: #eaaa08 !important;
   border-color: #eaaa08 !important;
   color: #ffffff !important;
@@ -130,17 +133,18 @@
 }
 
 .window-card.severity-low .window-card-head .ant-tag,
-.ant-tag-blue {
+.ant-tag.ant-tag-blue,
+.ant-table .ant-tag.ant-tag-blue {
   background: #2e90fa !important;
   border-color: #2e90fa !important;
   color: #ffffff !important;
   font-weight: 700 !important;
 }
 
-.ant-table .ant-tag-red,
-.ant-table .ant-tag-orange,
-.ant-table .ant-tag-gold,
-.ant-table .ant-tag-blue {
+.ant-table .ant-tag.ant-tag-red,
+.ant-table .ant-tag.ant-tag-orange,
+.ant-table .ant-tag.ant-tag-gold,
+.ant-table .ant-tag.ant-tag-blue {
   min-width: 52px;
   padding: 3px 10px;
   border-radius: 999px;
