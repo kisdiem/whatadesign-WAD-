@@ -63,6 +63,22 @@ class QwenBackboneAdapter:
         if hidden.shape[-1] != self.hidden_size:
             raise ValueError(f"hidden size {hidden.shape[-1]} != backbone size {self.hidden_size}")
 
+    def _model_device(self, device: torch.device | str | None) -> torch.device:
+        """Place the loaded backbone on the explicit inference device.
+
+        Token tensors and model weights must move together.  This is especially
+        important for the offline frozen-cache path, where the adapter is
+        constructed on CPU before the runner chooses CUDA.
+        """
+        if self.model is None:
+            raise RuntimeError("Qwen model not loaded")
+        requested = torch.device(device) if device is not None else next(self.model.parameters()).device
+        if next(self.model.parameters()).device != requested:
+            self.model.to(requested)
+        if self.mode == "frozen":
+            self.model.eval()
+        return requested
+
     @staticmethod
     def _timestamp(value: str | None) -> datetime:
         if not value:
@@ -147,7 +163,7 @@ class QwenBackboneAdapter:
             }
         if self.model is None or self.tokenizer is None:
             raise RuntimeError("Qwen model/tokenizer not loaded")
-        model_device = torch.device(device) if device is not None else next(self.model.parameters()).device
+        model_device = self._model_device(device)
         tokens = self.tokenizer(serialized, return_tensors="pt", truncation=True, padding=True)
         tokens = {name: value.to(model_device) for name, value in tokens.items()}
         context = torch.no_grad() if self.mode == "frozen" else torch.enable_grad()
@@ -178,7 +194,7 @@ class QwenBackboneAdapter:
             return {"embeddings": torch.stack([self._mock_window_embedding(item) for item in serialized]), "serialized": serialized, "mode": "mock", "is_mock": True}
         if self.model is None or self.tokenizer is None:
             raise RuntimeError("Qwen model/tokenizer not loaded")
-        model_device = torch.device(device) if device is not None else next(self.model.parameters()).device
+        model_device = self._model_device(device)
         tokens = self.tokenizer(serialized, return_tensors="pt", truncation=True, padding=True)
         tokens = {name: value.to(model_device) for name, value in tokens.items()}
         context = torch.no_grad() if self.mode == "frozen" else torch.enable_grad()
