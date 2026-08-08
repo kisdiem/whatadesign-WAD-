@@ -1,0 +1,42 @@
+schema_version: deberta-security-v1
+model:
+  base_id: microsoft/deberta-v3-base
+  hidden_size: 768
+  cache: ${MODEL_CACHE}/m1
+
+stage_a_domain_mlm:
+  enabled: true
+  labels_allowed: false
+  source_policy: all_available_unlabeled_logs
+  sources:
+    - ctu13_full
+    - sandworm_flow
+    - evtx_attack_samples
+    - splunk_windows_logs
+    - cert_if_available
+  objective:
+    mlm_probability: 0.15
+    field_value_mask_probability: 0.20
+  output: outputs/deberta_security/mlm
+
+stage_b_adapter_supervision:
+  enabled: true
+  encoder_frozen: true
+  labels_required: true
+  sources:
+    - ctu13_full
+    - sandworm_flow
+  split_policy: train_only
+  balance_policy: class_balanced_sampling
+  adapter:
+    bottleneck_dim: 96
+    dropout: 0.10
+  temporary_classifier_head: true
+  export_classifier_head: false
+  output: outputs/deberta_security/adapter
+
+export:
+  artifact: deberta_security_encoder_adapter
+  output_dimension: 768
+  consumer_contract: M2-M6
+  ait_labels_used: false
