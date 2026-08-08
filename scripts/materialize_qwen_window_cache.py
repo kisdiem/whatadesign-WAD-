@@ -46,6 +46,8 @@ def main() -> None:
     parser.add_argument("--max-tokens", type=int, default=2048)
     parser.add_argument("--chunk-batch-size", type=int, default=8)
     parser.add_argument("--alignment", choices=("current", "stride"), default="current")
+    parser.add_argument("--member-provenance", choices=("reconstruct", "ids"), default="reconstruct",
+                        help="Store reproducible window bounds/source hashes, or additionally every member record ID")
     parser.add_argument("--max-targets", type=int, default=None)
     args = parser.parse_args()
 
@@ -110,7 +112,11 @@ def main() -> None:
                 "window_id": window.window_id, "dataset_id": window.dataset_id,
                 "start": window.start.isoformat(), "end": window.end.isoformat(),
                 "alignment": window.alignment, "event_count": len(frames),
-                "event_record_ids": [frame.record_id for frame in frames],
+                # Bounds, source artifact hashes, and exclusion rules are
+                # sufficient to reproduce membership.  Persisting IDs for
+                # every overlapping strict window would explode storage.
+                **({"event_record_ids": [frame.record_id for frame in frames]}
+                   if args.member_provenance == "ids" else {}),
                 "chunk_event_counts": encoded["chunk_event_counts"],
                 "chunk_count": encoded["chunk_count"],
                 "qwen_embedding": encoded["embedding"].detach().cpu().tolist(),
@@ -128,6 +134,12 @@ def main() -> None:
         "strict_current_aligned": args.alignment == "current",
         "temporal_config": {"macro_seconds": config.macro_seconds, "micro_seconds": config.micro_seconds, "stride_seconds": config.stride_seconds},
         "qwen": qwen.export_backbone_manifest(), "labels_read": False,
+        "member_provenance": args.member_provenance,
+        "source_eventframe_hashes": {str(Path(source)): sha256(Path(source)) for source in args.source},
+        "membership_reconstruction": {
+            "predicate": "record_id != current_record_id AND start <= timestamp < end",
+            "current_event_excluded": True,
+        },
     }
     output.with_suffix(output.suffix + ".manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     print(json.dumps(manifest, indent=2))
