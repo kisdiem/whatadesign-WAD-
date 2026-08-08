@@ -8,6 +8,7 @@ import './light-theme.css'
 import './anomaly-visuals.css'
 import App from './App'
 import AnomalyTimelineEnhancer from './AnomalyTimelineEnhancer'
+import AssetPieEnhancer from './AssetPieEnhancer'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -28,6 +29,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     >
       <BrowserRouter>
         <App />
+        <AssetPieEnhancer />
         <AnomalyTimelineEnhancer />
       </BrowserRouter>
     </ConfigProvider>
