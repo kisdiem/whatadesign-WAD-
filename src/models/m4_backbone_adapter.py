@@ -164,5 +164,31 @@ class QwenBackboneAdapter:
             "is_mock": False,
         }
 
+    def encode_windows(self, windows: Iterable[Iterable[EventFrame]], *, device: torch.device | str | None = None) -> dict[str, Any]:
+        """Batch window encoding for offline M4 dataset preparation.
+
+        The input remains structured, normalized EventFrames. It is not a raw
+        log batch and has the same label-free serialization boundary as
+        :meth:`encode_window`.
+        """
+        serialized = [self.serialize_window(frames) for frames in windows]
+        if not serialized:
+            return {"embeddings": torch.zeros((0, self.hidden_size)), "serialized": [], "mode": self.mode, "is_mock": self.mode == "mock"}
+        if self.mode == "mock":
+            return {"embeddings": torch.stack([self._mock_window_embedding(item) for item in serialized]), "serialized": serialized, "mode": "mock", "is_mock": True}
+        if self.model is None or self.tokenizer is None:
+            raise RuntimeError("Qwen model/tokenizer not loaded")
+        model_device = torch.device(device) if device is not None else next(self.model.parameters()).device
+        tokens = self.tokenizer(serialized, return_tensors="pt", truncation=True, padding=True)
+        tokens = {name: value.to(model_device) for name, value in tokens.items()}
+        context = torch.no_grad() if self.mode == "frozen" else torch.enable_grad()
+        with context:
+            output = self.model(**tokens)
+            hidden = output.last_hidden_state
+            mask = tokens["attention_mask"].unsqueeze(-1).to(dtype=hidden.dtype)
+            embeddings = (hidden * mask).sum(dim=1) / mask.sum(dim=1).clamp_min(1.0)
+        self.validate_hidden_size(embeddings)
+        return {"embeddings": embeddings, "serialized": serialized, "mode": self.mode, "is_mock": False}
+
     def export_backbone_manifest(self) -> dict[str, Any]:
         return asdict(QwenManifest(self.name, self.mode, self.model_loaded, self.hidden_size, self.local_files_only))

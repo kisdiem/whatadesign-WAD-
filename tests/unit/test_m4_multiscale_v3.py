@@ -66,6 +66,14 @@ def test_qwen_window_encoder_uses_only_eventframe_fields_and_mock_is_determinist
     assert first["is_mock"] and torch.equal(first["embedding"], second["embedding"])
 
 
+def test_qwen_batch_window_encoder_preserves_window_count():
+    now = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    encoder = QwenBackboneAdapter(mode="mock")
+    output = encoder.encode_windows([[_frame("one", now)], [_frame("two", now + timedelta(seconds=1))]])
+    assert output["is_mock"]
+    assert output["embeddings"].shape == (2, encoder.hidden_size)
+
+
 def test_qformer_current_and_history_conditioning_and_variable_windows():
     torch.manual_seed(7)
     model = M4QFormerDecoder(M4Config(input_dim=4, hidden_dim=4, qwen_hidden_dim=6, heads=2, layers=1, query_count=2, dropout=0.0)).eval()
