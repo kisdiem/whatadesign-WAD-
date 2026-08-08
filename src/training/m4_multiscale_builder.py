@@ -74,7 +74,11 @@ class StrictM4BatchBuilder:
             for event_index, frame in enumerate(members):
                 event_tensor[window_index, event_index] = self._embedding(frame)
                 event_mask[window_index, event_index] = True
-            result = self.qwen.encode_window(members)
+            # Dense flow windows regularly exceed a backbone context.  The
+            # chunked encoder preserves every ordered EventFrame and records a
+            # count-weighted semantic aggregation, rather than silently
+            # truncating the history at tokenizer length.
+            result = self.qwen.encode_window_chunked(members)
             qwen_rows.append(result["embedding"].detach().to(dtype=torch.float32).cpu())
         qwen_tensor = torch.stack(qwen_rows) if qwen_rows else torch.zeros((0, self.qwen.hidden_size), dtype=torch.float32)
         return M4MultiscaleSample(
