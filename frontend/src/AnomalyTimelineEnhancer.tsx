@@ -4,6 +4,7 @@ import ReactECharts from 'echarts-for-react'
 import { createPortal } from 'react-dom'
 import { useLocation } from 'react-router-dom'
 import { anomalyWindows, type AnomalyWindow, type Severity } from './mocks/data'
+import { normalActivityEvents } from './mocks/normalActivity'
 
 const { Text } = Typography
 
@@ -163,6 +164,19 @@ export default function AnomalyTimelineEnhancer() {
       }),
     }))
 
+    const normalScatter = normalActivityEvents
+      .map((item, index) => ({
+        time: toSecond(item.time),
+        value: 35 + ((index * 13) % 18),
+        name: `${item.host} · ${item.action}`,
+      }))
+      .filter((item) => item.time >= start && item.time <= playhead)
+      .map((item) => ({
+        value: [item.time, item.value],
+        name: item.name,
+        itemStyle: { color: '#98a2b3', opacity: 0.55 },
+      }))
+
     const anomalyScatter = selectedWindows
       .filter((item) => toSecond(item.start) <= playhead)
       .map((item) => ({
@@ -205,6 +219,14 @@ export default function AnomalyTimelineEnhancer() {
       },
       series: [
         ...lines,
+        {
+          name: '正常活动',
+          type: 'scatter',
+          symbolSize: 5,
+          data: normalScatter,
+          z: 8,
+          tooltip: { show: false },
+        },
         {
           name: '异常窗口',
           type: 'scatter',
