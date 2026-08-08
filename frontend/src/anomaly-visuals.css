@@ -2,6 +2,22 @@
   margin-bottom: 14px;
 }
 
+#asset-pie-slot {
+  margin-bottom: 14px;
+}
+
+.asset-pie-row {
+  margin-bottom: 0;
+}
+
+.asset-pie-card {
+  min-height: 334px;
+}
+
+.asset-pie-card .ant-card-body {
+  padding: 12px 16px 8px;
+}
+
 .anomaly-disturbance-card {
   overflow: hidden;
   border: 1px solid #dfe5ec !important;
