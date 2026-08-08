@@ -74,10 +74,12 @@ export default function AnomalyTimelineEnhancer() {
       severities.includes(item.severity) && item.sourceTypes.some((source) => sources.includes(source))
     ))
 
-    const maxEventHour = Math.max(24, ...selectedWindows.map((item) => toHour(item.end)))
     const rangeHours = Number(range)
-    const startHour = rangeHours >= 24 ? 0 : Math.max(0, maxEventHour - rangeHours)
-    const endHour = maxEventHour
+    const observedMax = selectedWindows.length
+      ? Math.max(...selectedWindows.map((item) => toHour(item.end)))
+      : 24
+    const endHour = rangeHours >= 24 ? 24 : observedMax
+    const startHour = rangeHours >= 24 ? 0 : Math.max(0, endHour - rangeHours)
     const pointCount = Math.max(24, Math.round((endHour - startHour) * 4))
     const times = Array.from({ length: pointCount + 1 }, (_, index) => startHour + ((endHour - startHour) * index) / pointCount)
 
@@ -114,19 +116,26 @@ export default function AnomalyTimelineEnhancer() {
       }),
     }))
 
-    const anomalyScatter = selectedWindows.map((item) => ({
-      value: [(toHour(item.start) + toHour(item.end)) / 2, 42],
-      itemStyle: {
-        color: item.severity === 'critical'
-          ? '#d92d20'
-          : item.severity === 'high'
-            ? '#f79009'
-            : item.severity === 'medium'
-              ? '#eaaa08'
-              : '#2e90fa',
-      },
-      name: item.title,
-    }))
+    const anomalyScatter = selectedWindows
+      .map((item) => ({
+        hour: (toHour(item.start) + toHour(item.end)) / 2,
+        severity: item.severity,
+        title: item.title,
+      }))
+      .filter((item) => item.hour >= startHour && item.hour <= endHour)
+      .map((item) => ({
+        value: [item.hour, 42],
+        itemStyle: {
+          color: item.severity === 'critical'
+            ? '#d92d20'
+            : item.severity === 'high'
+              ? '#f79009'
+              : item.severity === 'medium'
+                ? '#eaaa08'
+                : '#2e90fa',
+        },
+        name: item.title,
+      }))
 
     return {
       animationDurationUpdate: 750,
