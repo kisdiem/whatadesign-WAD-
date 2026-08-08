@@ -5,7 +5,9 @@ import { BrowserRouter } from 'react-router-dom'
 import 'antd/dist/reset.css'
 import './styles.css'
 import './light-theme.css'
+import './anomaly-visuals.css'
 import App from './App'
+import AnomalyTimelineEnhancer from './AnomalyTimelineEnhancer'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -26,6 +28,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     >
       <BrowserRouter>
         <App />
+        <AnomalyTimelineEnhancer />
       </BrowserRouter>
     </ConfigProvider>
   </React.StrictMode>,
