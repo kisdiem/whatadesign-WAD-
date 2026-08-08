@@ -36,6 +36,9 @@ class M1SemanticNormalizer:
         action = self._action(lowered)
         outcome = self._outcome(lowered)
         entities = self._entities(template)
+        flow = self._flow_fields(parsed.fields)
+        if flow:
+            entities = list(dict.fromkeys(entities + [item["raw_value"] for item in flow["mentions"]]))
         actor = self._actor(template, entities)
         obj = self._object(template, entities)
         attributes: dict[str, Any] = {
@@ -52,17 +55,42 @@ class M1SemanticNormalizer:
         if confidence < self.config.min_confidence:
             attributes["quarantined_reason"] = "low_semantic_confidence"
         return EventFrame(
+            dataset_id=parsed.dataset_id,
             record_id=parsed.record_id,
+            timestamp=parsed.timestamp,
+            record_kind="network" if flow else "unknown",
+            relation_type="flow" if flow else "unknown",
+            action_family="connect" if flow else action,
+            action_leaf=flow["protocol"] if flow else action,
+            roles=flow["roles"] if flow else {},
             actor=actor,
             action=action,
             object=obj,
             location={"source_file": parsed.source_file, "source_line": parsed.source_line},
             outcome=outcome,
             entities=entities,
+            entity_mentions=flow["mentions"] if flow else [],
+            key_attributes=flow["attributes"] if flow else {},
             attributes=attributes,
             semantic_confidence=confidence,
             source_record_ref=parsed.raw_record_ref,
         )
+
+    @staticmethod
+    def _flow_fields(fields: dict[str, Any]) -> dict[str, Any] | None:
+        """Map structured flow columns without importing source labels."""
+        source = str(fields.get("SrcAddr", fields.get("src_ip", ""))).strip()
+        destination = str(fields.get("DstAddr", fields.get("dst_ip", ""))).strip()
+        if not source and not destination:
+            return None
+        protocol = str(fields.get("Proto", fields.get("protocol", "unknown"))).strip().lower() or "unknown"
+        mentions = []
+        if source: mentions.append({"raw_value": source, "role": "source_ip", "entity_type": "ip"})
+        if destination: mentions.append({"raw_value": destination, "role": "destination_ip", "entity_type": "ip"})
+        for value, role in ((fields.get("Sport"), "source_port"), (fields.get("Dport"), "destination_port")):
+            if value not in (None, ""): mentions.append({"raw_value": str(value), "role": role, "entity_type": "service"})
+        attributes = {key: fields[key] for key in ("Proto", "State", "Dir", "Dur", "TotPkts", "TotBytes", "SrcBytes") if key in fields}
+        return {"protocol": protocol, "roles": {"source_ip": source, "destination_ip": destination}, "mentions": mentions, "attributes": attributes}
 
     @staticmethod
     def _action(text: str) -> str:
