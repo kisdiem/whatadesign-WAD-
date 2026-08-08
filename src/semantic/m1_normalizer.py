@@ -79,17 +79,18 @@ class M1SemanticNormalizer:
     @staticmethod
     def _flow_fields(fields: dict[str, Any]) -> dict[str, Any] | None:
         """Map structured flow columns without importing source labels."""
-        source = str(fields.get("SrcAddr", fields.get("src_ip", ""))).strip()
-        destination = str(fields.get("DstAddr", fields.get("dst_ip", ""))).strip()
+        source = str(fields.get("SrcAddr", fields.get("Src IP", fields.get("src_ip", "")))).strip()
+        destination = str(fields.get("DstAddr", fields.get("Dst IP", fields.get("dst_ip", "")))).strip()
         if not source and not destination:
             return None
-        protocol = str(fields.get("Proto", fields.get("protocol", "unknown"))).strip().lower() or "unknown"
+        protocol = str(fields.get("Proto", fields.get("Protocol", fields.get("protocol", "unknown")))).strip().lower() or "unknown"
+        protocol = {"6": "tcp", "17": "udp", "1": "icmp"}.get(protocol, protocol)
         mentions = []
         if source: mentions.append({"raw_value": source, "role": "source_ip", "entity_type": "ip"})
         if destination: mentions.append({"raw_value": destination, "role": "destination_ip", "entity_type": "ip"})
-        for value, role in ((fields.get("Sport"), "source_port"), (fields.get("Dport"), "destination_port")):
+        for value, role in ((fields.get("Sport", fields.get("Src Port")), "source_port"), (fields.get("Dport", fields.get("Dst Port")), "destination_port")):
             if value not in (None, ""): mentions.append({"raw_value": str(value), "role": role, "entity_type": "service"})
-        attributes = {key: fields[key] for key in ("Proto", "State", "Dir", "Dur", "TotPkts", "TotBytes", "SrcBytes") if key in fields}
+        attributes = {key: fields[key] for key in ("Proto", "Protocol", "State", "Dir", "Dur", "Flow Duration", "TotPkts", "TotBytes", "SrcBytes", "Total Fwd Packet", "Total Bwd packets") if key in fields}
         return {"protocol": protocol, "roles": {"source_ip": source, "destination_ip": destination}, "mentions": mentions, "attributes": attributes}
 
     @staticmethod

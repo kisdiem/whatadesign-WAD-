@@ -1,0 +1,36 @@
+{
+  "blocking_reasons": [],
+  "config_hash": "2d1ffa804bb7d2e415c1b3d705926cec1411630fd11f2ab58ab88e7cba8e40cd",
+  "data_checks": [
+    {
+      "id": "evtx_attack_samples",
+      "readable": true,
+      "root": "/root/autodl-tmp/semantic-graph-apt/data/replacement_sources/evtx_attack_samples"
+    },
+    {
+      "id": "ctu13_selected",
+      "readable": true,
+      "root": "/root/autodl-tmp/semantic-graph-apt/data/ctu13_full_extracted"
+    },
+    {
+      "id": "sandworm_flow",
+      "readable": true,
+      "root": "/root/autodl-tmp/semantic-graph-apt/data/replacement_sources/sandworm"
+    }
+  ],
+  "git_commit": "5ecfb1adbfb79b05b630a6c80993ebe8d034e099",
+  "missing_items": [],
+  "mode": "train",
+  "model_checks": {
+    "model_cache": "/root/autodl-tmp/semantic-graph-apt/model_cache",
+    "readable": true
+  },
+  "pipeline_checks": {
+    "exists": true,
+    "source_entry": "scripts/run_source_v3_pipeline.py"
+  },
+  "status": "READY",
+  "warnings": [
+    "DARPA TC, LANL, CERT and AIT are not required source inputs for this configuration."
+  ]
+}

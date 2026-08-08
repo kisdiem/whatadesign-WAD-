@@ -256,10 +256,10 @@ def main() -> None:
     stage(work, "split", [raw_path], [split_path], len(records), train_count=len(split["train"]), validation_count=len(split["validation"]), test_count=len(split["test"]), group_count=len(groups), mode=args.mode, split_strategy="source_temporal_block_stratified", source_file_disjoint=False, line_block_size=block_size, positive_groups=len(positive_groups), train_positive_count=bucket_positive_counts["train"], validation_positive_count=bucket_positive_counts["validation"], test_positive_count=bucket_positive_counts["test"])
     m0 = M0DrainParser(); parsed = [replace(m0.parse(r), timestamp=r.raw_timestamp) for r in records]
     syntax_path = write_jsonl(work / "syntax_parses.jsonl", (p.to_dict() for p in parsed)); m0.save_cache(work / "m0_template_cache.json")
-    stage(work, "m0_fit_transform", [raw_path, split_path], [syntax_path, work / "m0_template_cache.json"], len(parsed), mode=args.mode)
+    stage(work, "m0_fit_transform", [raw_path], [syntax_path, work / "m0_template_cache.json"], len(parsed), mode=args.mode, fit_scope="all_available_unlabeled_records", split_labels_used=False, transductive_unlabeled_template_adaptation=True)
     normalizer = M1SemanticNormalizer(); frames = [replace(normalizer.normalize(p), timestamp=_normalize_timestamp(p.timestamp) or f"2000-01-01T00:00:{p.source_line % 60:02d}Z") for p in parsed]
     frame_path = write_jsonl(work / "event_frames.jsonl", (f.to_dict() for f in frames))
-    stage(work, "m1_semantic", [syntax_path], [frame_path], len(frames), mode=args.mode)
+    stage(work, "m1_semantic", [syntax_path], [frame_path], len(frames), mode=args.mode, normalization_scope="all_available_unlabeled_records", split_labels_used=False, transductive_unlabeled_template_adaptation=True)
     model_result = model_smoke(cache, args.device, work, args.mode)
     m2 = M2Pipeline(); all_entities = []; all_links = []; entity_by_event = {}
     for frame in frames:
