@@ -190,5 +190,41 @@ class QwenBackboneAdapter:
         self.validate_hidden_size(embeddings)
         return {"embeddings": embeddings, "serialized": serialized, "mode": self.mode, "is_mock": False}
 
+    def encode_window_chunked(self, frames: Iterable[EventFrame], *, max_tokens: int = 2048,
+                              mock_events_per_chunk: int = 128,
+                              device: torch.device | str | None = None) -> dict[str, Any]:
+        """Encode every event in a dense micro window without context truncation.
+
+        M1 still retains each individual event embedding. Qwen receives ordered
+        chunks and their representations are event-count weighted into one
+        explicit window representation; this is not anomaly-score summation.
+        """
+        ordered = sorted(frames, key=lambda frame: (self._timestamp(frame.timestamp), frame.record_id))
+        if not ordered:
+            output = self.encode_windows([], device=device)
+            return {**output, "embedding": torch.zeros(self.hidden_size), "chunk_event_counts": [], "chunk_count": 0}
+        chunks: list[list[EventFrame]] = []
+        current: list[EventFrame] = []
+        for frame in ordered:
+            candidate = current + [frame]
+            if self.mode == "mock":
+                overflow = len(candidate) > mock_events_per_chunk
+            else:
+                if self.tokenizer is None:
+                    raise RuntimeError("Qwen tokenizer not loaded")
+                token_count = len(self.tokenizer(self.serialize_window(candidate), add_special_tokens=True, truncation=False)["input_ids"])
+                overflow = bool(current) and token_count > max_tokens
+            if overflow:
+                chunks.append(current)
+                current = [frame]
+            else:
+                current = candidate
+        if current:
+            chunks.append(current)
+        encoded = self.encode_windows(chunks, device=device)
+        counts = torch.tensor([len(chunk) for chunk in chunks], dtype=encoded["embeddings"].dtype, device=encoded["embeddings"].device)
+        embedding = (encoded["embeddings"] * counts.unsqueeze(-1)).sum(dim=0) / counts.sum().clamp_min(1)
+        return {**encoded, "embedding": embedding, "chunk_event_counts": [int(value) for value in counts.cpu().tolist()], "chunk_count": len(chunks)}
+
     def export_backbone_manifest(self) -> dict[str, Any]:
         return asdict(QwenManifest(self.name, self.mode, self.model_loaded, self.hidden_size, self.local_files_only))

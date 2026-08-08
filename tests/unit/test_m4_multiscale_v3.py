@@ -74,6 +74,16 @@ def test_qwen_batch_window_encoder_preserves_window_count():
     assert output["embeddings"].shape == (2, encoder.hidden_size)
 
 
+def test_qwen_chunked_window_keeps_every_event_without_truncation():
+    now = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    encoder = QwenBackboneAdapter(mode="mock")
+    frames = [_frame(str(index), now + timedelta(seconds=index)) for index in range(5)]
+    output = encoder.encode_window_chunked(frames, mock_events_per_chunk=2)
+    assert output["chunk_event_counts"] == [2, 2, 1]
+    assert sum(output["chunk_event_counts"]) == len(frames)
+    assert output["embedding"].shape == (encoder.hidden_size,)
+
+
 def test_qformer_current_and_history_conditioning_and_variable_windows():
     torch.manual_seed(7)
     model = M4QFormerDecoder(M4Config(input_dim=4, hidden_dim=4, qwen_hidden_dim=6, heads=2, layers=1, query_count=2, dropout=0.0)).eval()
