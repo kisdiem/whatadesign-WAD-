@@ -4,19 +4,22 @@ import { ConfigProvider, theme } from 'antd'
 import { BrowserRouter } from 'react-router-dom'
 import 'antd/dist/reset.css'
 import './styles.css'
+import './light-theme.css'
 import App from './App'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ConfigProvider
       theme={{
-        algorithm: theme.darkAlgorithm,
+        algorithm: theme.defaultAlgorithm,
         token: {
-          colorPrimary: '#4da3ff',
-          colorBgBase: '#071019',
-          colorBgContainer: '#0d1824',
-          colorBgElevated: '#101d2a',
-          colorBorder: '#1d3044',
+          colorPrimary: '#2d84e5',
+          colorBgBase: '#ffffff',
+          colorBgContainer: '#ffffff',
+          colorBgElevated: '#ffffff',
+          colorBorder: '#e4e9ef',
+          colorText: '#253247',
+          colorTextSecondary: '#7b8796',
           borderRadius: 9,
         },
       }}
