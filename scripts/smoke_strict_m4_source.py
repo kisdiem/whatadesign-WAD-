@@ -27,7 +27,7 @@ def main() -> None:
 
     frames = [EventFrame.from_dict(json.loads(line)) for line in Path(args.events).read_text(encoding="utf-8").splitlines() if line.strip()]
     qwen = QwenBackboneAdapter(args.qwen_model, mode="frozen", local_files_only=True)
-    sample = StrictM4BatchBuilder(qwen).build_one(frames, args.record_id)
+    sample = StrictM4BatchBuilder(qwen, qwen_device=args.device).build_one(frames, args.record_id)
     batch = StrictM4BatchBuilder.collate([sample])
     m4 = M4QFormerDecoder(M4Config(input_dim=768, hidden_dim=128, qwen_hidden_dim=qwen.hidden_size, heads=4, layers=1)).eval()
     output = m4.forward_micro_windows(**batch)

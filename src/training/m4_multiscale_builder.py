@@ -37,10 +37,12 @@ class StrictM4BatchBuilder:
     """Construct causal M4 features from normalized source EventFrames only."""
 
     def __init__(self, qwen: QwenBackboneAdapter, *, window_builder: WindowBuilder | None = None,
-                 graph_builder: M3EventGraphBuilder | None = None) -> None:
+                 graph_builder: M3EventGraphBuilder | None = None,
+                 qwen_device: torch.device | str | None = None) -> None:
         self.qwen = qwen
         self.window_builder = window_builder or WindowBuilder()
         self.graph_builder = graph_builder or M3EventGraphBuilder(self.window_builder.config.macro_seconds)
+        self.qwen_device = qwen_device
 
     @staticmethod
     def _embedding(frame: EventFrame) -> Tensor:
@@ -78,7 +80,7 @@ class StrictM4BatchBuilder:
             # chunked encoder preserves every ordered EventFrame and records a
             # count-weighted semantic aggregation, rather than silently
             # truncating the history at tokenizer length.
-            result = self.qwen.encode_window_chunked(members)
+            result = self.qwen.encode_window_chunked(members, device=self.qwen_device)
             qwen_rows.append(result["embedding"].detach().to(dtype=torch.float32).cpu())
         qwen_tensor = torch.stack(qwen_rows) if qwen_rows else torch.zeros((0, self.qwen.hidden_size), dtype=torch.float32)
         return M4MultiscaleSample(
