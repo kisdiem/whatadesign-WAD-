@@ -30,7 +30,12 @@ def main() -> None:
     sample = StrictM4BatchBuilder(qwen, qwen_device=args.device).build_one(frames, args.record_id)
     batch = StrictM4BatchBuilder.collate([sample])
     m4 = M4QFormerDecoder(M4Config(input_dim=768, hidden_dim=128, qwen_hidden_dim=qwen.hidden_size, heads=4, layers=1)).eval()
-    output = m4.forward_micro_windows(**batch)
+    output = m4.forward_micro_windows(
+        batch["micro_event_embeddings"], batch["qwen_window_embeddings"],
+        batch["current_event_embedding"],
+        event_valid_mask=batch["micro_event_valid_mask"],
+        micro_window_mask=batch["micro_window_mask"],
+    )
     # All history membership has been established by WindowBuilder before Qwen
     # receives its structured EventFrames.  Assert the current event cannot
     # appear in any returned causal micro window.
