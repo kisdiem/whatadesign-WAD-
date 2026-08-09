@@ -46,6 +46,31 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def binary_metrics(labels: list[int], scores: list[float], threshold: float = 0.5) -> dict[str, float | int | None]:
+    """Threshold metrics plus rank-based ROC-AUC without sklearn dependency."""
+    predictions = [int(score >= threshold) for score in scores]
+    tp = sum(p == 1 and y == 1 for p, y in zip(predictions, labels))
+    fp = sum(p == 1 and y == 0 for p, y in zip(predictions, labels))
+    tn = sum(p == 0 and y == 0 for p, y in zip(predictions, labels))
+    fn = sum(p == 0 and y == 1 for p, y in zip(predictions, labels))
+    precision = tp / (tp + fp) if tp + fp else 0.0
+    recall = tp / (tp + fn) if tp + fn else 0.0
+    f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
+    positives, negatives = sum(labels), len(labels) - sum(labels)
+    auc = None
+    if positives and negatives:
+        wins = ties = 0
+        for score, label in zip(scores, labels):
+            if label:
+                for other, other_label in zip(scores, labels):
+                    if not other_label:
+                        wins += score > other
+                        ties += score == other
+        auc = (wins + 0.5 * ties) / (positives * negatives)
+    return {"threshold": threshold, "roc_auc": auc, "f1": f1, "precision": precision,
+            "recall": recall, "tp": tp, "fp": fp, "tn": tn, "fn": fn}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Strict source-only M4 Q-Former training")
     parser.add_argument("--targets", required=True)
@@ -79,7 +104,7 @@ def main() -> None:
         targets = dataset.split_targets(name)
         if limit is not None:
             targets = targets[:limit]
-        losses, scores = [], []
+        losses, scores, observed_labels = [], [], []
         for target in targets:
             rows = frames.get(target.dataset_id)
             if rows is None:
@@ -89,8 +114,11 @@ def main() -> None:
             if training:
                 losses.append(runner.train_one(batch, loss_label=label))
             else:
-                loss, score = runner.evaluate_one(batch, loss_label=label); losses.append(loss); scores.append(score)
-        return {"count": len(targets), "mean_loss": sum(losses) / max(len(losses), 1), "mean_score": sum(scores) / max(len(scores), 1)}
+                loss, score = runner.evaluate_one(batch, loss_label=label); losses.append(loss); scores.append(score); observed_labels.append(label)
+        result = {"count": len(targets), "mean_loss": sum(losses) / max(len(losses), 1), "mean_score": sum(scores) / max(len(scores), 1)}
+        if not training:
+            result["metrics"] = binary_metrics(observed_labels, scores)
+        return result
 
     best = float("inf"); history = []
     for epoch in range(1, args.epochs + 1):
