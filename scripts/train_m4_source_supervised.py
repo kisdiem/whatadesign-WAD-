@@ -142,6 +142,7 @@ def main() -> None:
         return result
 
     best = float("inf"); history = []
+    best_checkpoint: Path | None = None
     stale_epochs = 0
     for epoch in range(1, args.epochs + 1):
         train = run_split("train", args.max_train, True, epoch)
@@ -152,18 +153,27 @@ def main() -> None:
             checkpoint = output / "best_validation_m4_qformer.pt"
             torch.save({"epoch": epoch, "model": model.state_dict(), "optimizer": runner.optimizer.state_dict(), "validation": validation}, checkpoint)
             row["checkpoint"] = str(checkpoint)
+            best_checkpoint = checkpoint
             stale_epochs = 0
         else:
             stale_epochs += 1
             if stale_epochs >= args.early_stopping_patience:
                 row["early_stopped"] = True
                 break
+    if best_checkpoint is None:
+        raise RuntimeError("no validation checkpoint was produced; refusing held-out evaluation")
+    # Held-out evaluation must use the checkpoint selected solely by validation
+    # loss, never the final post-update epoch.
+    selected = torch.load(best_checkpoint, map_location=runner.device, weights_only=False)
+    model.load_state_dict(selected["model"])
     test = run_split("test", args.max_test, False)
     report = {"status": "COMPLETED", "protocol": "source_only_strict_m4", "ait_accessed": False,
               "labels_used_only_for_loss": True,
               "contrastive": {"enabled": bool(args.contrastive_weight), "weight": args.contrastive_weight,
                               "temperature": args.contrastive_temperature, "source_fact_triplets": len(train_triplets)},
-              "qwen": (qwen.export_backbone_manifest() if qwen else {"cache": args.qwen_cache, "mode": "frozen_cached_exact"}), "history": history, "held_out_test": test,
+              "qwen": (qwen.export_backbone_manifest() if qwen else {"cache": args.qwen_cache, "mode": "frozen_cached_exact"}), "history": history,
+              "selected_checkpoint": {"path": str(best_checkpoint), "epoch": selected["epoch"], "validation": selected["validation"]},
+              "held_out_test": test,
               "input_hashes": {str(Path(path)): sha256(Path(path)) for path in [args.targets, args.labels, *args.events]}}
     (output / "training_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     print(json.dumps(report, indent=2))
