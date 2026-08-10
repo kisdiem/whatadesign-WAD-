@@ -76,6 +76,8 @@ def main() -> None:
     parser.add_argument("--qwen-model", required=True)
     parser.add_argument("--qwen-cache")
     parser.add_argument("--qwen-cache-mapping")
+    parser.add_argument("--event-chunk-size", type=int, default=128,
+                        help="Time-ordered event embeddings per hierarchical M4 token; no events are dropped.")
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--epochs", type=int, default=1)
     parser.add_argument("--seed", type=int, default=20260810)
@@ -93,7 +95,7 @@ def main() -> None:
     frames = read_frames(args.events)
     if bool(args.qwen_cache) != bool(args.qwen_cache_mapping):
         raise ValueError("--qwen-cache and --qwen-cache-mapping must be supplied together")
-    cache = ExactM4Cache(args.qwen_cache, args.qwen_cache_mapping) if args.qwen_cache else None
+    cache = ExactM4Cache(args.qwen_cache, args.qwen_cache_mapping, event_chunk_size=args.event_chunk_size) if args.qwen_cache else None
     qwen = None if cache else QwenBackboneAdapter(args.qwen_model, mode="frozen", local_files_only=True)
     builder = None if cache else StrictM4BatchBuilder(qwen, qwen_device=args.device)
     qwen_hidden = len(next(iter(cache.windows.values()))["qwen_embedding"]) if cache else qwen.hidden_size
@@ -176,6 +178,7 @@ def main() -> None:
               "labels_used_only_for_loss": True,
               "contrastive": {"enabled": bool(args.contrastive_weight), "weight": args.contrastive_weight,
                               "temperature": args.contrastive_temperature, "source_fact_triplets": len(train_triplets)},
+              "event_hierarchy": {"event_chunk_size": args.event_chunk_size, "aggregation": "ordered_mean_no_event_drop"},
               "qwen": (qwen.export_backbone_manifest() if qwen else {"cache": args.qwen_cache, "mode": "frozen_cached_exact"}), "history": history,
               "selected_checkpoint": {"path": str(best_checkpoint), "epoch": selected["epoch"], "validation": selected["validation"],
                                       "decision_threshold": selected["decision_threshold"]},

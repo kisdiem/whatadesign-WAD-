@@ -13,7 +13,9 @@ from src.training.m4_window_cache import parse_utc
 
 
 class ExactM4Cache:
-    def __init__(self, cache_path: str | Path, mapping_path: str | Path) -> None:
+    def __init__(self, cache_path: str | Path, mapping_path: str | Path, *, event_chunk_size: int = 128) -> None:
+        if event_chunk_size <= 0:
+            raise ValueError("event_chunk_size must be positive")
         self.windows = {row["window_id"]: row for row in self._jsonl(cache_path)}
         self.mapping = {(row["dataset_id"], row["record_id"]): row["window_ids"] for row in self._jsonl(mapping_path)}
         if any(row.get("alignment") != "current" for row in self.windows.values()):
@@ -21,6 +23,7 @@ class ExactM4Cache:
         if any(bool(row.get("is_mock")) for row in self.windows.values()):
             raise ValueError("strict M4 training refuses mock Qwen cache")
         self._frame_indices: dict[tuple[str, int], tuple[list, list[EventFrame]]] = {}
+        self.event_chunk_size = event_chunk_size
 
     @staticmethod
     def _jsonl(path):
@@ -41,13 +44,18 @@ class ExactM4Cache:
             members.append([frame for frame in ordered_frames[left:right] if frame.record_id != record_id])
         dim = len(current.semantic_embedding or [])
         if not dim: raise ValueError("current EventFrame lacks M1 semantic_embedding")
-        width = max((len(item) for item in members), default=0)
+        # Keep every event, but represent long windows hierarchically.  Direct
+        # MHA over 20k+ events is quadratic and infeasible.  Each time-ordered
+        # chunk contains every member once; no events are sampled or dropped.
+        width = max(((len(item) + self.event_chunk_size - 1) // self.event_chunk_size for item in members), default=0)
         events = torch.zeros((1, len(rows), width, dim), dtype=torch.float32)
         event_mask = torch.zeros((1, len(rows), width), dtype=torch.bool)
         for window_index, frames_in_window in enumerate(members):
-            for event_index, frame in enumerate(frames_in_window):
-                events[0, window_index, event_index] = torch.tensor(frame.semantic_embedding, dtype=torch.float32)
-                event_mask[0, window_index, event_index] = True
+            for chunk_index, start_index in enumerate(range(0, len(frames_in_window), self.event_chunk_size)):
+                chunk = frames_in_window[start_index:start_index + self.event_chunk_size]
+                embeddings = torch.tensor([frame.semantic_embedding for frame in chunk], dtype=torch.float32)
+                events[0, window_index, chunk_index] = embeddings.mean(dim=0)
+                event_mask[0, window_index, chunk_index] = True
         return {"micro_event_embeddings": events,
                 "qwen_window_embeddings": torch.tensor([[row["qwen_embedding"] for row in rows]], dtype=torch.float32),
                 "current_event_embedding": torch.tensor([current.semantic_embedding], dtype=torch.float32),
