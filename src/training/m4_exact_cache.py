@@ -3,6 +3,7 @@ from __future__ import annotations
 """Build strict M4 tensors from a reproducible exact-Qwen cache."""
 
 import json
+from bisect import bisect_left
 from pathlib import Path
 
 import torch
@@ -19,6 +20,7 @@ class ExactM4Cache:
             raise ValueError("strict M4 training refuses non-current-aligned cache")
         if any(bool(row.get("is_mock")) for row in self.windows.values()):
             raise ValueError("strict M4 training refuses mock Qwen cache")
+        self._frame_indices: dict[tuple[str, int], tuple[list, list[EventFrame]]] = {}
 
     @staticmethod
     def _jsonl(path):
@@ -31,10 +33,12 @@ class ExactM4Cache:
         ids = self.mapping[(dataset_id, record_id)]
         rows = [self.windows[item] for item in ids]
         members = []
+        timestamps, ordered_frames = self._frame_index(frames, dataset_id)
         for row in rows:
             start, end = parse_utc(row["start"]), parse_utc(row["end"])
-            members.append([frame for frame in frames if frame.record_id != record_id and frame.timestamp
-                            and start <= parse_utc(frame.timestamp) < end])
+            left = bisect_left(timestamps, start)
+            right = bisect_left(timestamps, end)
+            members.append([frame for frame in ordered_frames[left:right] if frame.record_id != record_id])
         dim = len(current.semantic_embedding or [])
         if not dim: raise ValueError("current EventFrame lacks M1 semantic_embedding")
         width = max((len(item) for item in members), default=0)
@@ -49,3 +53,22 @@ class ExactM4Cache:
                 "current_event_embedding": torch.tensor([current.semantic_embedding], dtype=torch.float32),
                 "micro_event_valid_mask": event_mask,
                 "micro_window_mask": torch.ones((1, len(rows)), dtype=torch.bool)}
+
+    def _frame_index(self, frames: list[EventFrame], dataset_id: str) -> tuple[list, list[EventFrame]]:
+        """Index timestamps once per immutable source frame list.
+
+        M4 trains on overlapping windows, so rescanning all source events for
+        every target turns a small cached experiment into CPU-bound quadratic
+        work.  This index preserves the exact `[start, end)` predicate while
+        reducing membership lookup to two binary searches.
+        """
+        key = (dataset_id, id(frames))
+        indexed = self._frame_indices.get(key)
+        if indexed is None:
+            pairs = sorted(
+                ((parse_utc(frame.timestamp), frame) for frame in frames if frame.timestamp),
+                key=lambda item: (item[0], item[1].record_id),
+            )
+            indexed = ([item[0] for item in pairs], [item[1] for item in pairs])
+            self._frame_indices[key] = indexed
+        return indexed
