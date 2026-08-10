@@ -22,7 +22,7 @@ class ExactM4Cache:
             raise ValueError("strict M4 training refuses non-current-aligned cache")
         if any(bool(row.get("is_mock")) for row in self.windows.values()):
             raise ValueError("strict M4 training refuses mock Qwen cache")
-        self._frame_indices: dict[tuple[str, int], tuple[list, list[EventFrame], dict[str, EventFrame]]] = {}
+        self._frame_indices: dict[tuple[str, int], tuple[list, list[EventFrame], dict[str, EventFrame], dict[str, int], torch.Tensor]] = {}
         self.event_chunk_size = event_chunk_size
 
     @staticmethod
@@ -32,32 +32,42 @@ class ExactM4Cache:
                 if line.strip(): yield json.loads(line)
 
     def build(self, frames: list[EventFrame], *, dataset_id: str, record_id: str) -> dict[str, torch.Tensor]:
-        timestamps, ordered_frames, by_record_id = self._frame_index(frames, dataset_id)
+        timestamps, ordered_frames, by_record_id, positions, embedding_prefix = self._frame_index(frames, dataset_id)
         try:
             current = by_record_id[record_id]
         except KeyError as error:
             raise ValueError(f"target record not present in source EventFrames: {(dataset_id, record_id)}") from error
         ids = self.mapping[(dataset_id, record_id)]
         rows = [self.windows[item] for item in ids]
-        members = []
+        spans = []
         for row in rows:
             start, end = parse_utc(row["start"]), parse_utc(row["end"])
             left = bisect_left(timestamps, start)
             right = bisect_left(timestamps, end)
-            members.append([frame for frame in ordered_frames[left:right] if frame.record_id != record_id])
+            spans.append((left, right))
         dim = len(current.semantic_embedding or [])
         if not dim: raise ValueError("current EventFrame lacks M1 semantic_embedding")
         # Keep every event, but represent long windows hierarchically.  Direct
         # MHA over 20k+ events is quadratic and infeasible.  Each time-ordered
         # chunk contains every member once; no events are sampled or dropped.
-        width = max(((len(item) + self.event_chunk_size - 1) // self.event_chunk_size for item in members), default=0)
+        width = max(((right - left + self.event_chunk_size - 1) // self.event_chunk_size for left, right in spans), default=0)
         events = torch.zeros((1, len(rows), width, dim), dtype=torch.float32)
         event_mask = torch.zeros((1, len(rows), width), dtype=torch.bool)
-        for window_index, frames_in_window in enumerate(members):
-            for chunk_index, start_index in enumerate(range(0, len(frames_in_window), self.event_chunk_size)):
-                chunk = frames_in_window[start_index:start_index + self.event_chunk_size]
-                embeddings = torch.tensor([frame.semantic_embedding for frame in chunk], dtype=torch.float32)
-                events[0, window_index, chunk_index] = embeddings.mean(dim=0)
+        current_position = positions[record_id]
+        for window_index, (left, right) in enumerate(spans):
+            # In strict current-aligned windows the current event is at end and
+            # therefore outside [left, right). Retain a safe fallback for
+            # malformed cache/source combinations rather than silently leaking.
+            if left <= current_position < right:
+                members = [frame for frame in ordered_frames[left:right] if frame.record_id != record_id]
+                for chunk_index, start_index in enumerate(range(0, len(members), self.event_chunk_size)):
+                    chunk = torch.tensor([frame.semantic_embedding for frame in members[start_index:start_index + self.event_chunk_size]], dtype=torch.float32)
+                    events[0, window_index, chunk_index] = chunk.mean(dim=0)
+                    event_mask[0, window_index, chunk_index] = True
+                continue
+            for chunk_index, start_index in enumerate(range(left, right, self.event_chunk_size)):
+                end_index = min(start_index + self.event_chunk_size, right)
+                events[0, window_index, chunk_index] = (embedding_prefix[end_index] - embedding_prefix[start_index]) / (end_index - start_index)
                 event_mask[0, window_index, chunk_index] = True
         return {"micro_event_embeddings": events,
                 "qwen_window_embeddings": torch.tensor([[row["qwen_embedding"] for row in rows]], dtype=torch.float32),
@@ -65,7 +75,7 @@ class ExactM4Cache:
                 "micro_event_valid_mask": event_mask,
                 "micro_window_mask": torch.ones((1, len(rows)), dtype=torch.bool)}
 
-    def _frame_index(self, frames: list[EventFrame], dataset_id: str) -> tuple[list, list[EventFrame], dict[str, EventFrame]]:
+    def _frame_index(self, frames: list[EventFrame], dataset_id: str) -> tuple[list, list[EventFrame], dict[str, EventFrame], dict[str, int], torch.Tensor]:
         """Index timestamps once per immutable source frame list.
 
         M4 trains on overlapping windows, so rescanning all source events for
@@ -83,6 +93,12 @@ class ExactM4Cache:
             by_record_id = {frame.record_id: frame for frame in frames}
             if len(by_record_id) != len(frames):
                 raise ValueError(f"duplicate record_id in source EventFrames for dataset {dataset_id}")
-            indexed = ([item[0] for item in pairs], [item[1] for item in pairs], by_record_id)
+            ordered = [item[1] for item in pairs]
+            if any(not frame.semantic_embedding for frame in ordered):
+                raise ValueError("strict M4 cache requires M1 semantic_embedding on every history EventFrame")
+            embeddings = torch.tensor([frame.semantic_embedding for frame in ordered], dtype=torch.float32)
+            prefix = torch.cat([torch.zeros((1, embeddings.shape[1]), dtype=torch.float32), embeddings.cumsum(dim=0)], dim=0)
+            positions = {frame.record_id: position for position, frame in enumerate(ordered)}
+            indexed = ([item[0] for item in pairs], ordered, by_record_id, positions, prefix)
             self._frame_indices[key] = indexed
         return indexed

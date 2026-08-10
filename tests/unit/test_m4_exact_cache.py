@@ -37,8 +37,8 @@ def test_exact_cache_aggregates_every_event_in_ordered_chunks(tmp_path) -> None:
 
     result = ExactM4Cache(cache, mapping, event_chunk_size=2).build(frames, dataset_id="source", record_id="current")
 
-    assert result["micro_event_valid_mask"].tolist() == [[[True, True]]]
-    assert result["micro_event_embeddings"].tolist() == [[[[0.5, 0.5], [2.5, 2.5]]]]
+    assert result["micro_event_valid_mask"].tolist() == [[[True, True, False]]]
+    assert result["micro_event_embeddings"].tolist() == [[[[0.5, 0.5], [2.5, 2.5], [0.0, 0.0]]]]
 
 
 def test_exact_cache_indexes_target_record_ids(tmp_path) -> None:
@@ -48,7 +48,9 @@ def test_exact_cache_indexes_target_record_ids(tmp_path) -> None:
     mapping.write_text(json.dumps({"dataset_id": "source", "record_id": "missing", "window_ids": ["window"]}) + "\n", encoding="utf-8")
 
     try:
-        ExactM4Cache(cache, mapping).build([], dataset_id="source", record_id="missing")
+        ExactM4Cache(cache, mapping).build([
+            EventFrame(dataset_id="source", record_id="other", timestamp="2026-08-10T10:00:00+00:00", semantic_embedding=[1.0, 2.0]),
+        ], dataset_id="source", record_id="missing")
     except ValueError as error:
         assert "target record not present" in str(error)
     else:
