@@ -102,6 +102,8 @@ def main() -> None:
     model = M4QFormerDecoder(M4Config(input_dim=768, hidden_dim=128, qwen_hidden_dim=qwen_hidden, heads=4, layers=1))
     runner = M4SupervisedRunner(model, device=args.device, learning_rate=args.learning_rate)
     output = Path(args.output_dir); output.mkdir(parents=True, exist_ok=True)
+    progress_path = output / "epoch_progress.jsonl"
+    progress_path.write_text("", encoding="utf-8")
     train_triplets = build_source_relation_triplets(dataset.split_targets("train"), frames) if args.contrastive_weight else {}
 
     def run_split(name: str, limit: int | None, training: bool, epoch: int = 0) -> tuple[dict, list[int], list[float]]:
@@ -165,7 +167,12 @@ def main() -> None:
             stale_epochs += 1
             if stale_epochs >= args.early_stopping_patience:
                 row["early_stopped"] = True
-                break
+        row["checkpoint_selected"] = best_checkpoint == checkpoint if "checkpoint" in row else False
+        with progress_path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(row, ensure_ascii=True) + "\n")
+        print(json.dumps({"event": "epoch_completed", **row}, ensure_ascii=True), flush=True)
+        if row.get("early_stopped"):
+            break
     if best_checkpoint is None:
         raise RuntimeError("no validation checkpoint was produced; refusing held-out evaluation")
     # Held-out evaluation must use the checkpoint selected solely by validation
@@ -182,6 +189,7 @@ def main() -> None:
               "qwen": (qwen.export_backbone_manifest() if qwen else {"cache": args.qwen_cache, "mode": "frozen_cached_exact"}), "history": history,
               "selected_checkpoint": {"path": str(best_checkpoint), "epoch": selected["epoch"], "validation": selected["validation"],
                                       "decision_threshold": selected["decision_threshold"]},
+              "epoch_progress": str(progress_path),
               "held_out_test": test,
               "input_hashes": {str(Path(path)): sha256(Path(path)) for path in [args.targets, args.labels, *args.events]}}
     (output / "training_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
