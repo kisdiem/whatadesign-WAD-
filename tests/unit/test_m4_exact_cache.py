@@ -39,3 +39,17 @@ def test_exact_cache_aggregates_every_event_in_ordered_chunks(tmp_path) -> None:
 
     assert result["micro_event_valid_mask"].tolist() == [[[True, True]]]
     assert result["micro_event_embeddings"].tolist() == [[[[0.5, 0.5], [2.5, 2.5]]]]
+
+
+def test_exact_cache_indexes_target_record_ids(tmp_path) -> None:
+    cache = tmp_path / "cache.jsonl"
+    mapping = tmp_path / "mapping.jsonl"
+    cache.write_text(json.dumps({"window_id": "window", "start": "2026-08-10T10:00:00+00:00", "end": "2026-08-10T10:05:00+00:00", "alignment": "current", "is_mock": False, "qwen_embedding": [0.0, 0.0]}) + "\n", encoding="utf-8")
+    mapping.write_text(json.dumps({"dataset_id": "source", "record_id": "missing", "window_ids": ["window"]}) + "\n", encoding="utf-8")
+
+    try:
+        ExactM4Cache(cache, mapping).build([], dataset_id="source", record_id="missing")
+    except ValueError as error:
+        assert "target record not present" in str(error)
+    else:
+        raise AssertionError("missing target must fail explicitly")

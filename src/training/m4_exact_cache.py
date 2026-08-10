@@ -22,7 +22,7 @@ class ExactM4Cache:
             raise ValueError("strict M4 training refuses non-current-aligned cache")
         if any(bool(row.get("is_mock")) for row in self.windows.values()):
             raise ValueError("strict M4 training refuses mock Qwen cache")
-        self._frame_indices: dict[tuple[str, int], tuple[list, list[EventFrame]]] = {}
+        self._frame_indices: dict[tuple[str, int], tuple[list, list[EventFrame], dict[str, EventFrame]]] = {}
         self.event_chunk_size = event_chunk_size
 
     @staticmethod
@@ -32,11 +32,14 @@ class ExactM4Cache:
                 if line.strip(): yield json.loads(line)
 
     def build(self, frames: list[EventFrame], *, dataset_id: str, record_id: str) -> dict[str, torch.Tensor]:
-        current = next(frame for frame in frames if frame.record_id == record_id)
+        timestamps, ordered_frames, by_record_id = self._frame_index(frames, dataset_id)
+        try:
+            current = by_record_id[record_id]
+        except KeyError as error:
+            raise ValueError(f"target record not present in source EventFrames: {(dataset_id, record_id)}") from error
         ids = self.mapping[(dataset_id, record_id)]
         rows = [self.windows[item] for item in ids]
         members = []
-        timestamps, ordered_frames = self._frame_index(frames, dataset_id)
         for row in rows:
             start, end = parse_utc(row["start"]), parse_utc(row["end"])
             left = bisect_left(timestamps, start)
@@ -62,7 +65,7 @@ class ExactM4Cache:
                 "micro_event_valid_mask": event_mask,
                 "micro_window_mask": torch.ones((1, len(rows)), dtype=torch.bool)}
 
-    def _frame_index(self, frames: list[EventFrame], dataset_id: str) -> tuple[list, list[EventFrame]]:
+    def _frame_index(self, frames: list[EventFrame], dataset_id: str) -> tuple[list, list[EventFrame], dict[str, EventFrame]]:
         """Index timestamps once per immutable source frame list.
 
         M4 trains on overlapping windows, so rescanning all source events for
@@ -77,6 +80,9 @@ class ExactM4Cache:
                 ((parse_utc(frame.timestamp), frame) for frame in frames if frame.timestamp),
                 key=lambda item: (item[0], item[1].record_id),
             )
-            indexed = ([item[0] for item in pairs], [item[1] for item in pairs])
+            by_record_id = {frame.record_id: frame for frame in frames}
+            if len(by_record_id) != len(frames):
+                raise ValueError(f"duplicate record_id in source EventFrames for dataset {dataset_id}")
+            indexed = ([item[0] for item in pairs], [item[1] for item in pairs], by_record_id)
             self._frame_indices[key] = indexed
         return indexed
