@@ -22,7 +22,7 @@ from src.models.m4_backbone_adapter import QwenBackboneAdapter
 from src.models.m4_qformer import M4Config, M4QFormerDecoder
 from src.training.m4_multiscale_builder import StrictM4BatchBuilder
 from src.training.m4_exact_cache import ExactM4Cache
-from src.training.m4_metrics import binary_metrics
+from src.training.m4_metrics import binary_metrics, select_f1_threshold
 from src.training.m4_relation_pairs import build_source_relation_triplets
 from src.training.m4_source_dataset import StrictM4SourceDataset
 from src.training.m4_supervised_runner import M4SupervisedRunner
@@ -102,7 +102,7 @@ def main() -> None:
     output = Path(args.output_dir); output.mkdir(parents=True, exist_ok=True)
     train_triplets = build_source_relation_triplets(dataset.split_targets("train"), frames) if args.contrastive_weight else {}
 
-    def run_split(name: str, limit: int | None, training: bool, epoch: int = 0) -> dict[str, float]:
+    def run_split(name: str, limit: int | None, training: bool, epoch: int = 0) -> tuple[dict, list[int], list[float]]:
         targets = dataset.split_targets(name)
         if limit is not None:
             targets = targets[:limit]
@@ -139,19 +139,23 @@ def main() -> None:
         elif contrastive_losses:
             result["contrastive_triplets"] = len(contrastive_losses)
             result["mean_contrastive_loss"] = sum(contrastive_losses) / len(contrastive_losses)
-        return result
+        return result, observed_labels, scores
 
     best = float("inf"); history = []
     best_checkpoint: Path | None = None
     stale_epochs = 0
     for epoch in range(1, args.epochs + 1):
-        train = run_split("train", args.max_train, True, epoch)
-        validation = run_split("validation", args.max_validation, False)
+        train, _, _ = run_split("train", args.max_train, True, epoch)
+        validation, validation_labels, validation_scores = run_split("validation", args.max_validation, False)
+        decision_threshold, selection_metrics = select_f1_threshold(validation_labels, validation_scores)
+        validation["f1_selected_threshold"] = decision_threshold
+        validation["f1_selected_metrics"] = selection_metrics
         row = {"epoch": epoch, "train": train, "validation": validation}; history.append(row)
         if validation["mean_loss"] < best:
             best = validation["mean_loss"]
             checkpoint = output / "best_validation_m4_qformer.pt"
-            torch.save({"epoch": epoch, "model": model.state_dict(), "optimizer": runner.optimizer.state_dict(), "validation": validation}, checkpoint)
+            torch.save({"epoch": epoch, "model": model.state_dict(), "optimizer": runner.optimizer.state_dict(),
+                        "validation": validation, "decision_threshold": decision_threshold}, checkpoint)
             row["checkpoint"] = str(checkpoint)
             best_checkpoint = checkpoint
             stale_epochs = 0
@@ -166,13 +170,15 @@ def main() -> None:
     # loss, never the final post-update epoch.
     selected = torch.load(best_checkpoint, map_location=runner.device, weights_only=False)
     model.load_state_dict(selected["model"])
-    test = run_split("test", args.max_test, False)
+    test, test_labels, test_scores = run_split("test", args.max_test, False)
+    test["metrics_fixed_validation_threshold"] = binary_metrics(test_labels, test_scores, float(selected["decision_threshold"]))
     report = {"status": "COMPLETED", "protocol": "source_only_strict_m4", "ait_accessed": False,
               "labels_used_only_for_loss": True,
               "contrastive": {"enabled": bool(args.contrastive_weight), "weight": args.contrastive_weight,
                               "temperature": args.contrastive_temperature, "source_fact_triplets": len(train_triplets)},
               "qwen": (qwen.export_backbone_manifest() if qwen else {"cache": args.qwen_cache, "mode": "frozen_cached_exact"}), "history": history,
-              "selected_checkpoint": {"path": str(best_checkpoint), "epoch": selected["epoch"], "validation": selected["validation"]},
+              "selected_checkpoint": {"path": str(best_checkpoint), "epoch": selected["epoch"], "validation": selected["validation"],
+                                      "decision_threshold": selected["decision_threshold"]},
               "held_out_test": test,
               "input_hashes": {str(Path(path)): sha256(Path(path)) for path in [args.targets, args.labels, *args.events]}}
     (output / "training_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")

@@ -36,3 +36,23 @@ def binary_metrics(labels: list[int], scores: list[float], threshold: float = 0.
         pr_auc = precision_sum / positives
     return {"threshold": threshold, "roc_auc": roc_auc, "pr_auc": pr_auc, "f1": f1, "precision": precision,
             "recall": recall, "tp": tp, "fp": fp, "tn": tn, "fn": fn}
+
+
+def select_f1_threshold(labels: list[int], scores: list[float]) -> tuple[float, dict[str, float | int | None]]:
+    """Select a decision threshold on validation data only.
+
+    ROC-AUC/PR-AUC remain threshold-free ranking metrics.  The chosen F1
+    operating point is persisted with the selected checkpoint and is never
+    adjusted after held-out labels are read.
+    """
+    if not labels or len(labels) != len(scores):
+        raise ValueError("labels and scores must be non-empty and aligned")
+    candidates = sorted(set(scores) | {0.0, 0.5, 1.0})
+    ranked = [(threshold, binary_metrics(labels, scores, threshold)) for threshold in candidates]
+    # Stable tie break: higher recall, then threshold closer to 0.5, then the
+    # smaller threshold for reproducibility.
+    threshold, metrics = max(
+        ranked,
+        key=lambda item: (float(item[1]["f1"]), float(item[1]["recall"]), -abs(item[0] - 0.5), -item[0]),
+    )
+    return threshold, metrics
