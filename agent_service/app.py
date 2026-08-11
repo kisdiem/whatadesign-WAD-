@@ -68,26 +68,38 @@ async def query_stream(request: AgentQueryRequest):
         raise HTTPException(status_code=503, detail="OPENAI_API_KEY 未在 Agent 服务端配置。")
 
     async def events():
-        try:
-            decision = await runtime.resolve_mode(request)
-            yield _sse("route", {"mode": decision.mode, "confidence": decision.confidence, "reason_code": decision.reason_code})
-            if decision.mode == "security":
-                for label in ["正在读取安全上下文", "正在查询相关证据", "正在核验关键结论"]:
-                    yield _sse("status", {"label": label})
-                    await asyncio.sleep(0)
-            elif decision.mode == "knowledge":
-                yield _sse("status", {"label": "正在检索安全知识库"})
-            else:
-                yield _sse("status", {"label": "正在生成回答"})
+        decision = await runtime.resolve_mode(request)
+        yield _sse("route", {"mode": decision.mode, "confidence": decision.confidence, "reason_code": decision.reason_code})
 
-            result = await runtime.run(request, decision=decision)
+        status_queue: asyncio.Queue[str] = asyncio.Queue()
+
+        async def status_callback(label: str) -> None:
+            await status_queue.put(label)
+
+        task = asyncio.create_task(runtime.run(request, decision=decision, status_callback=status_callback))
+
+        try:
+            while not task.done() or not status_queue.empty():
+                try:
+                    label = await asyncio.wait_for(status_queue.get(), timeout=0.2)
+                    yield _sse("status", {"label": label})
+                except TimeoutError:
+                    continue
+
+            result = await task
             for evidence in result.evidence:
                 yield _sse("citation", evidence.model_dump())
             yield _sse("final", result.model_dump())
         except Exception as exc:
+            if not task.done():
+                task.cancel()
             yield _sse("error", {"message": f"Agent 执行失败：{type(exc).__name__}"})
 
-    return StreamingResponse(events(), media_type="text/event-stream")
+    return StreamingResponse(
+        events(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 @app.post("/api/assistant/query")
