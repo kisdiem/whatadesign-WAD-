@@ -3,7 +3,12 @@ import { Badge, Card, Segmented, Space, Tag, Typography } from 'antd'
 import { RobotOutlined, SafetyCertificateOutlined } from '@ant-design/icons'
 import { createPortal } from 'react-dom'
 import { useLocation } from 'react-router-dom'
-import { getAgentMode, setAgentMode, type AgentMode } from './services/api'
+import {
+  getAgentMode,
+  setAgentMode,
+  type AgentMode,
+  type ResolvedAgentMode,
+} from './services/api'
 
 const { Text } = Typography
 
@@ -13,6 +18,12 @@ const modeOptions = [
   { label: '知识问答', value: 'knowledge' },
   { label: '普通', value: 'general' },
 ]
+
+const modeLabels: Record<ResolvedAgentMode, string> = {
+  security: '安全分析',
+  knowledge: '知识问答',
+  general: '普通',
+}
 
 const descriptions: Record<AgentMode, string> = {
   auto: '根据问题与当前 Finding / Investigation / Entity 上下文自动选择最小权限模式。',
@@ -27,11 +38,19 @@ type Health = {
   repository: string
 }
 
+type AgentResultEvent = {
+  mode?: ResolvedAgentMode
+  verified?: boolean
+  confidence?: number
+  runId?: string
+}
+
 export default function AgentModeEnhancer() {
   const location = useLocation()
   const [host, setHost] = useState<HTMLDivElement | null>(null)
   const [mode, setMode] = useState<AgentMode>(getAgentMode())
   const [health, setHealth] = useState<Health | null>(null)
+  const [lastResult, setLastResult] = useState<AgentResultEvent | null>(null)
 
   useEffect(() => {
     if (!location.pathname.startsWith('/assistant')) {
@@ -63,10 +82,20 @@ export default function AgentModeEnhancer() {
     return () => { active = false }
   }, [host])
 
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const custom = event as CustomEvent<AgentResultEvent>
+      setLastResult(custom.detail || null)
+    }
+    window.addEventListener('wad-agent-result', handler)
+    return () => window.removeEventListener('wad-agent-result', handler)
+  }, [])
+
   const changeMode = (value: string | number) => {
     const next = String(value) as AgentMode
     setMode(next)
     setAgentMode(next)
+    setLastResult(null)
   }
 
   if (!host) return null
@@ -79,6 +108,12 @@ export default function AgentModeEnhancer() {
             <RobotOutlined />
             <Text strong>Agent 模式</Text>
             <Segmented value={mode} options={modeOptions} onChange={changeMode} />
+            {lastResult?.mode && (
+              <Tag color={lastResult.mode === 'security' ? 'processing' : undefined}>
+                本轮：{modeLabels[lastResult.mode]}
+              </Tag>
+            )}
+            {lastResult?.verified && <Tag color="success">证据已核验</Tag>}
           </Space>
           <div className="agent-mode-description">{descriptions[mode]}</div>
         </div>
