@@ -5,10 +5,11 @@ import json
 import os
 from typing import Any
 
-from agents import set_default_openai_key, set_tracing_disabled
+from agents import set_default_openai_client, set_tracing_disabled
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from openai import AsyncOpenAI
 from pydantic import BaseModel, Field
 
 from .models import AgentQueryRequest, AgentRequestContext
@@ -46,14 +47,15 @@ class AgentProviderRequest(BaseModel):
 
 
 def _provider_configured() -> bool:
-    return bool(os.getenv("OPENAI_API_KEY")) or _runtime_openai_configured
+    return _runtime_openai_configured or bool(os.getenv("OPENAI_API_KEY"))
 
 
 def _provider_source() -> str:
-    if os.getenv("OPENAI_API_KEY"):
-        return "environment"
+    # A runtime key intentionally overrides a possibly stale environment key/client.
     if _runtime_openai_configured:
         return "runtime-memory"
+    if os.getenv("OPENAI_API_KEY"):
+        return "environment"
     return "none"
 
 
@@ -93,8 +95,8 @@ async def health() -> dict[str, Any]:
 async def configure_provider(request: AgentProviderRequest) -> dict[str, Any]:
     """Configure the OpenAI key for this backend process only.
 
-    The secret is passed directly to the Agents SDK and is never returned, written to the
-    repository, or persisted by this service. Restarting the backend clears this runtime key.
+    The secret is loaded into an in-memory AsyncOpenAI client and is never returned, written to
+    the repository, or persisted by this service. Restarting the backend clears this runtime key.
     """
     global _runtime_openai_configured
 
@@ -102,9 +104,10 @@ async def configure_provider(request: AgentProviderRequest) -> dict[str, Any]:
     if len(key) < 8:
         raise HTTPException(status_code=422, detail="API Key 格式无效。")
 
-    set_default_openai_key(key, use_for_tracing=False)
-    # Runtime-entered secrets should not be used for trace export unless an operator configures
-    # tracing separately on the server.
+    # Using a fresh client makes this endpoint able to replace a stale/invalid environment client
+    # even after an earlier model request has already initialized the SDK provider.
+    client = AsyncOpenAI(api_key=key)
+    set_default_openai_client(client, use_for_tracing=False)
     set_tracing_disabled(True)
     _runtime_openai_configured = True
 
