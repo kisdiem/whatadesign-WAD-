@@ -15,3 +15,6 @@ downloads/
 *.pcap
 *.evtx
 *.parquet
+run_state/*.db
+run_state/*.db-wal
+run_state/*.db-shm
