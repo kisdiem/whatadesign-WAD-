@@ -219,8 +219,9 @@ class AgentRuntime:
                 max_turns=16 if (request.context.time_range == "7d" or "溯源" in request.message) else 8,
             )
             draft: SecurityDraft = result.final_output
-            if not context.tool_events:
-                answer = "当前问题需要读取真实安全数据，但本次 Agent 未获得任何内部工具证据，因此不生成环境事实判断。"
+            successful_tool_events = [event for event in context.tool_events if event.ok]
+            if not successful_tool_events:
+                answer = "当前问题需要读取真实安全数据，但本次 Agent 没有获得任何成功的内部数据工具结果，因此不生成当前环境事实判断。"
                 verified = False
                 confidence = 0.0
             else:
