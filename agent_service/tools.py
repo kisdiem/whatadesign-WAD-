@@ -13,6 +13,10 @@ from .repository import SecurityRepository
 StatusCallback = Callable[[str], Awaitable[None]]
 
 
+def _bounded_range(value: str, allowed: set[str], fallback: str) -> str:
+    return value if value in allowed else fallback
+
+
 @dataclass
 class AgentContext:
     repository: SecurityRepository
@@ -79,8 +83,9 @@ async def security_get_entity(wrapper: RunContextWrapper[AgentContext], entity_i
 
 
 @function_tool
-async def security_get_entity_history(wrapper: RunContextWrapper[AgentContext], entity_id: str, time_range: str = "7d") -> str:
-    """Read a bounded historical summary for an entity. Prefer 24h first; use 7d for deep traceback."""
+async def security_get_entity_history(wrapper: RunContextWrapper[AgentContext], entity_id: str, time_range: str = "24h") -> str:
+    """Read a bounded historical summary for an entity. Defaults to 24h and permits 1h/24h/7d only."""
+    time_range = _bounded_range(time_range, {"1h", "24h", "7d"}, "24h")
     await wrapper.context.notify(f"正在检查实体历史 · {time_range}")
     result = await wrapper.context.repository.get_entity_history(entity_id, time_range)
     return wrapper.context.record("security.get_entity_history", result)
@@ -89,6 +94,7 @@ async def security_get_entity_history(wrapper: RunContextWrapper[AgentContext], 
 @function_tool
 async def security_get_baseline(wrapper: RunContextWrapper[AgentContext], entity_id: str, time_range: str = "30d") -> str:
     """Read aggregated historical behavior baseline features. This does not re-run all historical logs."""
+    time_range = _bounded_range(time_range, {"14d", "30d", "90d"}, "30d")
     await wrapper.context.notify(f"正在检查历史行为基线 · {time_range}")
     result = await wrapper.context.repository.get_baseline(entity_id, time_range)
     return wrapper.context.record("security.get_baseline", result)
@@ -101,7 +107,8 @@ async def security_get_attack_timeline(
     entity_ids: list[str] | None = None,
     time_range: str = "24h",
 ) -> str:
-    """Return a time-ordered attack/evidence timeline for selected Findings or entities."""
+    """Return a time-ordered attack/evidence timeline. Defaults to 24h and permits 1h/24h/7d only."""
+    time_range = _bounded_range(time_range, {"1h", "24h", "7d"}, "24h")
     await wrapper.context.notify(f"正在整理攻击时间线 · {time_range}")
     result = await wrapper.context.repository.get_attack_timeline(
         finding_ids=finding_ids or wrapper.context.finding_ids,
