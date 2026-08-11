@@ -13,21 +13,32 @@ const USE_LOCAL_DATA = import.meta.env.VITE_USE_MOCKS !== 'false'
 const AGENT_USE_MOCKS = import.meta.env.VITE_AGENT_USE_MOCKS === 'true'
 const API_BASE = import.meta.env.VITE_API_BASE || '/api'
 
+function detailToMessage(detail: unknown, fallback: string): string {
+  if (typeof detail === 'string' && detail.trim()) return detail
+  if (detail && typeof detail === 'object') {
+    const value = detail as { message?: unknown; code?: unknown }
+    if (typeof value.message === 'string' && value.message.trim()) return value.message
+  }
+  return fallback
+}
+
+async function responseError(response: Response, fallback: string): Promise<Error> {
+  let detail = fallback
+  try {
+    const body = await response.json() as { detail?: unknown }
+    detail = detailToMessage(body.detail, fallback)
+  } catch {
+    // Keep the HTTP status message when the response is not JSON.
+  }
+  return new Error(detail)
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
     headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
     ...init,
   })
-  if (!response.ok) {
-    let detail = `Request failed: ${response.status}`
-    try {
-      const body = await response.json() as { detail?: string }
-      if (body.detail) detail = body.detail
-    } catch {
-      // Keep the HTTP status message when the response is not JSON.
-    }
-    throw new Error(detail)
-  }
+  if (!response.ok) throw await responseError(response, `Request failed: ${response.status}`)
   return response.json() as Promise<T>
 }
 
@@ -116,6 +127,33 @@ export interface AssistantContext {
 export type AgentMode = 'auto' | 'security' | 'knowledge' | 'general'
 export type ResolvedAgentMode = Exclude<AgentMode, 'auto'>
 
+export interface AgentHealth {
+  ok: boolean
+  openai_configured: boolean
+  provider_source?: 'environment' | 'runtime-memory' | 'none' | string
+  repository: string
+  modes?: AgentMode[]
+  production_mock_fallback?: boolean
+}
+
+export interface AgentProviderResult {
+  ok: boolean
+  openai_configured: boolean
+  provider_source: string
+  message: string
+}
+
+export async function getAgentHealth(): Promise<AgentHealth> {
+  return request<AgentHealth>('/agent/health')
+}
+
+export async function configureAgentProvider(apiKey: string): Promise<AgentProviderResult> {
+  return request<AgentProviderResult>('/agent/provider', {
+    method: 'POST',
+    body: JSON.stringify({ api_key: apiKey }),
+  })
+}
+
 const MODE_STORAGE_KEY = 'wad-agent-mode'
 const CONVERSATION_STORAGE_KEY = 'wad-agent-conversation-id'
 let activeAgentMode: AgentMode = (() => {
@@ -179,7 +217,7 @@ type AgentStreamEvent =
   | { type: 'status'; label: string }
   | ({ type: 'citation' } & AssistantEvidence)
   | ({ type: 'final' } & AgentApiResponse)
-  | { type: 'error'; message: string }
+  | { type: 'error'; code?: string; message: string }
 
 function publishAgentStatus(label: string) {
   try {
@@ -212,23 +250,21 @@ function buildAgentPayload(question: string, context: AssistantContext) {
 }
 
 async function agentStreamRequest(question: string, context: AssistantContext): Promise<AgentApiResponse> {
-  const response = await fetch(`${API_BASE}/agent/query/stream`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(buildAgentPayload(question, context)),
-  })
+  let response: Response
+  try {
+    response = await fetch(`${API_BASE}/agent/query/stream`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(buildAgentPayload(question, context)),
+    })
+  } catch {
+    throw new Error('Agent 后端未连接。请确认 agent_service 已在 127.0.0.1:8000 启动，并检查 Vite /api 代理。')
+  }
 
   if (!response.ok) {
-    let detail = `Agent request failed: ${response.status}`
-    try {
-      const body = await response.json() as { detail?: string }
-      if (body.detail) detail = body.detail
-    } catch {
-      // Keep status message.
-    }
-    throw new Error(detail)
+    throw await responseError(response, `Agent request failed: ${response.status}`)
   }
-  if (!response.body) throw new Error('Agent stream unavailable')
+  if (!response.body) throw new Error('Agent 后端未返回可读取的 SSE 数据流。')
 
   const reader = response.body.getReader()
   const decoder = new TextDecoder()
@@ -259,7 +295,7 @@ async function agentStreamRequest(question: string, context: AssistantContext): 
     if (done) break
   }
   if (buffer.trim()) consumeBlock(buffer)
-  if (!finalResponse) throw new Error('Agent stream ended without a final response')
+  if (!finalResponse) throw new Error('Agent SSE 已结束，但没有收到 final 结果。')
   return finalResponse
 }
 
@@ -279,8 +315,47 @@ async function askRealAgent(question: string, context: AssistantContext): Promis
   return result
 }
 
+function friendlyAgentError(error: unknown): string {
+  const message = error instanceof Error ? error.message : '未知错误'
+  const lower = message.toLowerCase()
+
+  if (message.includes('模型 API Key 未配置') || message.includes('OPENAI_API_KEY')) {
+    return '模型 API Key 尚未配置。请在 AI 分析页的“配置模型服务”中填写 API Key，或在后端设置 OPENAI_API_KEY。'
+  }
+  if (message.includes('认证失败') || lower.includes('authentication') || lower.includes('invalid api key')) {
+    return '模型服务认证失败。请重新检查 API Key。'
+  }
+  if (message.includes('没有访问') || lower.includes('permission')) {
+    return '当前 API Key 没有所配置模型的访问权限。请检查账号权限或模型配置。'
+  }
+  if (message.includes('限流') || lower.includes('rate limit')) {
+    return '模型服务当前触发限流，请稍后重试。'
+  }
+  if (message.includes('模型不可用') || lower.includes('model_not_found')) {
+    return '当前模型不可用或 API Key 没有访问权限，请检查后端模型配置。'
+  }
+  if (message.includes('Agent 后端未连接')) return message
+  if (message.includes('SSE')) return `Agent 数据流异常：${message}`
+
+  return import.meta.env.DEV
+    ? `Agent 请求失败：${message}`
+    : 'Agent 服务暂时不可用，请稍后重试。'
+}
+
 export async function askAssistant(question: string, context: AssistantContext = {}): Promise<AssistantAnswer> {
-  if (!AGENT_USE_MOCKS) return askRealAgent(question, context)
+  if (!AGENT_USE_MOCKS) {
+    try {
+      return await askRealAgent(question, context)
+    } catch (error) {
+      publishAgentStatus('')
+      const result: AssistantAnswer = {
+        answer: friendlyAgentError(error),
+        evidence: [],
+      }
+      publishAgentResult(result)
+      return result
+    }
+  }
 
   await delay(420)
   const normalized = question.toLowerCase()
