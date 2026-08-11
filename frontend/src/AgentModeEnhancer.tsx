@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
-import { Badge, Card, Segmented, Space, Tag, Typography } from 'antd'
-import { RobotOutlined, SafetyCertificateOutlined } from '@ant-design/icons'
+import { Alert, Badge, Button, Card, Input, Modal, Segmented, Space, Tag, Typography, message } from 'antd'
+import { KeyOutlined, RobotOutlined, SafetyCertificateOutlined } from '@ant-design/icons'
 import { createPortal } from 'react-dom'
 import { useLocation } from 'react-router-dom'
 import {
+  configureAgentProvider,
+  getAgentHealth,
   getAgentMode,
   setAgentMode,
+  type AgentHealth,
   type AgentMode,
   type ResolvedAgentMode,
 } from './services/api'
@@ -32,12 +35,6 @@ const descriptions: Record<AgentMode, string> = {
   general: '普通对话模式，不具备内部日志、Finding、实体或 Investigation 读取权限。',
 }
 
-type Health = {
-  ok: boolean
-  openai_configured: boolean
-  repository: string
-}
-
 type AgentResultEvent = {
   mode?: ResolvedAgentMode
   verified?: boolean
@@ -49,9 +46,12 @@ export default function AgentModeEnhancer() {
   const location = useLocation()
   const [host, setHost] = useState<HTMLDivElement | null>(null)
   const [mode, setMode] = useState<AgentMode>(getAgentMode())
-  const [health, setHealth] = useState<Health | null>(null)
+  const [health, setHealth] = useState<AgentHealth | null>(null)
   const [lastResult, setLastResult] = useState<AgentResultEvent | null>(null)
   const [liveStatus, setLiveStatus] = useState('')
+  const [providerOpen, setProviderOpen] = useState(false)
+  const [apiKey, setApiKey] = useState('')
+  const [savingKey, setSavingKey] = useState(false)
 
   useEffect(() => {
     if (!location.pathname.startsWith('/assistant')) {
@@ -73,14 +73,19 @@ export default function AgentModeEnhancer() {
     return () => slot?.remove()
   }, [location.pathname])
 
+  const refreshHealth = async () => {
+    try {
+      setHealth(await getAgentHealth())
+    } catch {
+      setHealth(null)
+    }
+  }
+
   useEffect(() => {
     if (!host) return
-    let active = true
-    fetch('/api/agent/health')
-      .then(async (response) => response.ok ? response.json() as Promise<Health> : Promise.reject())
-      .then((value) => { if (active) setHealth(value) })
-      .catch(() => { if (active) setHealth(null) })
-    return () => { active = false }
+    refreshHealth()
+    const timer = window.setInterval(refreshHealth, 10000)
+    return () => window.clearInterval(timer)
   }, [host])
 
   useEffect(() => {
@@ -109,39 +114,96 @@ export default function AgentModeEnhancer() {
     setLiveStatus('')
   }
 
+  const saveProviderKey = async () => {
+    const key = apiKey.trim()
+    if (key.length < 8) {
+      message.error('请输入有效的模型 API Key')
+      return
+    }
+
+    setSavingKey(true)
+    try {
+      const result = await configureAgentProvider(key)
+      setApiKey('')
+      setProviderOpen(false)
+      await refreshHealth()
+      message.success(result.message)
+    } catch (error) {
+      const text = error instanceof Error ? error.message : '模型服务配置失败'
+      message.error(text)
+    } finally {
+      setSavingKey(false)
+    }
+  }
+
   if (!host) return null
 
   return createPortal(
-    <Card className="agent-mode-card" size="small">
-      <div className="agent-mode-row">
-        <div>
+    <>
+      <Card className="agent-mode-card" size="small">
+        <div className="agent-mode-row">
+          <div>
+            <Space size={8} wrap>
+              <RobotOutlined />
+              <Text strong>Agent 模式</Text>
+              <Segmented value={mode} options={modeOptions} onChange={changeMode} />
+              {lastResult?.mode && (
+                <Tag color={lastResult.mode === 'security' ? 'processing' : undefined}>
+                  本轮：{modeLabels[lastResult.mode]}
+                </Tag>
+              )}
+              {lastResult?.verified && <Tag color="success">证据已核验</Tag>}
+            </Space>
+            <div className="agent-mode-description">{descriptions[mode]}</div>
+            {liveStatus && <div className="agent-live-status"><Badge status="processing" /> {liveStatus}</div>}
+          </div>
           <Space size={8} wrap>
-            <RobotOutlined />
-            <Text strong>Agent 模式</Text>
-            <Segmented value={mode} options={modeOptions} onChange={changeMode} />
-            {lastResult?.mode && (
-              <Tag color={lastResult.mode === 'security' ? 'processing' : undefined}>
-                本轮：{modeLabels[lastResult.mode]}
-              </Tag>
+            <Tag icon={<SafetyCertificateOutlined />}>只读工具</Tag>
+            {health ? (
+              <>
+                <Badge
+                  status={health.openai_configured ? 'success' : 'warning'}
+                  text={health.openai_configured ? `Agent 在线 · ${health.repository}` : 'Agent 在线 · 未配置模型密钥'}
+                />
+                <Button size="small" icon={<KeyOutlined />} onClick={() => setProviderOpen(true)}>
+                  {health.openai_configured ? '更换模型密钥' : '配置模型服务'}
+                </Button>
+              </>
+            ) : (
+              <Badge status="error" text="Agent 后端未连接" />
             )}
-            {lastResult?.verified && <Tag color="success">证据已核验</Tag>}
           </Space>
-          <div className="agent-mode-description">{descriptions[mode]}</div>
-          {liveStatus && <div className="agent-live-status"><Badge status="processing" /> {liveStatus}</div>}
         </div>
-        <Space size={8} wrap>
-          <Tag icon={<SafetyCertificateOutlined />}>只读工具</Tag>
-          {health ? (
-            <Badge
-              status={health.openai_configured ? 'success' : 'warning'}
-              text={health.openai_configured ? `Agent 在线 · ${health.repository}` : 'Agent 在线 · 未配置模型密钥'}
-            />
-          ) : (
-            <Badge status="default" text="Agent 服务未连接" />
-          )}
-        </Space>
-      </div>
-    </Card>,
+      </Card>
+
+      <Modal
+        title="配置模型服务"
+        open={providerOpen}
+        onCancel={() => { setProviderOpen(false); setApiKey('') }}
+        onOk={saveProviderKey}
+        okText="加载到后端"
+        cancelText="取消"
+        confirmLoading={savingKey}
+        destroyOnClose
+      >
+        <Alert
+          type="info"
+          showIcon
+          style={{ marginBottom: 16 }}
+          message="API Key 只加载到当前 Agent 后端进程内存"
+          description="不会写入 localStorage、sessionStorage、Git 或项目配置文件。后端重启后需要重新填写；生产部署仍建议通过 OPENAI_API_KEY 环境变量配置。"
+        />
+        <Text strong>OpenAI API Key</Text>
+        <Input.Password
+          value={apiKey}
+          onChange={(event) => setApiKey(event.target.value)}
+          placeholder="sk-..."
+          autoComplete="new-password"
+          style={{ marginTop: 8 }}
+          onPressEnter={saveProviderKey}
+        />
+      </Modal>
+    </>,
     host,
   )
 }
