@@ -8,7 +8,7 @@ from typing import Any
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from .models import AgentQueryRequest, AgentRequestContext
 from .runtime import AgentRuntime
@@ -33,7 +33,7 @@ runtime = AgentRuntime()
 
 class LegacyAssistantRequest(BaseModel):
     question: str
-    context: dict[str, Any] = {}
+    context: dict[str, Any] = Field(default_factory=dict)
 
 
 @app.get("/api/agent/health")
