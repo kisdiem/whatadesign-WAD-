@@ -45,8 +45,18 @@ KNOWLEDGE_MARKERS = re.compile(
 HIGH_RISK_MARKERS = re.compile(r"(入侵|攻击|攻陷|横向移动|数据泄露|外泄|隔离|封禁|处置)", re.IGNORECASE)
 
 
-def _settings(effort: str, verbosity: str = "low") -> ModelSettings:
-    return ModelSettings(reasoning=Reasoning(effort=effort), verbosity=verbosity, truncation="auto")
+def _settings(
+    effort: str,
+    verbosity: str = "low",
+    *,
+    parallel_tool_calls: bool | None = None,
+) -> ModelSettings:
+    return ModelSettings(
+        reasoning=Reasoning(effort=effort),
+        verbosity=verbosity,
+        truncation="auto",
+        parallel_tool_calls=parallel_tool_calls,
+    )
 
 
 router_agent = Agent(
@@ -65,7 +75,7 @@ router_agent = Agent(
 security_agent = Agent[AgentContext](
     name="WAD Security Analyst",
     model=ANALYST_MODEL,
-    model_settings=_settings("high", "medium"),
+    model_settings=_settings("high", "medium", parallel_tool_calls=False),
     tools=SECURITY_TOOLS,
     output_type=SecurityDraft,
     instructions=(
@@ -83,7 +93,7 @@ security_agent = Agent[AgentContext](
 knowledge_agent = Agent[AgentContext](
     name="WAD Knowledge Analyst",
     model=ANALYST_MODEL,
-    model_settings=_settings("medium", "medium"),
+    model_settings=_settings("medium", "medium", parallel_tool_calls=False),
     tools=KNOWLEDGE_TOOLS,
     instructions=(
         "Answer security knowledge questions naturally in Chinese. Always call knowledge_search first. "
@@ -154,7 +164,13 @@ class AgentRuntime:
         except Exception:
             return RouterDecision(mode="general", confidence=0.5, reason_code="ROUTER_FALLBACK_GENERAL")
 
-    def _context(self, request: AgentQueryRequest, status_callback: StatusCallback | None = None) -> AgentContext:
+    def _context(
+        self,
+        request: AgentQueryRequest,
+        *,
+        status_callback: StatusCallback | None = None,
+        tool_call_limit: int = 8,
+    ) -> AgentContext:
         return AgentContext(
             repository=self.repository,
             finding_ids=request.context.finding_ids,
@@ -162,6 +178,7 @@ class AgentRuntime:
             entity_ids=request.context.entity_ids,
             requested_time_range=request.context.time_range,
             status_callback=status_callback,
+            tool_call_limit=tool_call_limit,
         )
 
     @staticmethod
@@ -199,7 +216,15 @@ class AgentRuntime:
     ) -> AgentQueryResponse:
         decision = decision or await self.resolve_mode(request)
         run_id = f"RUN-{uuid.uuid4().hex[:12].upper()}"
-        context = self._context(request, status_callback=status_callback)
+        deep_security = decision.mode == "security" and (
+            request.context.time_range == "7d" or "溯源" in request.message
+        )
+        tool_call_limit = 16 if deep_security else 8 if decision.mode == "security" else 6
+        context = self._context(
+            request,
+            status_callback=status_callback,
+            tool_call_limit=tool_call_limit,
+        )
         # Tool transcripts are isolated by mode. Only user-visible text is shared across modes.
         session = SQLiteSession(f"{request.conversation_id}:{decision.mode}", SESSION_DB)
         cross_mode_history = self._cross_mode_history(request.conversation_id, decision.mode)
@@ -216,7 +241,7 @@ class AgentRuntime:
                 prompt,
                 context=context,
                 session=session,
-                max_turns=16 if (request.context.time_range == "7d" or "溯源" in request.message) else 8,
+                max_turns=tool_call_limit + 3,
             )
             draft: SecurityDraft = result.final_output
             successful_tool_events = [event for event in context.tool_events if event.ok]
@@ -262,7 +287,7 @@ class AgentRuntime:
                 f"用户问题：{request.message}\n"
                 f"其他模式中用户已经看过的最近对话（只能作为会话语境，不代表知识库证据）：\n{cross_mode_history}"
             )
-            result = await Runner.run(knowledge_agent, prompt, context=context, session=session, max_turns=6)
+            result = await Runner.run(knowledge_agent, prompt, context=context, session=session, max_turns=8)
             answer = str(result.final_output)
             verified = bool(context.tool_events and context.tool_events[0].ok)
             confidence = decision.confidence
