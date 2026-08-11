@@ -10,25 +10,66 @@ npm install
 npm run dev
 ```
 
-默认使用内置界面数据，可以直接浏览全部页面。
+默认仍可使用内置 Dashboard 演示数据浏览 Mission Control 页面。
 
-## 接入后端
+## Agent 服务
 
-后端提供接口后，将环境变量切换为真实 API：
+AI 页面已使用独立多模式 Agent 接口：
+
+```text
+自动 / 安全分析 / 知识问答 / 普通
+```
+
+Agent 默认不会跟随 Dashboard 自动回落到 mock。启动真实 Agent：
+
+```bash
+# 在仓库根目录
+pip install -r agent_service/requirements.txt
+export OPENAI_API_KEY="..."
+uvicorn agent_service.app:app --host 127.0.0.1 --port 8000 --reload
+```
+
+Windows PowerShell：
+
+```powershell
+pip install -r agent_service/requirements.txt
+$env:OPENAI_API_KEY="..."
+uvicorn agent_service.app:app --host 127.0.0.1 --port 8000 --reload
+```
+
+开发服务器默认把 `/api` 代理到 `http://127.0.0.1:8000`，可以通过 `WAD_API_PROXY` 修改。
+
+Agent 接口：
+
+- `GET /api/agent/health`
+- `POST /api/agent/query`
+- `POST /api/agent/query/stream`
+
+只有明确演示 Agent 时才设置：
+
+```bash
+VITE_AGENT_USE_MOCKS=true
+```
+
+生产前端不得启用该变量。
+
+## 其他后端接口
+
+将 Dashboard 也切换为真实 API 时：
 
 ```bash
 VITE_USE_MOCKS=false
 VITE_API_BASE=/api
 ```
 
-开发服务器默认把 `/api` 代理到 `http://127.0.0.1:8000`，可以通过 `WAD_API_PROXY` 修改。
-
-当前前端预留接口：
+当前预留：
 
 - `GET /api/windows`
 - `GET /api/investigations`
 - `GET /api/settings/log-sources`
 - `GET /api/knowledge/documents`
-- `POST /api/assistant/query`
+- `POST /api/settings/log-sources`
+- `POST /api/settings/log-sources/test`
+- `POST /api/assistant/query`（旧兼容入口）
 
-GPT 调用应由服务端完成，浏览器端不保存 OpenAI API Key。
+OpenAI API Key 和日志源 Token 必须只保存在服务端，浏览器端不持久化密钥。
