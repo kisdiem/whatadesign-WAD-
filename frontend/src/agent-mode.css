@@ -25,6 +25,12 @@
   line-height: 1.55;
 }
 
+.agent-live-status {
+  margin-top: 7px;
+  color: #526071;
+  font-size: 12px;
+}
+
 @media (max-width: 900px) {
   .agent-mode-row {
     align-items: flex-start;
