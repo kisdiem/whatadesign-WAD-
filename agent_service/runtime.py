@@ -13,7 +13,6 @@ from .models import (
     AgentQueryRequest,
     AgentQueryResponse,
     EvidenceRef,
-    ResolvedMode,
     RouterDecision,
     SecurityDraft,
     VerificationResult,
@@ -27,13 +26,16 @@ GENERAL_MODEL = os.getenv("WAD_GENERAL_MODEL", "gpt-5.4-mini")
 VERIFIER_MODEL = os.getenv("WAD_VERIFIER_MODEL", "gpt-5.6-sol")
 SESSION_DB = os.getenv("WAD_AGENT_SESSION_DB", "run_state/agent_sessions.db")
 
-SECURITY_MARKERS = re.compile(
+STRONG_SECURITY_MARKERS = re.compile(
     r"(HOST[-_]?\w+|CASE[-_]?\w+|WIN[-_]?\w+|EVT[-_]?\w+|finding|investigation|"
-    r"当前|最近|日志|告警|异常|风险分|风险评分|攻击链|主机|这个事件|该事件|该用户|这个用户|该IP|这个IP)",
+    r"当前|最近|这个事件|该事件|这个告警|该告警|该用户|这个用户|该IP|这个IP|"
+    r"风险分|风险评分|攻击链|查询日志|查日志|分析日志|异常日志|告警详情|本系统|我们的系统|"
+    r"是否被入侵|是否入侵|有没有异常|有什么异常|为什么高风险|为什么风险)",
     re.IGNORECASE,
 )
 KNOWLEDGE_MARKERS = re.compile(
-    r"(什么是|是什么意思|解释一下|概念|MITRE|ATT&CK|T\d{4}(?:\.\d{3})?|4625|4624|Kerberos|横向移动|凭据访问|PowerShell)",
+    r"(什么是|是什么意思|解释一下|概念|原理|定义|MITRE|ATT&CK|T\d{4}(?:\.\d{3})?|"
+    r"4625|4624|Kerberos|横向移动|凭据访问|PowerShell|日志是什么|主机是什么)",
     re.IGNORECASE,
 )
 HIGH_RISK_MARKERS = re.compile(r"(入侵|攻击|攻陷|横向移动|数据泄露|外泄|隔离|封禁|处置)", re.IGNORECASE)
@@ -135,7 +137,7 @@ class AgentRuntime:
             return RouterDecision(mode="security", confidence=1.0, reason_code="BOUND_SECURITY_CONTEXT")
 
         text = request.message.strip()
-        if SECURITY_MARKERS.search(text):
+        if STRONG_SECURITY_MARKERS.search(text):
             return RouterDecision(mode="security", confidence=0.98, reason_code="ENVIRONMENT_QUERY_RULE")
         if KNOWLEDGE_MARKERS.search(text):
             return RouterDecision(mode="knowledge", confidence=0.96, reason_code="SECURITY_KNOWLEDGE_RULE")
