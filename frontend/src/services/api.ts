@@ -174,6 +174,21 @@ interface AgentApiResponse {
   confidence?: number
 }
 
+type AgentStreamEvent =
+  | { type: 'route'; mode: ResolvedAgentMode; confidence: number; reason_code: string }
+  | { type: 'status'; label: string }
+  | ({ type: 'citation' } & AssistantEvidence)
+  | ({ type: 'final' } & AgentApiResponse)
+  | { type: 'error'; message: string }
+
+function publishAgentStatus(label: string) {
+  try {
+    window.dispatchEvent(new CustomEvent('wad-agent-status', { detail: { label } }))
+  } catch {
+    // UI event is best effort only.
+  }
+}
+
 function publishAgentResult(result: Pick<AssistantAnswer, 'mode' | 'verified' | 'confidence' | 'runId'>) {
   try {
     window.dispatchEvent(new CustomEvent('wad-agent-result', { detail: result }))
@@ -182,22 +197,75 @@ function publishAgentResult(result: Pick<AssistantAnswer, 'mode' | 'verified' | 
   }
 }
 
-async function askRealAgent(question: string, context: AssistantContext): Promise<AssistantAnswer> {
-  const response = await request<AgentApiResponse>('/agent/query', {
+function buildAgentPayload(question: string, context: AssistantContext) {
+  return {
+    conversation_id: getConversationId(),
+    mode: activeAgentMode,
+    message: question,
+    context: {
+      finding_ids: context.windowIds || [],
+      investigation_id: context.caseId || null,
+      entity_ids: context.entityIds || [],
+      time_range: context.timeRange || null,
+    },
+  }
+}
+
+async function agentStreamRequest(question: string, context: AssistantContext): Promise<AgentApiResponse> {
+  const response = await fetch(`${API_BASE}/agent/query/stream`, {
     method: 'POST',
-    body: JSON.stringify({
-      conversation_id: getConversationId(),
-      mode: activeAgentMode,
-      message: question,
-      context: {
-        finding_ids: context.windowIds || [],
-        investigation_id: context.caseId || null,
-        entity_ids: context.entityIds || [],
-        time_range: context.timeRange || null,
-      },
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(buildAgentPayload(question, context)),
   })
 
+  if (!response.ok) {
+    let detail = `Agent request failed: ${response.status}`
+    try {
+      const body = await response.json() as { detail?: string }
+      if (body.detail) detail = body.detail
+    } catch {
+      // Keep status message.
+    }
+    throw new Error(detail)
+  }
+  if (!response.body) throw new Error('Agent stream unavailable')
+
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+  let finalResponse: AgentApiResponse | null = null
+
+  const consumeBlock = (block: string) => {
+    const dataLine = block.split('\n').find((line) => line.startsWith('data: '))
+    if (!dataLine) return
+    const event = JSON.parse(dataLine.slice(6)) as AgentStreamEvent
+    if (event.type === 'route') {
+      publishAgentStatus(`已路由至${event.mode === 'security' ? '安全分析' : event.mode === 'knowledge' ? '知识问答' : '普通'}模式`)
+    } else if (event.type === 'status') {
+      publishAgentStatus(event.label)
+    } else if (event.type === 'error') {
+      throw new Error(event.message)
+    } else if (event.type === 'final') {
+      finalResponse = event
+    }
+  }
+
+  while (true) {
+    const { value, done } = await reader.read()
+    buffer += decoder.decode(value, { stream: !done })
+    const blocks = buffer.split('\n\n')
+    buffer = blocks.pop() || ''
+    for (const block of blocks) consumeBlock(block)
+    if (done) break
+  }
+  if (buffer.trim()) consumeBlock(buffer)
+  if (!finalResponse) throw new Error('Agent stream ended without a final response')
+  return finalResponse
+}
+
+async function askRealAgent(question: string, context: AssistantContext): Promise<AssistantAnswer> {
+  publishAgentStatus('正在接收问题')
+  const response = await agentStreamRequest(question, context)
   const result: AssistantAnswer = {
     answer: response.answer,
     evidence: response.evidence,
@@ -207,6 +275,7 @@ async function askRealAgent(question: string, context: AssistantContext): Promis
     confidence: response.confidence,
   }
   publishAgentResult(result)
+  publishAgentStatus('')
   return result
 }
 
