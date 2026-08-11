@@ -174,6 +174,14 @@ interface AgentApiResponse {
   confidence?: number
 }
 
+function publishAgentResult(result: Pick<AssistantAnswer, 'mode' | 'verified' | 'confidence' | 'runId'>) {
+  try {
+    window.dispatchEvent(new CustomEvent('wad-agent-result', { detail: result }))
+  } catch {
+    // UI event is best effort only.
+  }
+}
+
 async function askRealAgent(question: string, context: AssistantContext): Promise<AssistantAnswer> {
   const response = await request<AgentApiResponse>('/agent/query', {
     method: 'POST',
@@ -190,7 +198,7 @@ async function askRealAgent(question: string, context: AssistantContext): Promis
     }),
   })
 
-  return {
+  const result: AssistantAnswer = {
     answer: response.answer,
     evidence: response.evidence,
     mode: response.mode,
@@ -198,6 +206,8 @@ async function askRealAgent(question: string, context: AssistantContext): Promis
     verified: response.verified,
     confidence: response.confidence,
   }
+  publishAgentResult(result)
+  return result
 }
 
 export async function askAssistant(question: string, context: AssistantContext = {}): Promise<AssistantAnswer> {
@@ -205,17 +215,14 @@ export async function askAssistant(question: string, context: AssistantContext =
 
   await delay(420)
   const normalized = question.toLowerCase()
+  let result: AssistantAnswer
 
   if (activeAgentMode === 'general') {
-    return { answer: '当前是普通模式。演示环境不会读取任何内部日志、Finding 或实体数据。', evidence: [], mode: 'general' }
-  }
-
-  if (activeAgentMode === 'knowledge') {
-    return { answer: '当前是知识问答演示模式。真实部署会先检索安全知识库，再基于检索内容回答。', evidence: [{ label: 'KB-DEMO', ref: 'KB-DEMO' }], mode: 'knowledge' }
-  }
-
-  if (normalized.includes('alice') || context.caseId === 'CASE-001') {
-    return {
+    result = { answer: '当前是普通模式。演示环境不会读取任何内部日志、Finding 或实体数据。', evidence: [], mode: 'general' }
+  } else if (activeAgentMode === 'knowledge') {
+    result = { answer: '当前是知识问答演示模式。真实部署会先检索安全知识库，再基于检索内容回答。', evidence: [{ label: 'KB-DEMO', ref: 'KB-DEMO' }], mode: 'knowledge' }
+  } else if (normalized.includes('alice') || context.caseId === 'CASE-001') {
+    result = {
       answer: 'Alice 在多个时间窗口和不同主机中连续出现。当前链路从 HOST-07 登录与 PowerShell 执行开始，随后在 HOST-12 出现命令执行，并进一步延伸到敏感文件访问。多个窗口共享用户实体，同时伴随进程与主机行为连续性，建议作为同一调查链继续核验。',
       evidence: [
         { label: 'WIN-0321', ref: 'WIN-20260809-0321' },
@@ -224,19 +231,20 @@ export async function askAssistant(question: string, context: AssistantContext =
       ],
       mode: 'security',
     }
-  }
-
-  if (normalized.includes('host-07') || context.entityIds?.includes('HOST-07')) {
-    return {
+  } else if (normalized.includes('host-07') || context.entityIds?.includes('HOST-07')) {
+    result = {
       answer: 'HOST-07 当前最需要关注的是登录后紧接着出现的高权限 PowerShell 执行与外联行为。建议优先核对执行账号、父进程、目标地址以及相邻时间窗口中的同一用户活动。',
       evidence: [{ label: 'WIN-0321', ref: 'WIN-20260809-0321' }],
       mode: 'security',
     }
+  } else {
+    result = {
+      answer: '当前处于显式 Agent 演示模式。请设置 VITE_AGENT_USE_MOCKS=false 并启动 agent_service 后使用真实多模式 Agent。',
+      evidence: [],
+      mode: activeAgentMode === 'auto' ? 'general' : activeAgentMode,
+    }
   }
 
-  return {
-    answer: '当前处于显式 Agent 演示模式。请设置 VITE_AGENT_USE_MOCKS=false 并启动 agent_service 后使用真实多模式 Agent。',
-    evidence: [],
-    mode: activeAgentMode === 'auto' ? 'general' : activeAgentMode,
-  }
+  publishAgentResult(result)
+  return result
 }
