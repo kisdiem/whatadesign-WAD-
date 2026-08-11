@@ -1,0 +1,33 @@
+#agent-mode-slot {
+  margin-bottom: 12px;
+}
+
+.agent-mode-card {
+  border-color: #dfe6ee !important;
+  background: #fbfdff !important;
+}
+
+.agent-mode-card .ant-card-body {
+  padding: 12px 14px;
+}
+
+.agent-mode-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.agent-mode-description {
+  margin-top: 7px;
+  color: #728096;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .agent-mode-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
