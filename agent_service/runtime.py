@@ -4,6 +4,7 @@ import json
 import os
 import re
 import uuid
+from collections.abc import Awaitable, Callable
 from pathlib import Path
 
 from agents import Agent, ModelSettings, Runner, SQLiteSession
@@ -27,6 +28,7 @@ GENERAL_MODEL = os.getenv("WAD_GENERAL_MODEL", "gpt-5.4-mini")
 VERIFIER_MODEL = os.getenv("WAD_VERIFIER_MODEL", "gpt-5.6-sol")
 SESSION_DB = os.getenv("WAD_AGENT_SESSION_DB", "run_state/agent_sessions.db")
 VISIBLE_MEMORY_DB = os.getenv("WAD_AGENT_MEMORY_DB", "run_state/agent_visible_memory.db")
+StatusCallback = Callable[[str], Awaitable[None]]
 
 STRONG_SECURITY_MARKERS = re.compile(
     r"(HOST[-_]?\w+|CASE[-_]?\w+|WIN[-_]?\w+|EVT[-_]?\w+|finding|investigation|"
@@ -152,13 +154,14 @@ class AgentRuntime:
         except Exception:
             return RouterDecision(mode="general", confidence=0.5, reason_code="ROUTER_FALLBACK_GENERAL")
 
-    def _context(self, request: AgentQueryRequest) -> AgentContext:
+    def _context(self, request: AgentQueryRequest, status_callback: StatusCallback | None = None) -> AgentContext:
         return AgentContext(
             repository=self.repository,
             finding_ids=request.context.finding_ids,
             investigation_id=request.context.investigation_id,
             entity_ids=request.context.entity_ids,
             requested_time_range=request.context.time_range,
+            status_callback=status_callback,
         )
 
     @staticmethod
@@ -183,15 +186,26 @@ class AgentRuntime:
             for item in messages
         )
 
-    async def run(self, request: AgentQueryRequest, decision: RouterDecision | None = None) -> AgentQueryResponse:
+    @staticmethod
+    async def _notify(callback: StatusCallback | None, label: str) -> None:
+        if callback:
+            await callback(label)
+
+    async def run(
+        self,
+        request: AgentQueryRequest,
+        decision: RouterDecision | None = None,
+        status_callback: StatusCallback | None = None,
+    ) -> AgentQueryResponse:
         decision = decision or await self.resolve_mode(request)
         run_id = f"RUN-{uuid.uuid4().hex[:12].upper()}"
-        context = self._context(request)
+        context = self._context(request, status_callback=status_callback)
         # Tool transcripts are isolated by mode. Only user-visible text is shared across modes.
         session = SQLiteSession(f"{request.conversation_id}:{decision.mode}", SESSION_DB)
         cross_mode_history = self._cross_mode_history(request.conversation_id, decision.mode)
 
         if decision.mode == "security":
+            await self._notify(status_callback, "正在规划安全分析")
             prompt = (
                 f"用户问题：{request.message}\n"
                 f"当前前端安全上下文：{self._context_hint(request)}\n"
@@ -219,6 +233,7 @@ class AgentRuntime:
                 verified = False
                 confidence = draft.confidence
                 if needs_verification:
+                    await self._notify(status_callback, "正在核验关键证据")
                     verification_input = json.dumps(
                         {"claims": draft.claims, "evidence": context.evidence_payloads},
                         ensure_ascii=False,
@@ -228,6 +243,7 @@ class AgentRuntime:
                     verified = not verification.unsupported and not verification.contradictions
                     confidence = min(confidence, verification.confidence)
                     if not verified:
+                        await self._notify(status_callback, "正在收敛不受支持的结论")
                         repair_input = json.dumps(
                             {
                                 "draft": draft.answer,
@@ -240,6 +256,7 @@ class AgentRuntime:
                         answer = str(repair.final_output)
 
         elif decision.mode == "knowledge":
+            await self._notify(status_callback, "正在准备知识检索")
             prompt = (
                 f"用户问题：{request.message}\n"
                 f"其他模式中用户已经看过的最近对话（只能作为会话语境，不代表知识库证据）：\n{cross_mode_history}"
@@ -250,6 +267,7 @@ class AgentRuntime:
             confidence = decision.confidence
 
         else:
+            await self._notify(status_callback, "正在生成普通回答")
             prompt = (
                 f"用户问题：{request.message}\n"
                 f"其他模式中用户已经看过的最近对话（仅作为普通会话上下文；你没有权限重新读取内部安全数据）：\n{cross_mode_history}"
