@@ -7,6 +7,7 @@ import './styles.css'
 import './light-theme.css'
 import './mission-control.css'
 import MissionControlApp from './MissionControlApp'
+import ApiSourceEnhancer from './ApiSourceEnhancer'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -27,6 +28,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     >
       <BrowserRouter>
         <MissionControlApp />
+        <ApiSourceEnhancer />
       </BrowserRouter>
     </ConfigProvider>
   </React.StrictMode>,
