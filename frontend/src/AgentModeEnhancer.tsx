@@ -51,6 +51,7 @@ export default function AgentModeEnhancer() {
   const [mode, setMode] = useState<AgentMode>(getAgentMode())
   const [health, setHealth] = useState<Health | null>(null)
   const [lastResult, setLastResult] = useState<AgentResultEvent | null>(null)
+  const [liveStatus, setLiveStatus] = useState('')
 
   useEffect(() => {
     if (!location.pathname.startsWith('/assistant')) {
@@ -83,12 +84,21 @@ export default function AgentModeEnhancer() {
   }, [host])
 
   useEffect(() => {
-    const handler = (event: Event) => {
+    const resultHandler = (event: Event) => {
       const custom = event as CustomEvent<AgentResultEvent>
       setLastResult(custom.detail || null)
+      setLiveStatus('')
     }
-    window.addEventListener('wad-agent-result', handler)
-    return () => window.removeEventListener('wad-agent-result', handler)
+    const statusHandler = (event: Event) => {
+      const custom = event as CustomEvent<{ label?: string }>
+      setLiveStatus(custom.detail?.label || '')
+    }
+    window.addEventListener('wad-agent-result', resultHandler)
+    window.addEventListener('wad-agent-status', statusHandler)
+    return () => {
+      window.removeEventListener('wad-agent-result', resultHandler)
+      window.removeEventListener('wad-agent-status', statusHandler)
+    }
   }, [])
 
   const changeMode = (value: string | number) => {
@@ -96,6 +106,7 @@ export default function AgentModeEnhancer() {
     setMode(next)
     setAgentMode(next)
     setLastResult(null)
+    setLiveStatus('')
   }
 
   if (!host) return null
@@ -116,6 +127,7 @@ export default function AgentModeEnhancer() {
             {lastResult?.verified && <Tag color="success">证据已核验</Tag>}
           </Space>
           <div className="agent-mode-description">{descriptions[mode]}</div>
+          {liveStatus && <div className="agent-live-status"><Badge status="processing" /> {liveStatus}</div>}
         </div>
         <Space size={8} wrap>
           <Tag icon={<SafetyCertificateOutlined />}>只读工具</Tag>
