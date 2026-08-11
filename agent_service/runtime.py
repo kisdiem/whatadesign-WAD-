@@ -9,6 +9,7 @@ from pathlib import Path
 from agents import Agent, ModelSettings, Runner, SQLiteSession
 from openai.types.shared import Reasoning
 
+from .memory import VisibleConversationStore
 from .models import (
     AgentQueryRequest,
     AgentQueryResponse,
@@ -25,6 +26,7 @@ ANALYST_MODEL = os.getenv("WAD_ANALYST_MODEL", "gpt-5.6-sol")
 GENERAL_MODEL = os.getenv("WAD_GENERAL_MODEL", "gpt-5.4-mini")
 VERIFIER_MODEL = os.getenv("WAD_VERIFIER_MODEL", "gpt-5.6-sol")
 SESSION_DB = os.getenv("WAD_AGENT_SESSION_DB", "run_state/agent_sessions.db")
+VISIBLE_MEMORY_DB = os.getenv("WAD_AGENT_MEMORY_DB", "run_state/agent_visible_memory.db")
 
 STRONG_SECURITY_MARKERS = re.compile(
     r"(HOST[-_]?\w+|CASE[-_]?\w+|WIN[-_]?\w+|EVT[-_]?\w+|finding|investigation|"
@@ -95,7 +97,8 @@ general_agent = Agent(
     model_settings=_settings("low", "medium"),
     instructions=(
         "You are the general conversation mode of 链影寻踪. Answer naturally and directly in the user's language. "
-        "You have no access to internal logs, Findings, entities or Investigations. Never imply that you checked them."
+        "You have no access to internal logs, Findings, entities or Investigations. Never imply that you checked them. "
+        "You may use user-visible text from earlier modes as conversation context, but must treat it only as previously displayed text, not as new tool evidence."
     ),
 )
 
@@ -127,6 +130,7 @@ class AgentRuntime:
     def __init__(self, repository: SecurityRepository | None = None):
         self.repository = repository or build_repository()
         Path(SESSION_DB).parent.mkdir(parents=True, exist_ok=True)
+        self.visible_memory = VisibleConversationStore(VISIBLE_MEMORY_DB)
 
     async def resolve_mode(self, request: AgentQueryRequest) -> RouterDecision:
         if request.mode != "auto":
@@ -167,14 +171,32 @@ class AgentRuntime:
         }
         return json.dumps(payload, ensure_ascii=False)
 
+    def _cross_mode_history(self, conversation_id: str, current_mode: str) -> str:
+        messages = [
+            item for item in self.visible_memory.recent(conversation_id, limit=12)
+            if item["mode"] != current_mode
+        ]
+        if not messages:
+            return "无"
+        return "\n".join(
+            f'{item["role"]}（{item["mode"]}）：{item["content"]}'
+            for item in messages
+        )
+
     async def run(self, request: AgentQueryRequest, decision: RouterDecision | None = None) -> AgentQueryResponse:
         decision = decision or await self.resolve_mode(request)
         run_id = f"RUN-{uuid.uuid4().hex[:12].upper()}"
         context = self._context(request)
-        session = SQLiteSession(request.conversation_id, SESSION_DB)
-        prompt = f"用户问题：{request.message}\n当前前端安全上下文：{self._context_hint(request)}"
+        # Tool transcripts are isolated by mode. Only user-visible text is shared across modes.
+        session = SQLiteSession(f"{request.conversation_id}:{decision.mode}", SESSION_DB)
+        cross_mode_history = self._cross_mode_history(request.conversation_id, decision.mode)
 
         if decision.mode == "security":
+            prompt = (
+                f"用户问题：{request.message}\n"
+                f"当前前端安全上下文：{self._context_hint(request)}\n"
+                f"其他模式中用户已经看过的最近对话（仅用于指代和连续表达，不可代替安全工具证据）：\n{cross_mode_history}"
+            )
             result = await Runner.run(
                 security_agent,
                 prompt,
@@ -218,16 +240,31 @@ class AgentRuntime:
                         answer = str(repair.final_output)
 
         elif decision.mode == "knowledge":
+            prompt = (
+                f"用户问题：{request.message}\n"
+                f"其他模式中用户已经看过的最近对话（只能作为会话语境，不代表知识库证据）：\n{cross_mode_history}"
+            )
             result = await Runner.run(knowledge_agent, prompt, context=context, session=session, max_turns=6)
             answer = str(result.final_output)
             verified = bool(context.tool_events and context.tool_events[0].ok)
             confidence = decision.confidence
 
         else:
-            result = await Runner.run(general_agent, request.message, session=session, max_turns=4)
+            prompt = (
+                f"用户问题：{request.message}\n"
+                f"其他模式中用户已经看过的最近对话（仅作为普通会话上下文；你没有权限重新读取内部安全数据）：\n{cross_mode_history}"
+            )
+            result = await Runner.run(general_agent, prompt, session=session, max_turns=4)
             answer = str(result.final_output)
             verified = False
             confidence = decision.confidence
+
+        self.visible_memory.append_exchange(
+            request.conversation_id,
+            decision.mode,
+            request.message,
+            answer,
+        )
 
         evidence = [EvidenceRef(label=ref, ref=ref) for ref in sorted(context.evidence_refs)]
         return AgentQueryResponse(
