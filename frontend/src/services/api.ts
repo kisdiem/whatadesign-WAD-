@@ -47,6 +47,55 @@ export async function getKnowledgeDocs(): Promise<KnowledgeDoc[]> {
   return knowledgeDocs
 }
 
+export interface ApiLogSourceConfig {
+  name: string
+  endpoint: string
+  method: 'GET' | 'POST'
+  authType: 'bearer' | 'api-key' | 'none'
+  token?: string
+  pollInterval: number
+}
+
+export interface ApiConnectionTestResult {
+  ok: boolean
+  message: string
+}
+
+export async function testApiLogSource(config: ApiLogSourceConfig): Promise<ApiConnectionTestResult> {
+  if (!USE_LOCAL_DATA) {
+    return request<ApiConnectionTestResult>('/settings/log-sources/test', {
+      method: 'POST',
+      body: JSON.stringify({ type: 'api', ...config }),
+    })
+  }
+
+  await delay(260)
+  return {
+    ok: false,
+    message: 'API 接入服务尚未连接后端；地址已通过前端格式校验。',
+  }
+}
+
+export async function createApiLogSource(config: ApiLogSourceConfig): Promise<LogSource> {
+  if (!USE_LOCAL_DATA) {
+    return request<LogSource>('/settings/log-sources', {
+      method: 'POST',
+      body: JSON.stringify({ type: 'api', ...config }),
+    })
+  }
+
+  await delay(180)
+  return {
+    id: `SRC-API-${Date.now()}`,
+    name: config.name,
+    path: config.endpoint,
+    kind: 'API',
+    status: 'offline',
+    size: '0 B',
+    lastRead: '等待后端接入',
+  }
+}
+
 export interface AssistantContext {
   windowIds?: string[]
   caseId?: string
