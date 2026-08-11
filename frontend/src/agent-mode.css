@@ -31,6 +31,16 @@
   font-size: 12px;
 }
 
+.mc-chat-bubble .ant-typography {
+  white-space: pre-wrap;
+}
+
+/* MissionControlApp still contains its original generic loading line.
+   The mode card now renders real SSE execution stages, so suppress the stale generic line. */
+.mc-chat-stream > div:not(.mc-chat-row) {
+  display: none;
+}
+
 @media (max-width: 900px) {
   .agent-mode-row {
     align-items: flex-start;
