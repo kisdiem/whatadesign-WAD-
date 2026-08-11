@@ -6,8 +6,10 @@ import 'antd/dist/reset.css'
 import './styles.css'
 import './light-theme.css'
 import './mission-control.css'
+import './agent-mode.css'
 import MissionControlApp from './MissionControlApp'
 import ApiSourceEnhancer from './ApiSourceEnhancer'
+import AgentModeEnhancer from './AgentModeEnhancer'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -29,6 +31,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <MissionControlApp />
         <ApiSourceEnhancer />
+        <AgentModeEnhancer />
       </BrowserRouter>
     </ConfigProvider>
   </React.StrictMode>,
