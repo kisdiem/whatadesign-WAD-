@@ -5,10 +5,11 @@ import { BrowserRouter } from 'react-router-dom'
 import 'antd/dist/reset.css'
 import './styles.css'
 import './light-theme.css'
-import './anomaly-visuals.css'
-import App from './App'
-import AnomalyTimelineEnhancer from './AnomalyTimelineEnhancer'
-import AssetPieEnhancer from './AssetPieEnhancer'
+import './mission-control.css'
+import './agent-mode.css'
+import MissionControlApp from './MissionControlApp'
+import ApiSourceEnhancer from './ApiSourceEnhancer'
+import AgentModeEnhancer from './AgentModeEnhancer'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -16,21 +17,21 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       theme={{
         algorithm: theme.defaultAlgorithm,
         token: {
-          colorPrimary: '#2d84e5',
+          colorPrimary: '#0f62fe',
           colorBgBase: '#ffffff',
           colorBgContainer: '#ffffff',
           colorBgElevated: '#ffffff',
           colorBorder: '#e4e9ef',
           colorText: '#253247',
           colorTextSecondary: '#7b8796',
-          borderRadius: 9,
+          borderRadius: 8,
         },
       }}
     >
       <BrowserRouter>
-        <App />
-        <AssetPieEnhancer />
-        <AnomalyTimelineEnhancer />
+        <MissionControlApp />
+        <ApiSourceEnhancer />
+        <AgentModeEnhancer />
       </BrowserRouter>
     </ConfigProvider>
   </React.StrictMode>,
