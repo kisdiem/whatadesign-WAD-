@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Alert, Badge, Button, Card, Input, Modal, Segmented, Space, Tag, Typography, message } from 'antd'
+import { Alert, Badge, Button, Card, Input, Modal, Segmented, Select, Space, Tag, Typography, message } from 'antd'
 import { KeyOutlined, RobotOutlined, SafetyCertificateOutlined } from '@ant-design/icons'
 import { createPortal } from 'react-dom'
 import { useLocation } from 'react-router-dom'
@@ -10,10 +10,19 @@ import {
   setAgentMode,
   type AgentHealth,
   type AgentMode,
+  type AgentProviderConfig,
   type ResolvedAgentMode,
 } from './services/api'
 
 const { Text } = Typography
+
+const providerPresets: Record<AgentProviderConfig['provider'], { label: string; baseUrl: string; model: string }> = {
+  openai: { label: 'OpenAI', baseUrl: '', model: 'gpt-4o-mini' },
+  deepseek: { label: 'DeepSeek', baseUrl: 'https://api.deepseek.com/v1', model: 'deepseek-chat' },
+  qwen: { label: '通义千问', baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1', model: 'qwen-plus' },
+  siliconflow: { label: 'SiliconFlow', baseUrl: 'https://api.siliconflow.cn/v1', model: 'Qwen/Qwen2.5-72B-Instruct' },
+  custom: { label: '自定义兼容接口', baseUrl: '', model: '' },
+}
 
 const modeOptions = [
   { label: '自动', value: 'auto' },
@@ -51,6 +60,9 @@ export default function AgentModeEnhancer() {
   const [liveStatus, setLiveStatus] = useState('')
   const [providerOpen, setProviderOpen] = useState(false)
   const [apiKey, setApiKey] = useState('')
+  const [provider, setProvider] = useState<AgentProviderConfig['provider']>('openai')
+  const [baseUrl, setBaseUrl] = useState(providerPresets.openai.baseUrl)
+  const [model, setModel] = useState(providerPresets.openai.model)
   const [savingKey, setSavingKey] = useState(false)
 
   useEffect(() => {
@@ -123,7 +135,7 @@ export default function AgentModeEnhancer() {
 
     setSavingKey(true)
     try {
-      const result = await configureAgentProvider(key)
+      const result = await configureAgentProvider({ apiKey: key, provider, baseUrl, model })
       setApiKey('')
       setProviderOpen(false)
       await refreshHealth()
@@ -194,6 +206,28 @@ export default function AgentModeEnhancer() {
           description="不会写入 localStorage、sessionStorage、Git 或项目配置文件。后端重启后需要重新填写；生产部署仍建议通过 OPENAI_API_KEY 环境变量配置。"
         />
         <Text strong>OpenAI API Key</Text>
+        <Select
+          value={provider}
+          style={{ width: '100%', marginTop: 8 }}
+          options={Object.entries(providerPresets).map(([value, item]) => ({ value, label: item.label }))}
+          onChange={(value: AgentProviderConfig['provider']) => {
+            setProvider(value)
+            setBaseUrl(providerPresets[value].baseUrl)
+            setModel(providerPresets[value].model)
+          }}
+        />
+        <Input
+          value={baseUrl}
+          onChange={(event) => setBaseUrl(event.target.value)}
+          placeholder="Base URL，例如 https://api.deepseek.com/v1"
+          style={{ marginTop: 8 }}
+        />
+        <Input
+          value={model}
+          onChange={(event) => setModel(event.target.value)}
+          placeholder="模型名，例如 deepseek-chat"
+          style={{ marginTop: 8 }}
+        />
         <Input.Password
           value={apiKey}
           onChange={(event) => setApiKey(event.target.value)}

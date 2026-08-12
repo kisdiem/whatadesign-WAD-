@@ -7,7 +7,7 @@ import uuid
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 
-from agents import Agent, ModelSettings, Runner, SQLiteSession
+from agents import Agent, ModelSettings, OpenAIChatCompletionsModel, Runner, SQLiteSession
 from openai.types.shared import Reasoning
 
 from .memory import VisibleConversationStore
@@ -29,6 +29,7 @@ VERIFIER_MODEL = os.getenv("WAD_VERIFIER_MODEL", "gpt-5.6-sol")
 SESSION_DB = os.getenv("WAD_AGENT_SESSION_DB", "run_state/agent_sessions.db")
 VISIBLE_MEMORY_DB = os.getenv("WAD_AGENT_MEMORY_DB", "run_state/agent_visible_memory.db")
 StatusCallback = Callable[[str], Awaitable[None]]
+CHAT_COMPAT_MODE = False
 
 STRONG_SECURITY_MARKERS = re.compile(
     r"(HOST[-_]?\w+|CASE[-_]?\w+|WIN[-_]?\w+|EVT[-_]?\w+|finding|investigation|"
@@ -138,6 +139,41 @@ repair_agent = Agent(
 )
 
 
+def configure_model(model: str, client, *, use_chat_completions: bool = False) -> None:
+    """Apply a runtime provider/model to every Agent without persisting secrets."""
+    global CHAT_COMPAT_MODE
+    CHAT_COMPAT_MODE = use_chat_completions
+    selected = OpenAIChatCompletionsModel(model=model, openai_client=client) if use_chat_completions else model
+    for agent in (router_agent, security_agent, knowledge_agent, general_agent, verifier_agent, repair_agent):
+        agent.model = selected
+        if use_chat_completions and agent.model_settings is not None:
+            settings = agent.model_settings
+            # OpenAI-compatible chat endpoints do not accept Responses-only
+            # fields such as reasoning, verbosity, or truncation.
+            agent.model_settings = ModelSettings(
+                temperature=settings.temperature,
+                top_p=settings.top_p,
+                frequency_penalty=settings.frequency_penalty,
+                presence_penalty=settings.presence_penalty,
+                tool_choice=settings.tool_choice,
+                parallel_tool_calls=settings.parallel_tool_calls,
+                max_tokens=settings.max_tokens,
+                extra_body=settings.extra_body,
+                extra_headers=settings.extra_headers,
+                extra_args=settings.extra_args,
+            )
+    if use_chat_completions:
+        # Some OpenAI-compatible providers reject strict JSON Schema response
+        # formats. Security mode still keeps tool calling, but parses its
+        # final answer as text and preserves the evidence contract locally.
+        security_agent.output_type = None
+        verifier_agent.output_type = None
+        repair_agent.output_type = None
+    else:
+        security_agent.output_type = SecurityDraft
+        verifier_agent.output_type = VerificationResult
+
+
 class AgentRuntime:
     def __init__(self, repository: SecurityRepository | None = None):
         self.repository = repository or build_repository()
@@ -243,7 +279,12 @@ class AgentRuntime:
                 session=session,
                 max_turns=tool_call_limit + 3,
             )
-            draft: SecurityDraft = result.final_output
+            draft_output = result.final_output
+            draft: SecurityDraft = (
+                draft_output
+                if isinstance(draft_output, SecurityDraft)
+                else SecurityDraft(answer=str(draft_output), confidence=0.5)
+            )
             successful_tool_events = [event for event in context.tool_events if event.ok]
             if not successful_tool_events:
                 answer = "当前问题需要读取真实安全数据，但本次 Agent 没有获得任何成功的内部数据工具结果，因此不生成当前环境事实判断。"
@@ -258,7 +299,7 @@ class AgentRuntime:
                 answer = draft.answer
                 verified = False
                 confidence = draft.confidence
-                if needs_verification:
+                if needs_verification and not CHAT_COMPAT_MODE:
                     await self._notify(status_callback, "正在核验关键证据")
                     verification_input = json.dumps(
                         {"claims": draft.claims, "evidence": context.evidence_payloads},

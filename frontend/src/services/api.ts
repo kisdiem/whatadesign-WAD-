@@ -83,6 +83,11 @@ export interface ApiConnectionTestResult {
 }
 
 export async function testApiLogSource(config: ApiLogSourceConfig): Promise<ApiConnectionTestResult> {
+  return request<ApiConnectionTestResult>('/settings/log-sources/test', {
+    method: 'POST',
+    body: JSON.stringify({ type: 'api', ...config }),
+  })
+
   if (!USE_LOCAL_DATA) {
     return request<ApiConnectionTestResult>('/settings/log-sources/test', {
       method: 'POST',
@@ -98,6 +103,11 @@ export async function testApiLogSource(config: ApiLogSourceConfig): Promise<ApiC
 }
 
 export async function createApiLogSource(config: ApiLogSourceConfig): Promise<LogSource> {
+  return request<LogSource>('/settings/log-sources', {
+    method: 'POST',
+    body: JSON.stringify({ type: 'api', ...config }),
+  })
+
   if (!USE_LOCAL_DATA) {
     return request<LogSource>('/settings/log-sources', {
       method: 'POST',
@@ -143,14 +153,26 @@ export interface AgentProviderResult {
   message: string
 }
 
+export interface AgentProviderConfig {
+  apiKey: string
+  provider: 'openai' | 'deepseek' | 'qwen' | 'siliconflow' | 'custom'
+  baseUrl?: string
+  model: string
+}
+
 export async function getAgentHealth(): Promise<AgentHealth> {
   return request<AgentHealth>('/agent/health')
 }
 
-export async function configureAgentProvider(apiKey: string): Promise<AgentProviderResult> {
+export async function configureAgentProvider(config: AgentProviderConfig): Promise<AgentProviderResult> {
   return request<AgentProviderResult>('/agent/provider', {
     method: 'POST',
-    body: JSON.stringify({ api_key: apiKey }),
+    body: JSON.stringify({
+      api_key: config.apiKey,
+      provider: config.provider,
+      base_url: config.baseUrl || undefined,
+      model: config.model,
+    }),
   })
 }
 
