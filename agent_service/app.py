@@ -6,7 +6,8 @@ import logging
 import os
 import urllib.error
 import urllib.request
-from datetime import datetime, timezone
+import time
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +20,8 @@ from pydantic import BaseModel, Field
 
 from .models import AgentQueryRequest, AgentRequestContext
 from .runtime import AgentRuntime, configure_model
+from src.detection.engine import DetectionEngine
+from src.detection.log_index import index_metadata, index_overview, search_log_index
 
 logger = logging.getLogger("wad.agent")
 
@@ -73,12 +76,20 @@ class SecurityLogSearchRequest(BaseModel):
     start_time: str | None = None
     end_time: str | None = None
     limit: int = Field(default=50, ge=1, le=200)
+    offset: int = Field(default=0, ge=0, le=10_000_000)
+    time_range: str | None = None
 
 
 _api_log_sources: list[dict[str, Any]] = []
 _runtime_provider = "none"
 _runtime_model = ""
 _runtime_base_url: str | None = None
+_simulation_started_at = time.time() - 31 * 60
+
+
+def _log_index_path() -> Path:
+    configured = os.getenv("WAD_LOG_INDEX")
+    return Path(configured) if configured else Path(__file__).resolve().parents[1] / "outputs" / "scale_parallel" / "all_logs.sqlite"
 
 _demo_windows: list[dict[str, Any]] = [
     {
@@ -273,11 +284,16 @@ def _safe_agent_error(exc: Exception) -> tuple[str, str]:
 
 
 def _dashboard_data_root() -> Path | None:
-    root = os.getenv("WAD_AGENT_DATA_DIR")
-    if not root:
-        return None
-    path = Path(root)
-    return path if path.exists() else None
+    configured = os.getenv("WAD_DETECTION_DATA_DIR") or os.getenv("WAD_AGENT_DATA_DIR")
+    if configured:
+        path = Path(configured)
+        return path if path.exists() else None
+    outputs = Path(__file__).resolve().parents[1] / "outputs"
+    for name in ("scale_parallel", "scale_online", "demo_state"):
+        bundled = outputs / name
+        if bundled.exists():
+            return bundled
+    return None
 
 
 def _mock_dashboard_enabled() -> bool:
@@ -297,6 +313,17 @@ def _load_dashboard_collection(filename: str, fallback: list[dict[str, Any]]) ->
     raise HTTPException(status_code=503, detail=f"{filename} 尚未配置。请设置 WAD_AGENT_DATA_DIR，或显式启用 WAD_AGENT_USE_MOCKS=true。")
 
 
+def _load_detection_artifact(filename: str) -> Any:
+    root = _dashboard_data_root()
+    if not root:
+        raise HTTPException(status_code=503, detail="检测产物目录未配置，且没有生成 outputs/demo_state。")
+    path = root / filename
+    if not path.is_file():
+        raise HTTPException(status_code=503, detail=f"缺少真实检测产物 {path}；请先运行 scripts/run_real_detection.py。")
+    with path.open("r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
 @app.get("/api/agent/health")
 async def health() -> dict[str, Any]:
     return {
@@ -313,12 +340,112 @@ async def health() -> dict[str, Any]:
 
 @app.get("/api/windows")
 async def list_windows() -> list[dict[str, Any]]:
-    return _load_dashboard_collection("windows.json", _demo_windows)
+    payload = _load_detection_artifact("windows.json")
+    if not isinstance(payload, list):
+        return []
+    # Project sealed findings onto a deterministic recent replay timeline. Original
+    # evidence timestamps remain available for audit and are never overwritten on disk.
+    offsets_hours = [0.25, 4, 18, 48, 96, 144, 240, 480, 600, 696]
+    anchor = datetime.now(timezone.utc).replace(second=0, microsecond=0)
+    projected: list[dict[str, Any]] = []
+    for index, item in enumerate(payload):
+        copied = dict(item)
+        copied["original_start"] = item.get("start")
+        copied["original_end"] = item.get("end")
+        replay_end = anchor - timedelta(hours=offsets_hours[index % len(offsets_hours)])
+        replay_start = replay_end - timedelta(minutes=max(1, int(item.get("eventCount", 1)) * 2))
+        copied["start"] = replay_start.isoformat()
+        copied["end"] = replay_end.isoformat()
+        copied["time_mode"] = "scenario_replay"
+        projected.append(copied)
+    return projected
 
 
 @app.get("/api/investigations")
 async def list_investigations() -> list[dict[str, Any]]:
-    return _load_dashboard_collection("investigations.json", _demo_investigations)
+    windows = await list_windows()
+    if not windows:
+        return []
+    payload = _load_detection_artifact("investigations.json")
+    investigations = payload if isinstance(payload, list) and payload else DetectionEngine._investigations(windows)
+    windows_by_id = {item["id"]: item for item in windows}
+    projected: list[dict[str, Any]] = []
+    for item in investigations:
+        copied = dict(item)
+        starts = [windows_by_id[window_id]["start"] for window_id in copied["windowIds"] if window_id in windows_by_id]
+        copied["original_createdAt"] = item.get("createdAt", "")
+        copied["createdAt"] = min(starts) if starts else item.get("createdAt", "")
+        copied["time_mode"] = "scenario_replay"
+        projected.append(copied)
+    return projected
+
+
+@app.get("/api/detection/manifest")
+async def detection_manifest() -> dict[str, Any]:
+    payload = _load_detection_artifact("detection_manifest.json")
+    if not isinstance(payload, dict):
+        return {}
+    payload.setdefault("input_sha256", payload.get("source_catalog_sha256", ""))
+    payload.setdefault("events_per_second", payload.get("records_per_second", 0))
+    return payload
+
+
+@app.get("/api/evaluation/report")
+async def evaluation_report() -> dict[str, Any]:
+    report_path = Path(__file__).resolve().parents[1] / "outputs" / "evaluation" / "evaluation_report.json"
+    if not report_path.is_file():
+        raise HTTPException(status_code=503, detail="评测报告尚未生成，请运行 scripts/evaluate_detection.py。")
+    with report_path.open("r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+@app.get("/api/scale/report")
+async def scale_report() -> dict[str, Any]:
+    candidates = [
+        Path(__file__).resolve().parents[1] / "outputs" / "scale_parallel" / "scale_report.json",
+        Path(__file__).resolve().parents[1] / "outputs" / "scale_online" / "scale_report.json",
+        Path(__file__).resolve().parents[1] / "outputs" / "scale_sample" / "scale_report.json",
+        Path(__file__).resolve().parents[1] / "outputs" / "evaluation" / "scale_benchmark.json",
+    ]
+    for report_path in candidates:
+        if report_path.is_file():
+            with report_path.open("r", encoding="utf-8") as handle:
+                return json.load(handle)
+    raise HTTPException(status_code=503, detail="规模测试报告尚未生成，请运行 scripts/run_scale_detection.py。")
+
+
+@app.get("/api/scale/simulation")
+async def scale_simulation() -> dict[str, Any]:
+    """Clearly-labelled UI simulation; never presented as measured ingestion."""
+    target_bytes = 3_200_000_000_000
+    simulated_rate = 188_000_000
+    elapsed = max(0.0, time.time() - _simulation_started_at)
+    processed = min(target_bytes, int(elapsed * simulated_rate))
+    return {
+        "mode": "capacity_simulation", "is_simulated": True,
+        "label": "容量仿真（非真实扫描）", "target_bytes": target_bytes,
+        "processed_bytes": processed, "bytes_per_second": simulated_rate,
+        "progress": processed / target_bytes, "eta_seconds": max(0, (target_bytes - processed) / simulated_rate),
+        "purpose": "用于演示 TB 级异步任务的进度、分片和积压监控；不计入实测吞吐报告。",
+    }
+
+
+@app.get("/api/log-index/metadata")
+async def log_index_metadata() -> dict[str, Any]:
+    path = _log_index_path()
+    if not path.is_file():
+        raise HTTPException(status_code=503, detail="日志索引尚未生成，请运行 scripts/build_log_index.py。")
+    return await asyncio.to_thread(index_metadata, path)
+
+
+@app.get("/api/log-index/overview")
+async def log_index_overview(time_range: str = "24h") -> dict[str, Any]:
+    if time_range not in {"1h", "24h", "7d", "30d"}:
+        raise HTTPException(status_code=422, detail="time_range must be one of 1h, 24h, 7d, 30d")
+    path = _log_index_path()
+    if not path.is_file():
+        raise HTTPException(status_code=503, detail="日志索引尚未生成。")
+    return await asyncio.to_thread(index_overview, path, time_range)
 
 
 @app.get("/api/knowledge/documents")
@@ -333,7 +460,21 @@ async def test_log_source(request: ApiLogSourceRequest) -> dict[str, Any]:
 
 @app.get("/api/settings/log-sources")
 async def list_log_sources() -> list[dict[str, Any]]:
-    base_sources = _load_dashboard_collection("log_sources.json", _demo_log_sources)
+    payload = _load_detection_artifact("log_sources.json")
+    base_sources = payload if isinstance(payload, list) else []
+    root = _dashboard_data_root()
+    catalog_path = root / "source_catalog.json" if root else None
+    if catalog_path and catalog_path.is_file():
+        with catalog_path.open("r", encoding="utf-8") as handle:
+            catalog = json.load(handle)
+        if isinstance(catalog, list) and catalog:
+            base_sources = [{
+                "id": f"SRC-{index:04d}",
+                "name": str(item.get("member") or Path(str(item.get("path", "unknown"))).name),
+                "path": "::".join(value for value in (str(item.get("path", "")), str(item.get("member") or "")) if value),
+                "kind": str(item.get("kind", "unknown")), "status": "online",
+                "size": f"{int(item.get('size_bytes', 0))} B", "lastRead": "已建立分页索引",
+            } for index, item in enumerate(catalog, 1)]
     return [*base_sources, *_api_log_sources]
 
 
@@ -355,6 +496,13 @@ async def create_log_source(request: ApiLogSourceRequest) -> dict[str, Any]:
 
 @app.post("/api/security/logs/search")
 async def search_security_logs(request: SecurityLogSearchRequest) -> dict[str, Any]:
+    index_path = _log_index_path()
+    if index_path.is_file():
+        return await asyncio.to_thread(
+            search_log_index, index_path, entities=request.entities, source_types=request.source_types,
+            keywords=request.keywords, start_time=request.start_time, end_time=request.end_time,
+            limit=request.limit, offset=request.offset, time_range=request.time_range,
+        )
     result = await runtime.repository.search_logs(
         entities=request.entities,
         source_types=request.source_types,

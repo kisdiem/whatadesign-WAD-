@@ -297,4 +297,9 @@ def build_repository() -> SecurityRepository:
     root = os.getenv("WAD_AGENT_DATA_DIR")
     if root and Path(root).exists():
         return JsonDirectoryRepository(root)
+    outputs = Path(__file__).resolve().parents[1] / "outputs"
+    for name in ("scale_parallel", "scale_online", "demo_state"):
+        bundled_state = outputs / name
+        if bundled_state.exists():
+            return JsonDirectoryRepository(bundled_state)
     return UnavailableRepository()

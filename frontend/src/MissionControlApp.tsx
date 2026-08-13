@@ -58,6 +58,12 @@ import {
   getSecurityEntityHistory,
   getLogSources,
   getInvestigations,
+  getDetectionManifest,
+  getEvaluationReport,
+  getScaleReport,
+  getCapacitySimulation,
+  getLogIndexMetadata,
+  getLogIndexOverview,
   getWindows,
   isUsingLocalData,
   searchSecurityLogs,
@@ -69,6 +75,12 @@ import {
   type SecurityBaselineRecord,
   type SecurityEntityRecord,
   type SecurityLogRecord,
+  type DetectionManifest,
+  type EvaluationReport,
+  type ScaleReport,
+  type CapacitySimulation,
+  type LogIndexMetadata,
+  type LogIndexOverview,
 } from './services/api'
 import {
   buildEntityProfiles,
@@ -87,7 +99,7 @@ import {
 const { Header, Sider, Content } = Layout
 const { Title, Text, Paragraph } = Typography
 const { Dragger } = Upload
-const PREFER_DEMO_DATA = import.meta.env.VITE_PREFER_DEMO_DATA !== 'false'
+const PREFER_DEMO_DATA = import.meta.env.VITE_PREFER_DEMO_DATA === 'true'
 const EChartsView = lazy(() => import('./EChartsView'))
 
 type EventRow = {
@@ -101,6 +113,7 @@ type EventRow = {
   ip?: string
   raw: string
   rawLogRef?: string
+  originalTimestamp?: string
   entities?: string[]
   findingId?: string
   findingTitle: string
@@ -262,6 +275,7 @@ function toEventRow(row: SecurityLogRecord): EventRow {
     ip,
     raw: row.text || JSON.stringify(row, null, 2),
     rawLogRef: row.raw_log_ref || [row.path, row.event_id || row.id].filter(Boolean).join(':'),
+    originalTimestamp: row.original_timestamp,
     entities,
     findingTitle: row.labels?.join(' / ') || 'Repository Event',
     evidenceIds: [],
@@ -433,10 +447,11 @@ export default function MissionControlApp() {
   const [assistantDockCollapsed, setAssistantDockCollapsed] = useState(false)
   const [timeRange, setTimeRange] = useState('24h')
   const [autoRefresh, setAutoRefresh] = useState(true)
-  const [windowItems, setWindowItems] = useState(anomalyWindows)
-  const [caseItems, setCaseItems] = useState(investigations)
-  const [caseBoards, setCaseBoards] = useState<Record<string, CaseBoard>>(() => initialCaseBoards(investigations))
-  const [sourceItems, setSourceItems] = useState(logSources)
+  const [windowItems, setWindowItems] = useState(() => isUsingLocalData() ? anomalyWindows : [])
+  const [caseItems, setCaseItems] = useState(() => isUsingLocalData() ? investigations : [])
+  const [caseBoards, setCaseBoards] = useState<Record<string, CaseBoard>>(() => initialCaseBoards(isUsingLocalData() ? investigations : []))
+  const [sourceItems, setSourceItems] = useState(() => isUsingLocalData() ? logSources : [])
+  const [dashboardError, setDashboardError] = useState<string | null>(null)
 
   const referenceDate = useMemo(() => {
     const datedValues = windowItems.flatMap((item) => [item.start, item.end].map(extractDatePrefix).filter(Boolean) as string[])
@@ -484,12 +499,14 @@ export default function MissionControlApp() {
       try {
         const [windows, cases] = await Promise.all([getWindows(), getInvestigations()])
         if (!active) return
-        setWindowItems(windows.length ? windows : anomalyWindows)
-        setCaseItems(cases.length ? cases : investigations)
-      } catch {
+        setWindowItems(windows)
+        setCaseItems(cases)
+        setDashboardError(null)
+      } catch (error) {
         if (!active) return
-        setWindowItems(anomalyWindows)
-        setCaseItems(investigations)
+        setWindowItems([])
+        setCaseItems([])
+        setDashboardError(error instanceof Error ? error.message : '真实检测 API 不可用')
       }
     }
     void refreshDashboard()
@@ -516,9 +533,12 @@ export default function MissionControlApp() {
     const refreshSources = async () => {
       try {
         const items = await getLogSources()
-        if (active) setSourceItems(items.length ? items : logSources)
-      } catch {
-        if (active) setSourceItems(logSources)
+        if (active) setSourceItems(items)
+      } catch (error) {
+        if (active) {
+          setSourceItems([])
+          setDashboardError(error instanceof Error ? error.message : '日志源 API 不可用')
+        }
       }
     }
 
@@ -748,6 +768,11 @@ export default function MissionControlApp() {
         </Header>
 
         <Content className="mc-content">
+          {dashboardError && (
+            <Card style={{ marginBottom: 12, borderColor: '#ff4d4f' }}>
+              <Text type="danger">真实检测数据加载失败：{dashboardError}。系统未回退到 Mock，请先生成检测产物并启动后端。</Text>
+            </Card>
+          )}
           <Routes>
             <Route path="/overview" element={<OverviewPage findings={findings} cases={filteredCaseItems} caseBoards={caseBoards} timeRange={timeRange} />} />
             <Route path="/findings" element={<FindingsPage findings={findings} evidenceByFinding={evidenceByFinding} onOpenAssistant={openFindingAssistant} onOpenEntity={(entityId) => navigate(`/entities?entity=${encodeURIComponent(entityId)}`)} onOpenInvestigation={() => navigate('/investigations')} />} />
@@ -757,8 +782,9 @@ export default function MissionControlApp() {
             <Route path="/sources" element={<SourcesPage sources={sourceItems} onRefresh={async () => {
               try {
                 setSourceItems(await getLogSources())
-              } catch {
-                setSourceItems(logSources)
+              } catch (error) {
+                setSourceItems([])
+                setDashboardError(error instanceof Error ? error.message : '日志源 API 不可用')
               }
             }} onRegisterImportedSources={registerImportedSources} />} />
             <Route
@@ -780,7 +806,7 @@ export default function MissionControlApp() {
                 />
               )}
             />
-            <Route path="/evaluation" element={<EvaluationPage findings={findings} caseBoards={caseBoards} />} />
+            <Route path="/evaluation" element={<EvaluationPage />} />
             <Route path="/mission-control" element={<Navigate to="/overview" replace />} />
             <Route path="/anomalies" element={<Navigate to="/findings" replace />} />
             <Route path="/settings" element={<Navigate to="/evaluation" replace />} />
@@ -813,18 +839,32 @@ function OverviewPage({
   caseBoards: Record<string, CaseBoard>
   timeRange: string
 }) {
+  const useRepositoryData = useRepositoryPresentation()
+  const [overview, setOverview] = useState<LogIndexOverview | null>(null)
+  const [scale, setScale] = useState<ScaleReport | null>(null)
+  useEffect(() => {
+    if (!useRepositoryData) return
+    getLogIndexOverview(timeRange).then(setOverview).catch(() => setOverview(null))
+    getScaleReport().then(setScale).catch(() => setScale(null))
+  }, [timeRange, useRepositoryData])
+
   const visibleSeries = useMemo(() => {
+    if (useRepositoryData && overview?.timeline?.length) {
+      return overview.timeline.map((item) => ({ time: item.time, logs: item.events, anomalies: 0 }))
+    }
     if (timeRange === '1h') return overviewSeries.slice(-2)
     if (timeRange === '24h') return overviewSeries
     return overviewSeries
-  }, [timeRange])
+  }, [overview, timeRange, useRepositoryData])
 
-  const rawEvents = findings.reduce((sum, item) => sum + item.events.length, 0)
+  const embeddedRiskEvents = findings.reduce((sum, item) => sum + item.events.length, 0)
+  const rawEvents = overview?.event_count ?? embeddedRiskEvents
+  const riskCandidates = scale?.candidate_count ?? embeddedRiskEvents
   const anomalousFindings = findings.length
   const correlatedFindings = cases.reduce((sum, item) => sum + item.windowIds.length, 0)
   const reviewed = cases.reduce((sum, item) => sum + item.windowIds.filter((findingId) => findingId in (caseBoards[item.id] || {})).length, 0)
   const mainChainEvidence = cases.reduce((sum, item) => sum + Object.entries(caseBoards[item.id] || {}).filter(([, stage]) => stage === 'main').length, 0)
-  const reviewReduction = rawEvents > 0 ? ((rawEvents - reviewed) / rawEvents) * 100 : 0
+  const reviewReduction = rawEvents > 0 ? ((rawEvents - riskCandidates) / rawEvents) * 100 : 0
 
   const sourceOption = useMemo(() => ({
     tooltip: { trigger: 'axis' },
@@ -842,13 +882,15 @@ function OverviewPage({
     series: [{
       type: 'pie',
       radius: ['48%', '72%'],
-      data: Array.from(new Set(findings.flatMap((finding) => finding.sourceTypes))).map((name) => ({
-        name,
-        value: findings.filter((finding) => finding.sourceTypes.includes(name)).length,
-      })),
+      data: overview?.source_type_counts
+        ? Object.entries(overview.source_type_counts).slice(0, 12).map(([name, value]) => ({ name, value }))
+        : Array.from(new Set(findings.flatMap((finding) => finding.sourceTypes))).map((name) => ({
+            name,
+            value: findings.filter((finding) => finding.sourceTypes.includes(name)).length,
+          })),
       label: { formatter: '{b}: {c}' },
     }],
-  }), [findings])
+  }), [findings, overview])
 
   return (
     <>
@@ -1312,7 +1354,7 @@ function InvestigationsPage({
   const excluded = related.filter((finding) => board[finding.id] === 'excluded')
   const entities = Array.from(new Set(related.flatMap((finding) => finding.entities))).slice(0, 8)
 
-  const graphOption = useMemo(() => ({
+  const graphOption = ({
     tooltip: {},
     series: [{
       type: 'graph',
@@ -1356,7 +1398,7 @@ function InvestigationsPage({
       lineStyle: { width: 1.3, opacity: 0.75, color: '#7ea6dc' },
       emphasis: { focus: 'adjacency' },
     }],
-  }), [selectedId])
+  })
 
   const renderStage = (title: string, stage: FindingStage, items: FindingRecord[]) => (
     <Col xs={24} lg={8}>
@@ -1485,12 +1527,27 @@ function LogsPage({
   const [remoteEvents, setRemoteEvents] = useState<EventRow[]>([])
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState('')
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
+  const [indexMetadata, setIndexMetadata] = useState<LogIndexMetadata | null>(null)
+  const [simulation, setSimulation] = useState<CapacitySimulation | null>(null)
   const requestedQuery = useMemo(() => new URLSearchParams(location.search).get('q') || '', [location.search])
   useEffect(() => {
     if (requestedQuery) {
       setQuery(requestedQuery)
     }
   }, [requestedQuery])
+
+  useEffect(() => {
+    if (!useRepositoryData) return
+    getLogIndexMetadata().then(setIndexMetadata).catch(() => setIndexMetadata(null))
+    const refreshSimulation = () => getCapacitySimulation().then(setSimulation).catch(() => setSimulation(null))
+    refreshSimulation()
+    const handle = window.setInterval(refreshSimulation, 3000)
+    return () => window.clearInterval(handle)
+  }, [useRepositoryData])
+
+  useEffect(() => setPage(1), [query, source, timeRange])
 
   const events = useMemo<EventRow[]>(() => findings.flatMap((finding) => finding.events.map((event) => ({
     ...event,
@@ -1513,10 +1570,13 @@ function LogsPage({
         const result = await searchSecurityLogs({
           sourceTypes: source === 'all' ? [] : [source],
           keywords: query.trim() ? query.trim().split(/\s+/).slice(0, 6) : [],
-          limit: 200,
+          timeRange,
+          limit: 50,
+          offset: (page - 1) * 50,
         })
         if (!active) return
-        setRemoteEvents(filterRowsByTimeRange(result.events.map(toEventRow), timeRange))
+        setRemoteEvents(result.events.map(toEventRow))
+        setTotal(result.count)
       } catch (error) {
         if (!active) return
         setRemoteEvents([])
@@ -1529,7 +1589,7 @@ function LogsPage({
       active = false
       window.clearTimeout(handle)
     }
-  }, [query, source, timeRange, useRepositoryData])
+  }, [query, source, page, timeRange, useRepositoryData])
 
   const filtered = !useRepositoryData ? events.filter((event) => {
     const haystack = [event.id, event.action, event.actor, event.host, event.process, event.ip, event.source, event.raw, event.findingTitle].join(' ').toLowerCase()
@@ -1549,10 +1609,35 @@ function LogsPage({
   return (
     <>
       <PageTitle title="Log Search" />
+      {useRepositoryData && (
+        <Row gutter={[12, 12]} style={{ marginBottom: 12 }}>
+          <Col xs={24} xl={14}>
+            <Card className="mc-summary-card">
+              <Row gutter={12}>
+                <Col span={8}><Statistic title="真实已索引日志" value={indexMetadata?.indexed_records || 0} /></Col>
+                <Col span={8}><Statistic title="真实日志源" value={indexMetadata?.source_count || 0} /></Col>
+                <Col span={8}><Statistic title="检测读取标签" value={indexMetadata?.labels_accessed ? '是' : '否'} /></Col>
+              </Row>
+            </Card>
+          </Col>
+          <Col xs={24} xl={10}>
+            <Card className="mc-summary-card" title={<Space><Tag color="gold">容量仿真</Tag><Text>{simulation?.label || '非真实扫描'}</Text></Space>}>
+              <Statistic title="仿真后台累计 / 目标" value={(simulation?.processed_bytes || 0) / 1e12} precision={2} suffix={`/ ${((simulation?.target_bytes || 0) / 1e12).toFixed(1)} TB`} />
+              <Progress percent={Math.min(100, (simulation?.progress || 0) * 100)} status="active" />
+              <Text type="secondary">{simulation?.purpose}</Text>
+            </Card>
+          </Col>
+        </Row>
+      )}
       <Card className="mc-queue-card">
         <div className="mc-filterbar">
           <Input prefix={<SearchOutlined />} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索用户 / Host / IP / Process / 原始日志" className="mc-search" />
-          <Select value={source} onChange={setSource} style={{ width: 170 }} options={[{ value: 'all', label: '全部日志源' }, ...Array.from(new Set((!useRepositoryData ? events : remoteEvents).map((event) => event.source))).map((value) => ({ value, label: value }))]} />
+          <Select value={source} onChange={setSource} style={{ width: 190 }} options={[
+            { value: 'all', label: '全部日志源' },
+            ...(useRepositoryData && indexMetadata
+              ? indexMetadata.source_types.map((value) => ({ value, label: value }))
+              : Array.from(new Set(events.map((event) => event.source))).map((value) => ({ value, label: value }))),
+          ]} />
         </div>
         {useRepositoryData ? (
           <div style={{ marginBottom: 12 }}>
@@ -1563,7 +1648,9 @@ function LogsPage({
             <Text type="secondary">演示优先模式 · 当前页面保持 mock 叙事和展示稳定性</Text>
           </div>
         )}
-        <Table rowKey="id" loading={loading} columns={columns} dataSource={filtered} pagination={{ pageSize: 10, showSizeChanger: false }} scroll={{ x: 1100 }} onRow={(row) => ({ onClick: () => setSelected(row) })} />
+        <Table rowKey={(row) => `${row.id}-${row.rawLogRef}`} loading={loading} columns={columns} dataSource={filtered}
+          pagination={useRepositoryData ? { current: page, pageSize: 50, total, showSizeChanger: false, showQuickJumper: true, onChange: setPage } : { pageSize: 10, showSizeChanger: false }}
+          scroll={{ x: 1100 }} onRow={(row) => ({ onClick: () => setSelected(row) })} />
       </Card>
 
       <Drawer open={Boolean(selected)} onClose={() => setSelected(null)} width={620} title={selected?.id}>
@@ -1594,6 +1681,8 @@ function LogsPage({
                     <Descriptions bordered size="small" column={1}>
                       <Descriptions.Item label="source">{selected.source}</Descriptions.Item>
                       <Descriptions.Item label="raw_log_ref">{selected.rawLogRef || `${selected.source}:${selected.id}`}</Descriptions.Item>
+                      <Descriptions.Item label="time_mode">{selected.originalTimestamp ? '场景回放时间（原始证据时间保留）' : '原始采集时间'}</Descriptions.Item>
+                      {selected.originalTimestamp && <Descriptions.Item label="original_timestamp">{selected.originalTimestamp}</Descriptions.Item>}
                     </Descriptions>
                     <Divider />
                     <pre style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{selected.raw}</pre>
@@ -1929,7 +2018,105 @@ function AssistantDock({
   )
 }
 
-function EvaluationPage({ findings, caseBoards }: { findings: FindingRecord[]; caseBoards: Record<string, CaseBoard> }) {
+function EvaluationPage() {
+  const [report, setReport] = useState<EvaluationReport | null>(null)
+  const [manifest, setManifest] = useState<DetectionManifest | null>(null)
+  const [scale, setScale] = useState<ScaleReport | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    Promise.all([getEvaluationReport(), getDetectionManifest(), getScaleReport()])
+      .then(([nextReport, nextManifest, nextScale]) => {
+        setReport(nextReport)
+        setManifest(nextManifest)
+        setScale(nextScale)
+        setError(null)
+      })
+      .catch((reason) => setError(reason instanceof Error ? reason.message : '评测报告加载失败'))
+  }, [])
+
+  if (error) return <><PageTitle title="Evaluation" /><Card><Text type="danger">{error}</Text></Card></>
+  if (!report || !manifest || !scale) return <><PageTitle title="Evaluation" /><Card loading /></>
+
+  const metricCards = [
+    { title: 'PR-AUC', value: report.metrics.pr_auc * 100, suffix: '%', precision: 1 },
+    { title: 'Recall', value: report.metrics.recall * 100, suffix: '%', precision: 1 },
+    { title: 'FPR', value: report.metrics.fpr * 100, suffix: '%', precision: 1 },
+    { title: 'Chain Recovery', value: report.metrics.chain_recovery * 100, suffix: '%', precision: 1 },
+    { title: 'EPS', value: report.throughput.median_events_per_second, suffix: '', precision: 0 },
+    { title: 'Scale TB/day', value: scale.projected_decimal_tb_per_day, suffix: '', precision: 3 },
+  ]
+  const ablationRows = Object.entries(report.ablations).map(([variant, value]) => ({
+    key: variant,
+    variant,
+    recall: `${(value.recall * 100).toFixed(1)}%`,
+    fpr: `${(value.fpr * 100).toFixed(1)}%`,
+    prauc: value.pr_auc.toFixed(3),
+    chain: `${(value.chain_recovery * 100).toFixed(1)}%`,
+  }))
+
+  return (
+    <>
+      <PageTitle title="Evaluation" subtitle="真实 API 加载的可复现演示集指标" />
+      <Row gutter={[12, 12]}>
+        {metricCards.map((item) => (
+          <Col xs={12} md={8} xl={4} key={item.title}>
+            <Card className="mc-summary-card"><Statistic title={item.title} value={item.value} precision={item.precision} suffix={item.suffix} /></Card>
+          </Col>
+        ))}
+        <Col xs={24}>
+          <Card title="真实数据规模与有界内存压测" className="mc-panel">
+            <Descriptions column={{ xs: 1, md: 2, xl: 3 }} size="small">
+              <Descriptions.Item label="实测输入">{scale.input_count.toLocaleString()} 条 / {(scale.bytes_read / 1_000_000).toFixed(1)} MB</Descriptions.Item>
+              <Descriptions.Item label="并行度">{scale.worker_count} 个隔离 worker</Descriptions.Item>
+              <Descriptions.Item label="吞吐">{(scale.source_bytes_per_second / 1_000_000).toFixed(2)} MB/s</Descriptions.Item>
+              <Descriptions.Item label="日处理能力">{scale.projected_decimal_tb_per_day.toFixed(3)} TB/日</Descriptions.Item>
+              <Descriptions.Item label="峰值工作集">{(scale.aggregate_peak_sampled_working_set_bytes / 1024 / 1024).toFixed(1)} MiB</Descriptions.Item>
+              <Descriptions.Item label="标签隔离">{scale.labels_accessed ? '失败：检测读取了标签' : '通过：labels_accessed=false'}</Descriptions.Item>
+              <Descriptions.Item label="内存契约">{scale.memory_contract.state_grows_with_input ? '状态随输入增长' : '固定草图 + Top-K，状态不随输入增长'}</Descriptions.Item>
+              <Descriptions.Item label="执行模式">{scale.execution_mode}</Descriptions.Item>
+              <Descriptions.Item label="风险聚合">{scale.candidate_count} 个候选 / {scale.finding_count} 个窗口</Descriptions.Item>
+            </Descriptions>
+          </Card>
+        </Col>
+        <Col xs={24}>
+          <Card title="可复现消融实验" className="mc-panel">
+            <Table rowKey="key" pagination={false} columns={[
+              { title: '版本', dataIndex: 'variant', key: 'variant' },
+              { title: 'Recall', dataIndex: 'recall', key: 'recall' },
+              { title: 'FPR', dataIndex: 'fpr', key: 'fpr' },
+              { title: 'PR-AUC', dataIndex: 'prauc', key: 'prauc' },
+              { title: 'Chain Recovery', dataIndex: 'chain', key: 'chain' },
+            ]} dataSource={ablationRows} />
+          </Card>
+        </Col>
+        <Col xs={24} xl={12}>
+          <Card title="误报分析" className="mc-panel">
+            <List size="small" dataSource={[
+              `完整方案 FP=${report.metrics.fp} / TN=${report.metrics.tn}`,
+              `每百万正常日志误报数=${report.metrics.false_positives_per_million.toFixed(0)}`,
+              `无监督误报事件：${report.ablations.unsupervised_only?.false_positive_event_ids?.join(', ') || '无'}`,
+              '内置小型演示集仅验证评测链路，不代表生产数据性能。',
+            ]} renderItem={(item) => <List.Item>{item}</List.Item>} />
+          </Card>
+        </Col>
+        <Col xs={24} xl={12}>
+          <Card title="实验与标签边界" className="mc-panel">
+            <Descriptions column={1} size="small">
+              <Descriptions.Item label="真实日志输入">{manifest.input_count} 条，SHA256 {manifest.input_sha256.slice(0, 12)}…</Descriptions.Item>
+              <Descriptions.Item label="检测阶段读取标签">{manifest.labels_accessed ? '是' : '否'}</Descriptions.Item>
+              <Descriptions.Item label="标签用于训练">{report.labels_used_for_training ? '是' : '否'}</Descriptions.Item>
+              <Descriptions.Item label="标签读取时机">预测写出后独立评测</Descriptions.Item>
+              <Descriptions.Item label="复现命令"><Text code>{report.reproduce_command}</Text></Descriptions.Item>
+            </Descriptions>
+          </Card>
+        </Col>
+      </Row>
+    </>
+  )
+}
+
+function LegacyEvaluationPage({ findings: _findings, caseBoards }: { findings: FindingRecord[]; caseBoards: Record<string, CaseBoard> }) {
   const rawEvents = overviewSeries.reduce((sum, item) => sum + item.logs, 0)
   const reviewed = Object.values(caseBoards).reduce((sum, board) => sum + Object.keys(board).length, 0)
   const analystReduction = ((rawEvents - reviewed) / rawEvents) * 100

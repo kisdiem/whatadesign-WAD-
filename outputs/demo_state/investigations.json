@@ -1,0 +1,17 @@
+[
+  {
+    "id": "CASE-AUTO-0001",
+    "title": "弱监督与无监督联合发现",
+    "severity": "critical",
+    "status": "investigating",
+    "windowIds": [
+      "WIN-F96EFC3EC25A",
+      "WIN-16B47A1C6CC4",
+      "WIN-304D6FB35B07",
+      "WIN-F89E3B4CD323"
+    ],
+    "owner": "Unassigned",
+    "createdAt": "2026-08-09T02:14:00Z",
+    "summary": "检测引擎自动聚合的候选攻击链；尚未使用任何真实标签。"
+  }
+]

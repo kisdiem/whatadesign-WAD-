@@ -1,0 +1,22 @@
+{
+  "status": "COMPLETED",
+  "execution_mode": "real_log_file",
+  "input_path": "data/demo/real_logs.jsonl",
+  "input_sha256": "afb356784f3ad77e180015edcb7c6cf1bde6aefd787d7f514ce8f4fe19b6f538",
+  "input_count": 16,
+  "finding_count": 4,
+  "labels_accessed": false,
+  "weak_supervision": true,
+  "unsupervised_baseline": "frequency-isolation-robust-v1",
+  "variant": "full",
+  "chain_aggregation": true,
+  "config": {
+    "event_threshold": 0.61,
+    "window_minutes": 30,
+    "weak_weight": 0.62,
+    "anomaly_weight": 0.38,
+    "version": "wad-weak-unsupervised-v1"
+  },
+  "elapsed_seconds": 0.0065011999977286905,
+  "events_per_second": 2461.084108409199
+}

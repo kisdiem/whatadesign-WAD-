@@ -1,0 +1,14 @@
+{
+  "purpose": "evaluation_only",
+  "must_not_be_passed_to_detector": true,
+  "labels": {
+    "EVT-001": 0, "EVT-002": 0, "EVT-003": 0, "EVT-004": 0,
+    "EVT-005": 1, "EVT-006": 1, "EVT-007": 1, "EVT-008": 1,
+    "EVT-009": 0, "EVT-010": 0, "EVT-011": 1, "EVT-012": 1,
+    "EVT-013": 1, "EVT-014": 0, "EVT-015": 0, "EVT-016": 0
+  },
+  "chains": {
+    "CHAIN-HOST07": ["EVT-005", "EVT-006", "EVT-007"],
+    "CHAIN-WEB01": ["EVT-011", "EVT-012"]
+  }
+}

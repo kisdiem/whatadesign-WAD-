@@ -1,0 +1,58 @@
+[
+  {
+    "rule_id": "WS-PS-ENCODED",
+    "pattern": "powershell.*(?:-enc|-encodedcommand|frombase64string)",
+    "weight": 0.95,
+    "tactic": "Execution",
+    "reason": "编码 PowerShell 命令",
+    "source_types": []
+  },
+  {
+    "rule_id": "WS-LOLBIN",
+    "pattern": "(?:certutil|bitsadmin|rundll32|regsvr32).*(?:http|download|urlcache)",
+    "weight": 0.88,
+    "tactic": "Execution",
+    "reason": "系统工具下载或代理执行",
+    "source_types": []
+  },
+  {
+    "rule_id": "WS-WEBSHELL",
+    "pattern": "(?:cmd=|shell\\.php|/bin/sh|whoami).*(?:http|waf|uri|status)",
+    "weight": 0.92,
+    "tactic": "Persistence",
+    "reason": "疑似 WebShell 命令执行",
+    "source_types": []
+  },
+  {
+    "rule_id": "WS-CREDENTIAL-DUMP",
+    "pattern": "(?:mimikatz|sekurlsa|lsass.*(?:dump|access)|procdump.*lsass)",
+    "weight": 0.98,
+    "tactic": "Credential Access",
+    "reason": "凭据转储行为",
+    "source_types": []
+  },
+  {
+    "rule_id": "WS-DNS-TUNNEL",
+    "pattern": "(?:query|qname)[=: ]+[a-z0-9]{24,}\\.[a-z0-9.-]+",
+    "weight": 0.86,
+    "tactic": "Command and Control",
+    "reason": "高熵长子域查询",
+    "source_types": []
+  },
+  {
+    "rule_id": "WS-BRUTE-FORCE",
+    "pattern": "(?:failed|failure|invalid).*(?:login|logon|password).*(?:count|attempts?)[=: ]+(?:[6-9]|[1-9][0-9]+)",
+    "weight": 0.78,
+    "tactic": "Credential Access",
+    "reason": "短时认证失败聚集",
+    "source_types": []
+  },
+  {
+    "rule_id": "WS-SENSITIVE-EXFIL",
+    "pattern": "(?:shadow|passwd|sensitive|secret|finance).*(?:archive|zip|upload|egress|external)",
+    "weight": 0.9,
+    "tactic": "Exfiltration",
+    "reason": "敏感文件归档或外传",
+    "source_types": []
+  }
+]

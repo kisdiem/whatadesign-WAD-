@@ -9,7 +9,8 @@ import {
   type LogSource,
 } from '../mocks/data'
 
-const USE_LOCAL_DATA = import.meta.env.VITE_USE_MOCKS !== 'false'
+// Detection data is API-first. Local demo data requires explicit opt-in.
+const USE_LOCAL_DATA = import.meta.env.VITE_USE_MOCKS === 'true'
 const AGENT_USE_MOCKS = import.meta.env.VITE_AGENT_USE_MOCKS === 'true'
 const API_BASE = import.meta.env.VITE_API_BASE || '/api'
 
@@ -60,6 +61,75 @@ export async function getInvestigations(): Promise<Investigation[]> {
   return investigations
 }
 
+export interface EvaluationMetrics {
+  tp: number
+  fp: number
+  tn: number
+  fn: number
+  precision: number
+  recall: number
+  f1: number
+  fpr: number
+  pr_auc: number
+  chain_recovery: number
+  false_positives_per_million: number
+  false_positive_event_ids?: string[]
+}
+
+export interface EvaluationReport {
+  status: string
+  dataset_scope: string
+  labels_used_for_training: boolean
+  labels_read_after_prediction: boolean
+  metrics: EvaluationMetrics
+  ablations: Record<string, EvaluationMetrics>
+  throughput: { records: number; repeats: number; median_events_per_second: number; scope: string }
+  reproduce_command: string
+}
+
+export interface DetectionManifest {
+  execution_mode: string
+  input_count: number
+  finding_count: number
+  labels_accessed: boolean
+  events_per_second: number
+  input_sha256: string
+}
+
+export interface ScaleReport {
+  status: string
+  execution_mode: string
+  worker_count: number
+  input_count: number
+  bytes_read: number
+  candidate_count: number
+  finding_count: number
+  elapsed_seconds: number
+  records_per_second: number
+  source_bytes_per_second: number
+  projected_decimal_tb_per_day: number
+  aggregate_peak_sampled_working_set_bytes: number
+  labels_accessed: boolean
+  memory_contract: {
+    state_grows_with_input: boolean
+    max_retained_candidates: number
+    worker_count: number
+    isolation: string
+  }
+}
+
+export async function getEvaluationReport(): Promise<EvaluationReport> {
+  return request<EvaluationReport>('/evaluation/report')
+}
+
+export async function getDetectionManifest(): Promise<DetectionManifest> {
+  return request<DetectionManifest>('/detection/manifest')
+}
+
+export async function getScaleReport(): Promise<ScaleReport> {
+  return request<ScaleReport>('/scale/report')
+}
+
 export async function getLogSources(): Promise<LogSource[]> {
   if (!USE_LOCAL_DATA) return request<LogSource[]>('/settings/log-sources')
   await delay()
@@ -87,11 +157,16 @@ export interface SecurityLogRecord {
   event_id_value?: string
   tactic?: string
   evtx_file?: string
+  original_timestamp?: string
+  time_mode?: string
 }
 
 export interface SecurityLogSearchResponse {
   count: number
   events: SecurityLogRecord[]
+  offset?: number
+  limit?: number
+  has_more?: boolean
 }
 
 export interface SecurityLogSearchParams {
@@ -101,6 +176,8 @@ export interface SecurityLogSearchParams {
   startTime?: string
   endTime?: string
   limit?: number
+  offset?: number
+  timeRange?: string
 }
 
 export interface SecurityEntityRecord {
@@ -148,8 +225,54 @@ export async function searchSecurityLogs(params: SecurityLogSearchParams): Promi
       start_time: params.startTime || null,
       end_time: params.endTime || null,
       limit: params.limit || 50,
+      offset: params.offset || 0,
+      time_range: params.timeRange || null,
     }),
   })
+}
+
+export interface LogIndexMetadata {
+  indexed_records: number
+  source_count: number
+  excluded_count: number
+  source_types: string[]
+  max_records_per_root: number
+  labels_accessed: boolean
+  source_type_counts: Record<string, number>
+  timeline: Array<{ time: string; events: number }>
+}
+
+export interface LogIndexOverview {
+  time_range: string
+  time_mode: 'scenario_replay'
+  replay_anchor: string
+  event_count: number
+  source_type_counts: Record<string, number>
+  timeline: Array<{ time: string; events: number }>
+}
+
+export interface CapacitySimulation {
+  mode: 'capacity_simulation'
+  is_simulated: true
+  label: string
+  target_bytes: number
+  processed_bytes: number
+  bytes_per_second: number
+  progress: number
+  eta_seconds: number
+  purpose: string
+}
+
+export async function getLogIndexMetadata(): Promise<LogIndexMetadata> {
+  return request<LogIndexMetadata>('/log-index/metadata')
+}
+
+export async function getLogIndexOverview(timeRange: string): Promise<LogIndexOverview> {
+  return request<LogIndexOverview>(`/log-index/overview?time_range=${encodeURIComponent(timeRange)}`)
+}
+
+export async function getCapacitySimulation(): Promise<CapacitySimulation> {
+  return request<CapacitySimulation>('/scale/simulation')
 }
 
 export async function getSecurityEntity(entityId: string): Promise<SecurityEntityRecord> {

@@ -1,0 +1,120 @@
+{
+  "status": "COMPLETED",
+  "dataset_scope": "labelled_demo_only",
+  "labels_used_for_training": false,
+  "labels_read_after_prediction": true,
+  "metrics": {
+    "tp": 7,
+    "fp": 0,
+    "tn": 9,
+    "fn": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "fpr": 0.0,
+    "false_positives_per_million": 0.0,
+    "false_positive_event_ids": [],
+    "false_negative_event_ids": [],
+    "pr_auc": 1.0,
+    "chain_recovery": 1.0,
+    "finding_count": 4
+  },
+  "ablations": {
+    "full": {
+      "tp": 7,
+      "fp": 0,
+      "tn": 9,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0,
+      "false_positives_per_million": 0.0,
+      "false_positive_event_ids": [],
+      "false_negative_event_ids": [],
+      "pr_auc": 1.0,
+      "chain_recovery": 1.0,
+      "finding_count": 4
+    },
+    "unsupervised_only": {
+      "tp": 5,
+      "fp": 2,
+      "tn": 7,
+      "fn": 2,
+      "precision": 0.7142857142857143,
+      "recall": 0.7142857142857143,
+      "f1": 0.7142857142857143,
+      "fpr": 0.2222222222222222,
+      "false_positives_per_million": 222222.22222222222,
+      "false_positive_event_ids": [
+        "EVT-002",
+        "EVT-003"
+      ],
+      "false_negative_event_ids": [
+        "EVT-011",
+        "EVT-013"
+      ],
+      "pr_auc": 0.8258503401360544,
+      "chain_recovery": 0.5,
+      "finding_count": 5
+    },
+    "weak_only": {
+      "tp": 7,
+      "fp": 0,
+      "tn": 9,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0,
+      "false_positives_per_million": 0.0,
+      "false_positive_event_ids": [],
+      "false_negative_event_ids": [],
+      "pr_auc": 1.0,
+      "chain_recovery": 1.0,
+      "finding_count": 4
+    },
+    "without_entity_rarity": {
+      "tp": 7,
+      "fp": 0,
+      "tn": 9,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0,
+      "false_positives_per_million": 0.0,
+      "false_positive_event_ids": [],
+      "false_negative_event_ids": [],
+      "pr_auc": 1.0,
+      "chain_recovery": 1.0,
+      "finding_count": 4
+    },
+    "without_chain_aggregation": {
+      "tp": 7,
+      "fp": 0,
+      "tn": 9,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0,
+      "false_positives_per_million": 0.0,
+      "false_positive_event_ids": [],
+      "false_negative_event_ids": [],
+      "pr_auc": 1.0,
+      "chain_recovery": 0.0,
+      "finding_count": 7
+    }
+  },
+  "throughput": {
+    "records": 10000,
+    "repeats": 7,
+    "median_events_per_second": 28401.070834044633,
+    "min_events_per_second": 24871.192096049774,
+    "max_events_per_second": 29743.996397973224,
+    "benchmark_mode": "bundled sample records repeated to a fixed workload",
+    "scope": "single-process in-memory scoring; excludes disk I/O"
+  },
+  "reproduce_command": "python scripts/evaluate_detection.py --input data/demo/real_logs.jsonl --labels data/demo/evaluation_labels.json --output-dir outputs/evaluation"
+}

@@ -1,0 +1,26 @@
+{
+  "status": "COMPLETED",
+  "execution_mode": "parallel_bounded_memory_online",
+  "worker_count": 4,
+  "input_scope": "four real unlabelled roots; capped at 200000 parsed events per worker",
+  "input_count": 604633,
+  "bytes_read": 473587848,
+  "candidate_count": 15,
+  "finding_count": 10,
+  "elapsed_seconds": 35.339617,
+  "records_per_second": 17109.212021,
+  "source_bytes_per_second": 13401046.423,
+  "projected_decimal_tb_per_day": 1.157850411,
+  "projected_decimal_tb_per_day_median_3_runs": 1.204726652,
+  "projected_decimal_tb_per_day_range_3_runs": [1.157850411, 1.223393504],
+  "aggregate_peak_sampled_working_set_bytes": 114737152,
+  "labels_accessed": false,
+  "projection_disclaimer": "Short real-data throughput projection; this is not a claim that one TB was fully scanned.",
+  "reproduce_command": "powershell -ExecutionPolicy Bypass -File scripts/run_scale_benchmark.ps1",
+  "memory_contract": {
+    "state_grows_with_input": false,
+    "max_retained_candidates": 10000,
+    "worker_count": 4,
+    "isolation": "one fixed-memory state per source shard"
+  }
+}

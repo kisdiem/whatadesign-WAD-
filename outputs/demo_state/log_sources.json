@@ -1,0 +1,38 @@
+[
+  {
+    "id": "SRC-01",
+    "name": "DNS",
+    "path": "data/demo/real_logs.jsonl",
+    "kind": "DNS",
+    "status": "online",
+    "size": "3620 B",
+    "lastRead": "2026-08-09T12:05:00Z"
+  },
+  {
+    "id": "SRC-02",
+    "name": "ETW",
+    "path": "data/demo/real_logs.jsonl",
+    "kind": "ETW",
+    "status": "online",
+    "size": "3620 B",
+    "lastRead": "2026-08-09T12:05:00Z"
+  },
+  {
+    "id": "SRC-03",
+    "name": "Syslog",
+    "path": "data/demo/real_logs.jsonl",
+    "kind": "Syslog",
+    "status": "online",
+    "size": "3620 B",
+    "lastRead": "2026-08-09T12:05:00Z"
+  },
+  {
+    "id": "SRC-04",
+    "name": "WAF",
+    "path": "data/demo/real_logs.jsonl",
+    "kind": "WAF",
+    "status": "online",
+    "size": "3620 B",
+    "lastRead": "2026-08-09T12:05:00Z"
+  }
+]
