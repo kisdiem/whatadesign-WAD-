@@ -1,0 +1,25 @@
+schema_version: v3_protocols_1
+target_access:
+  ait_training_allowed: false
+  ait_labels_allowed_before_sealed_predictions: false
+  ait_threshold_selection_allowed: false
+  ait_source_names_as_features: false
+  target_labels_phase: post_seal_scoring_only
+protocols:
+  p1_zero_shot:
+    description: frozen external release, AIT inference and post-seal scoring only
+    uses_ait_labels: false
+    uses_ait_unlabeled_adaptation: false
+  p2_unlabeled_adaptation:
+    description: independent unlabeled target adaptation checkpoint
+    uses_ait_labels: false
+    checkpoint_dir: outputs/ait_p2_unsupervised_adapt
+  p3_supervised_upper_bound:
+    description: separate AIT supervised upper bound, never reported as zero-shot
+    uses_ait_labels: true
+    checkpoint_dir: outputs/ait_p3_supervised_upper
+release:
+  require_locked_release: true
+  require_source_holdout: true
+  require_manifest: true
+  require_checkpoint_hashes: true

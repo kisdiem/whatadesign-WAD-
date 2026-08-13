@@ -1,0 +1,29 @@
+{
+  "audit_version": "v3_compliance_audit_2026-08-06",
+  "git_commit": "pending",
+  "test_result": "97 passed, 4 warnings",
+  "statuses": {
+    "M0": "PARTIAL",
+    "M1": "PARTIAL",
+    "M2": "PARTIAL",
+    "GRAPH": "PARTIAL",
+    "M3": "PARTIAL",
+    "M4": "PARTIAL",
+    "M5": "PARTIAL",
+    "M6": "PARTIAL",
+    "DATA": "BLOCKED_BY_DATA",
+    "SOURCE_HELD_OUT": "IMPLEMENTED_AND_TESTED",
+    "LEAKAGE": "IMPLEMENTED_AND_TESTED",
+    "THRESHOLD_CALIBRATION": "INTERFACE_ONLY",
+    "LOCKED_RELEASE": "IMPLEMENTED_NOT_TESTED",
+    "AIT_P1": "BLOCKED_BY_DATA",
+    "BASELINES": "MISSING",
+    "ABLATIONS": "MISSING",
+    "METRICS": "MISSING",
+    "UNIT_TESTS": "IMPLEMENTED_AND_TESTED",
+    "INTEGRATION_TESTS": "IMPLEMENTED_AND_TESTED",
+    "OUTPUT_FILES": "PARTIAL",
+    "TRACEABILITY": "PARTIAL"
+  },
+  "interpretation": "Interfaces and synthetic protocol tests are implemented. Learned backbones, real training, real metrics, release artifacts, and AIT scoring are intentionally not claimed."
+}

@@ -1,0 +1,49 @@
+#agent-mode-slot {
+  margin-bottom: 10px;
+}
+
+.agent-mode-card {
+  border-color: #dfe6ee !important;
+  background: #fbfdff !important;
+}
+
+.agent-mode-card .ant-card-body {
+  padding: 10px 12px;
+}
+
+.agent-mode-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.agent-mode-description {
+  margin-top: 7px;
+  color: #728096;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.agent-live-status {
+  margin-top: 6px;
+  color: #526071;
+  font-size: 12px;
+}
+
+.mc-chat-bubble .ant-typography {
+  white-space: pre-wrap;
+}
+
+/* MissionControlApp still contains its original generic loading line.
+   The mode card now renders real SSE execution stages, so suppress the stale generic line. */
+.mc-chat-stream > div:not(.mc-chat-row) {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .agent-mode-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

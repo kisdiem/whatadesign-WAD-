@@ -1,0 +1,7 @@
+{
+  "schema_version": "v3_run_state_1",
+  "ait_accessed": false,
+  "completed_steps": [],
+  "in_progress": "A00_environment_and_registry",
+  "failures": []
+}

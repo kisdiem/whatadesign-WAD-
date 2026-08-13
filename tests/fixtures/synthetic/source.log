@@ -1,0 +1,12 @@
+2026-01-01T00:00:00Z User Alice logged in to Host-A success
+2026-01-01T00:01:00Z Process powershell.exe started on Host-A by User Alice
+2026-01-01T00:03:00Z User Alice downloaded C:\\Users\\Alice\\tool.ps1 on Host-A
+2026-01-01T00:05:00Z Process powershell.exe executed C:\\Users\\Alice\\tool.ps1 on Host-A
+2026-01-01T00:08:00Z Process powershell.exe accessed C:\\Users\\Alice\\secret.txt on Host-A
+2026-01-01T00:12:00Z Process powershell.exe connected to 203.0.113.10 from Host-A
+2026-01-01T00:20:00Z User Bob logged in to Host-B success
+2026-01-01T00:21:00Z Process notepad.exe started on Host-B by User Bob
+2026-01-01T00:23:00Z User Bob read /home/bob/notes.txt on Host-B
+2026-01-01T00:25:00Z Process notepad.exe connected to 203.0.113.10 from Host-B
+2026-01-01T00:40:00Z User Alice logged in to Host-A success pid=77
+MALFORMED RECORD WITHOUT STRUCTURE

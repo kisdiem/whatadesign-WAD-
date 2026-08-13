@@ -1,0 +1,5 @@
+{
+  "required_roles": ["actor_of", "process_of", "object_of", "destination_of"],
+  "ip_only_pair_must_be_rejected": true,
+  "same_pid_different_host_must_not_merge": true
+}

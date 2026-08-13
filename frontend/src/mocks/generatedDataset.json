@@ -1,0 +1,3058 @@
+{
+  "anomalyWindows": [
+    {
+      "id": "WIN-russellmitchell-network_scans-20220124-030100",
+      "title": "外部网络扫描",
+      "severity": "medium",
+      "score": 0.68,
+      "start": "2026-08-07 08:40:20",
+      "end": "2026-08-07 09:36:06",
+      "status": "reviewing",
+      "eventCount": 8,
+      "entities": [
+        "wazuh-client"
+      ],
+      "hosts": [
+        "wazuh-client"
+      ],
+      "sourceTypes": [
+        "Wazuh"
+      ],
+      "summary": "russellmitchell 场景中的 外部网络扫描 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "1685986746.6709972",
+          "time": "2026-08-07 09:04:34",
+          "action": "ClamAV database update",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": null,
+          "source": "Wazuh",
+          "raw": "Jan 24 03:25:14 davey-mail freshclam[29822]: Mon Jan 24 03:25:14 2022 -> ClamAV update process started at Mon Jan 24 03:25:14 2022",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685986756.6710346",
+          "time": "2026-08-07 09:04:44",
+          "action": "ClamAV database update",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": null,
+          "source": "Wazuh",
+          "raw": "Jan 24 03:25:24 morris-mail freshclam[29586]: Mon Jan 24 03:25:24 2022 -> ClamAV update process started at Mon Jan 24 03:25:24 2022",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685987161.6710721",
+          "time": "2026-08-07 09:11:29",
+          "action": "ClamAV database update",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": null,
+          "source": "Wazuh",
+          "raw": "Jan 24 03:32:09 mail freshclam[31104]: Mon Jan 24 03:32:09 2022 -> ClamAV update process started at Mon Jan 24 03:32:09 2022",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685987165.6711088",
+          "time": "2026-08-07 09:11:34",
+          "action": "ClamAV database update",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": null,
+          "source": "Wazuh",
+          "raw": "Jan 24 03:32:14 mail freshclam[31104]: Mon Jan 24 03:32:14 2022 -> ClamAV update process started at Mon Jan 24 03:32:14 2022",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685987171.6711455",
+          "time": "2026-08-07 09:11:39",
+          "action": "ClamAV database update",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": null,
+          "source": "Wazuh",
+          "raw": "Jan 24 03:32:19 mail freshclam[31104]: Mon Jan 24 03:32:19 2022 -> ClamAV update process started at Mon Jan 24 03:32:19 2022",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685987175.6711822",
+          "time": "2026-08-07 09:11:44",
+          "action": "ClamAV database update",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": null,
+          "source": "Wazuh",
+          "raw": "Jan 24 03:32:24 mail freshclam[31104]: Mon Jan 24 03:32:24 2022 -> ClamAV update process started at Mon Jan 24 03:32:24 2022",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685987181.6712189",
+          "time": "2026-08-07 09:11:49",
+          "action": "ClamAV database update",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": null,
+          "source": "Wazuh",
+          "raw": "Jan 24 03:32:29 mail freshclam[31104]: Mon Jan 24 03:32:29 2022 -> ClamAV update process started at Mon Jan 24 03:32:29 2022",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685987181.6712556",
+          "time": "2026-08-07 09:11:49",
+          "action": "ClamAV database update",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": null,
+          "source": "Wazuh",
+          "raw": "Jan 24 03:32:29 mail freshclam[31104]: Mon Jan 24 03:32:29 2022 -> ClamAV update process started at Mon Jan 24 03:32:29 2022",
+          "confidence": 0.91
+        }
+      ]
+    },
+    {
+      "id": "WIN-russellmitchell-service_scans-20220124-035646",
+      "title": "服务枚举探测",
+      "severity": "medium",
+      "score": 0.72,
+      "start": "2026-08-07 09:36:06",
+      "end": "2026-08-07 09:36:45",
+      "status": "reviewing",
+      "eventCount": 367,
+      "entities": [
+        "10.143.2.4",
+        "172.19.128.1",
+        "172.19.130.68",
+        "172.19.131.174",
+        "192.168.230.122",
+        "wazuh-client"
+      ],
+      "hosts": [
+        "wazuh-client"
+      ],
+      "sourceTypes": [
+        "Suricata"
+      ],
+      "summary": "russellmitchell 场景中的 服务枚举探测 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "1685988653.6767986",
+          "time": "2026-08-07 09:36:21",
+          "action": "Suricata: Alert - ET SCAN Possible Nmap User-Agent Observed",
+          "actor": "192.168.230.122",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.130.68",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.130.68\", \"name\": \"wazuh-client\", \"id\": \"6\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"tx_id\": \"0\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"192.168.230.122\", \"src_port\": \"34642\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"1\", \"signature_id\": \"2024364\", \"rev\": \"4\", \"metadata\": {\"performance_impact\": [\"Low\"], \"affected_product\": [\"Any\"], \"attack_target\": [\"Client_and_Server\"], \"updated_at\": [\"2020_08_06\"], \"former_category\": [\"SCAN\"], \"created_at\": [\"2",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988653.6775710",
+          "time": "2026-08-07 09:36:21",
+          "action": "Multiple IDS alerts for same id.",
+          "actor": "172.19.130.68",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "192.168.230.122",
+          "source": "Suricata",
+          "raw": "01/24/2022-03:57:01.687867  [**] [1:2024364:4] ET SCAN Possible Nmap User-Agent Observed [**] [Classification: Web Application Attack] [Priority: 1] {TCP} 192.168.230.122:34642 -> 172.19.130.68:80",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988653.6770704",
+          "time": "2026-08-07 09:36:21",
+          "action": "Suricata: Alert - ET SCAN Possible Nmap User-Agent Observed",
+          "actor": "192.168.230.122",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.130.68",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.130.68\", \"name\": \"wazuh-client\", \"id\": \"6\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"tx_id\": \"0\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"192.168.230.122\", \"src_port\": \"34658\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"1\", \"signature_id\": \"2024364\", \"rev\": \"4\", \"metadata\": {\"performance_impact\": [\"Low\"], \"affected_product\": [\"Any\"], \"attack_target\": [\"Client_and_Server\"], \"updated_at\": [\"2020_08_06\"], \"former_category\": [\"SCAN\"], \"created_at\": [\"2",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988653.6725009",
+          "time": "2026-08-07 09:36:21",
+          "action": "Suricata: Alert - ET SCAN Possible Nmap User-Agent Observed",
+          "actor": "192.168.230.122",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.128.1",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.128.1\", \"name\": \"wazuh-client\", \"id\": \"22\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"tx_id\": \"0\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"192.168.230.122\", \"src_port\": \"34642\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"1\", \"signature_id\": \"2024364\", \"rev\": \"4\", \"metadata\": {\"performance_impact\": [\"Low\"], \"affected_product\": [\"Any\"], \"attack_target\": [\"Client_and_Server\"], \"updated_at\": [\"2020_08_06\"], \"former_category\": [\"SCAN\"], \"created_at\": [\"2",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988653.6777099",
+          "time": "2026-08-07 09:36:21",
+          "action": "Suricata: Alert - ET SCAN Possible Nmap User-Agent Observed",
+          "actor": "10.143.2.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.131.174\", \"name\": \"wazuh-client\", \"id\": \"9\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"tx_id\": \"0\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"172.19.131.174\", \"src_port\": \"38710\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"1\", \"signature_id\": \"2024364\", \"rev\": \"4\", \"metadata\": {\"performance_impact\": [\"Low\"], \"affected_product\": [\"Any\"], \"attack_target\": [\"Client_and_Server\"], \"updated_at\": [\"2020_08_06\"], \"former_category\": [\"SCAN\"], \"created_at\": [\"2",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988653.6727731",
+          "time": "2026-08-07 09:36:21",
+          "action": "Suricata: Alert - ET SCAN Possible Nmap User-Agent Observed",
+          "actor": "192.168.230.122",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.128.1",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.128.1\", \"name\": \"wazuh-client\", \"id\": \"22\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"tx_id\": \"0\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"192.168.230.122\", \"src_port\": \"34658\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"1\", \"signature_id\": \"2024364\", \"rev\": \"4\", \"metadata\": {\"performance_impact\": [\"Low\"], \"affected_product\": [\"Any\"], \"attack_target\": [\"Client_and_Server\"], \"updated_at\": [\"2020_08_06\"], \"former_category\": [\"SCAN\"], \"created_at\": [\"2",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988653.6737301",
+          "time": "2026-08-07 09:36:21",
+          "action": "Suricata: Alert - ET SCAN Possible Nmap User-Agent Observed",
+          "actor": "172.19.131.174",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.143.2.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.143.2.4\", \"name\": \"wazuh-client\", \"id\": \"10\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"tx_id\": \"0\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"172.19.131.174\", \"src_port\": \"38710\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"1\", \"signature_id\": \"2024364\", \"rev\": \"4\", \"metadata\": {\"performance_impact\": [\"Low\"], \"affected_product\": [\"Any\"], \"attack_target\": [\"Client_and_Server\"], \"updated_at\": [\"2020_08_06\"], \"former_category\": [\"SCAN\"], \"created_at\": [\"2017",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988653.6779805",
+          "time": "2026-08-07 09:36:21",
+          "action": "Suricata: Alert - ET SCAN Possible Nmap User-Agent Observed",
+          "actor": "10.143.2.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.131.174\", \"name\": \"wazuh-client\", \"id\": \"9\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"tx_id\": \"0\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"172.19.131.174\", \"src_port\": \"38700\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"1\", \"signature_id\": \"2024364\", \"rev\": \"4\", \"metadata\": {\"performance_impact\": [\"Low\"], \"affected_product\": [\"Any\"], \"attack_target\": [\"Client_and_Server\"], \"updated_at\": [\"2020_08_06\"], \"former_category\": [\"SCAN\"], \"created_at\": [\"2",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988653.6740019",
+          "time": "2026-08-07 09:36:21",
+          "action": "Suricata: Alert - ET SCAN Possible Nmap User-Agent Observed",
+          "actor": "172.19.131.174",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.143.2.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.143.2.4\", \"name\": \"wazuh-client\", \"id\": \"10\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"tx_id\": \"0\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"172.19.131.174\", \"src_port\": \"38700\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"1\", \"signature_id\": \"2024364\", \"rev\": \"4\", \"metadata\": {\"performance_impact\": [\"Low\"], \"affected_product\": [\"Any\"], \"attack_target\": [\"Client_and_Server\"], \"updated_at\": [\"2020_08_06\"], \"former_category\": [\"SCAN\"], \"created_at\": [\"2017",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988653.6773223",
+          "time": "2026-08-07 09:36:21",
+          "action": "Suricata: Alert - ET SCAN Possible Nmap User-Agent Observed",
+          "actor": "192.168.230.122",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.130.68",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.130.68\", \"name\": \"wazuh-client\", \"id\": \"6\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"tx_id\": \"0\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"192.168.230.122\", \"src_port\": \"34676\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"1\", \"signature_id\": \"2024364\", \"rev\": \"4\", \"metadata\": {\"performance_impact\": [\"Low\"], \"affected_product\": [\"Any\"], \"attack_target\": [\"Client_and_Server\"], \"updated_at\": [\"2020_08_06\"], \"former_category\": [\"SCAN\"], \"created_at\": [\"2",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988653.6730256",
+          "time": "2026-08-07 09:36:21",
+          "action": "Suricata: Alert - ET SCAN Possible Nmap User-Agent Observed",
+          "actor": "192.168.230.122",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.128.1",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.128.1\", \"name\": \"wazuh-client\", \"id\": \"22\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"tx_id\": \"0\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"192.168.230.122\", \"src_port\": \"34676\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"1\", \"signature_id\": \"2024364\", \"rev\": \"4\", \"metadata\": {\"performance_impact\": [\"Low\"], \"affected_product\": [\"Any\"], \"attack_target\": [\"Client_and_Server\"], \"updated_at\": [\"2020_08_06\"], \"former_category\": [\"SCAN\"], \"created_at\": [\"2",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988653.6782312",
+          "time": "2026-08-07 09:36:21",
+          "action": "Suricata: Alert - ET SCAN Possible Nmap User-Agent Observed",
+          "actor": "10.143.2.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.131.174\", \"name\": \"wazuh-client\", \"id\": \"9\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"tx_id\": \"0\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"172.19.131.174\", \"src_port\": \"38732\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"1\", \"signature_id\": \"2024364\", \"rev\": \"4\", \"metadata\": {\"performance_impact\": [\"Low\"], \"affected_product\": [\"Any\"], \"attack_target\": [\"Client_and_Server\"], \"updated_at\": [\"2020_08_06\"], \"former_category\": [\"SCAN\"], \"created_at\": [\"2",
+          "confidence": 0.91
+        }
+      ]
+    },
+    {
+      "id": "WIN-russellmitchell-dirb-20220124-035725",
+      "title": "目录扫描与路径发现",
+      "severity": "medium",
+      "score": 0.74,
+      "start": "2026-08-07 09:36:45",
+      "end": "2026-08-07 09:37:08",
+      "status": "reviewing",
+      "eventCount": 4522,
+      "entities": [
+        "172.19.131.174",
+        "wazuh-client"
+      ],
+      "hosts": [
+        "wazuh-client"
+      ],
+      "sourceTypes": [
+        "Wazuh"
+      ],
+      "summary": "russellmitchell 场景中的 目录扫描与路径发现 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "1685988679.7175610",
+          "time": "2026-08-07 09:36:48",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:28 +0000] \"GET /aspdnsfcommon HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988677.6869674",
+          "time": "2026-08-07 09:36:46",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:26 +0000] \"GET /randomfile1 HTTP/1.1\" 404 3383 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988677.6880047",
+          "time": "2026-08-07 09:36:46",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:26 +0000] \"GET /.listing HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988677.6906969",
+          "time": "2026-08-07 09:36:46",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:26 +0000] \"GET /_include HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988677.6889377",
+          "time": "2026-08-07 09:36:46",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:26 +0000] \"GET /_ HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988677.6916302",
+          "time": "2026-08-07 09:36:46",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:26 +0000] \"GET /_pages HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988677.6898171",
+          "time": "2026-08-07 09:36:46",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:26 +0000] \"GET /_config HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988677.6925113",
+          "time": "2026-08-07 09:36:46",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:26 +0000] \"GET /_template HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988677.6933989",
+          "time": "2026-08-07 09:36:46",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:26 +0000] \"GET /_vti_map HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988677.6942860",
+          "time": "2026-08-07 09:36:46",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:26 +0000] \"GET /~http HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988679.6960390",
+          "time": "2026-08-07 09:36:47",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:27 +0000] \"GET /1 HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988679.6969084",
+          "time": "2026-08-07 09:36:47",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:27 +0000] \"GET /1990 HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        }
+      ]
+    },
+    {
+      "id": "WIN-russellmitchell-wpscan-20220124-035748",
+      "title": "WordPress 资产探测",
+      "severity": "medium",
+      "score": 0.76,
+      "start": "2026-08-07 09:37:08",
+      "end": "2026-08-07 09:37:39",
+      "status": "reviewing",
+      "eventCount": 6359,
+      "entities": [
+        "172.19.130.4",
+        "172.19.131.174",
+        "wazuh-client"
+      ],
+      "hosts": [
+        "wazuh-client"
+      ],
+      "sourceTypes": [
+        "Suricata",
+        "Wazuh"
+      ],
+      "summary": "russellmitchell 场景中的 WordPress 资产探测 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "1685988727.12199701",
+          "time": "2026-08-07 09:37:34",
+          "action": "Multiple IDS events from same source ip.",
+          "actor": "172.19.131.174",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.130.4",
+          "source": "Suricata",
+          "raw": "01/24/2022-03:58:14.536472  [**] [1:2230002:1] SURICATA TLS invalid record type [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 172.19.130.4:465 -> 172.19.131.174:35200",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988711.9741973",
+          "time": "2026-08-07 09:37:19",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:59 +0000] \"HEAD /wp-content/themes/bridge/ HTTP/1.1\" 404 146 \"https://intranet.smith.russellmitchell.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988711.9784734",
+          "time": "2026-08-07 09:37:19",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:59 +0000] \"HEAD /wp-content/themes/dt-chocolate/ HTTP/1.1\" 404 146 \"https://intranet.smith.russellmitchell.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988711.9795408",
+          "time": "2026-08-07 09:37:19",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:59 +0000] \"HEAD /wp-content/themes/eunoia/ HTTP/1.1\" 404 146 \"https://intranet.smith.russellmitchell.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988711.9806068",
+          "time": "2026-08-07 09:37:19",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:59 +0000] \"HEAD /wp-content/themes/findus/ HTTP/1.1\" 404 146 \"https://intranet.smith.russellmitchell.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988711.9827411",
+          "time": "2026-08-07 09:37:19",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:59 +0000] \"HEAD /wp-content/themes/i-love-it/ HTTP/1.1\" 404 146 \"https://intranet.smith.russellmitchell.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988711.9720600",
+          "time": "2026-08-07 09:37:19",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:59 +0000] \"HEAD /wp-content/themes/antisnews/ HTTP/1.1\" 404 146 \"https://intranet.smith.russellmitchell.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988711.9731310",
+          "time": "2026-08-07 09:37:19",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:59 +0000] \"HEAD /wp-content/themes/authentic/ HTTP/1.1\" 404 146 \"https://intranet.smith.russellmitchell.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988711.9763345",
+          "time": "2026-08-07 09:37:19",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:59 +0000] \"HEAD /wp-content/themes/construct/ HTTP/1.1\" 404 146 \"https://intranet.smith.russellmitchell.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988711.9699053",
+          "time": "2026-08-07 09:37:19",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:59 +0000] \"HEAD /wp-content/themes/RedSteel/ HTTP/1.1\" 404 146 \"https://intranet.smith.russellmitchell.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988711.9709805",
+          "time": "2026-08-07 09:37:19",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:59 +0000] \"HEAD /wp-content/themes/akal/ HTTP/1.1\" 404 146 \"https://intranet.smith.russellmitchell.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988711.9688401",
+          "time": "2026-08-07 09:37:19",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Wazuh",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:57:59 +0000] \"HEAD /wp-content/themes/Avada/ HTTP/1.1\" 404 3166 \"https://intranet.smith.russellmitchell.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        }
+      ]
+    },
+    {
+      "id": "WIN-russellmitchell-webshell-20220124-035819",
+      "title": "可疑 WebShell 落地",
+      "severity": "high",
+      "score": 0.89,
+      "start": "2026-08-07 09:37:39",
+      "end": "2026-08-07 09:38:42",
+      "status": "investigating",
+      "eventCount": 6,
+      "entities": [
+        "172.19.128.1",
+        "172.19.131.174",
+        "192.168.230.122",
+        "192.168.230.4",
+        "ekmkimzkps-1642996700.9285.php",
+        "wazuh-client"
+      ],
+      "hosts": [
+        "wazuh-client"
+      ],
+      "sourceTypes": [
+        "AMiner",
+        "Suricata"
+      ],
+      "summary": "russellmitchell 场景中的 可疑 WebShell 落地 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "1685988767.12204610",
+          "time": "2026-08-07 09:38:15",
+          "action": "Suricata: Alert - SURICATA TLS invalid record/traffic",
+          "actor": "192.168.230.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.128.1",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.128.1\", \"name\": \"wazuh-client\", \"id\": \"22\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"192.168.230.4\", \"src_port\": \"587\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230010\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid record/traffic\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988767.12200680",
+          "time": "2026-08-07 09:38:15",
+          "action": "Suricata: Alert - SURICATA TLS invalid record type",
+          "actor": "192.168.230.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.128.1",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.128.1\", \"name\": \"wazuh-client\", \"id\": \"22\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"192.168.230.4\", \"src_port\": \"587\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230002\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid record type\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"}, ",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988767.12208969",
+          "time": "2026-08-07 09:38:15",
+          "action": "IDS event.",
+          "actor": "192.168.230.122",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "192.168.230.4",
+          "source": "Suricata",
+          "raw": "01/24/2022-03:58:55.360008  [**] [1:2230010:1] SURICATA TLS invalid record/traffic [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 192.168.230.4:587 -> 192.168.230.122:49978",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988767.12208549",
+          "time": "2026-08-07 09:38:15",
+          "action": "IDS event.",
+          "actor": "192.168.230.122",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "192.168.230.4",
+          "source": "Suricata",
+          "raw": "01/24/2022-03:58:55.360008  [**] [1:2230002:1] SURICATA TLS invalid record type [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 192.168.230.4:587 -> 192.168.230.122:49978",
+          "confidence": 0.91
+        },
+        {
+          "id": "WIN-russellmitchell-webshell-20220124-035819-E0005",
+          "time": "2026-08-07 09:38:34",
+          "action": "AMiner: High entropy in Apache Access request.",
+          "actor": null,
+          "host": null,
+          "process": "ekmkimzkps-1642996700.9285.php",
+          "ip": "172.19.131.174",
+          "source": "AMiner",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:59:14 +0000] \"GET /wp-content/uploads/2022/01/ekmkimzkps-1642996700.9285.php?wp_meta=WyJteXNxbCIsICItdSIsICJ3b3JkcHJlc3MiLCAiLXB0YWlub294M2FlZGVlU2giLCAid29yZHByZXNzX2RiIiwgIi1lIiwgIlwic2VsZWN0ICogZnJvbSB3cF91c2Vyc1wiIl0%3D HTTP/1.1\" 200 507686 \"-\" \"python-requests/2.27.1\"",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-russellmitchell-webshell-20220124-035819-E0006",
+          "time": "2026-08-07 09:38:42",
+          "action": "AMiner: High entropy in Apache Access request.",
+          "actor": null,
+          "host": null,
+          "process": "ekmkimzkps-1642996700.9285.php",
+          "ip": "172.19.131.174",
+          "source": "AMiner",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:59:22 +0000] \"GET /wp-content/uploads/2022/01/ekmkimzkps-1642996700.9285.php?wp_meta=WyJ3Z2V0IiwgImh0dHBzOi8vZ2l0aHViLmNvbS9haXQtYWVjaWQvd3BoYXNoY3JhY2svYXJjaGl2ZS9yZWZzL3RhZ3MvdjAuMS50YXIuZ3oiXQ%3D%3D HTTP/1.1\" 200 506741 \"-\" \"python-requests/2.27.1\"",
+          "confidence": 0.87
+        }
+      ]
+    },
+    {
+      "id": "WIN-russellmitchell-cracking-20220124-035922",
+      "title": "凭据破解尝试",
+      "severity": "high",
+      "score": 0.9,
+      "start": "2026-08-07 09:38:42",
+      "end": "2026-08-07 10:16:16",
+      "status": "investigating",
+      "eventCount": 14,
+      "entities": [
+        "10.143.2.4",
+        "172.19.131.174",
+        "ekmkimzkps-1642996700.9285.php",
+        "wazuh-client"
+      ],
+      "hosts": [
+        "wazuh-client"
+      ],
+      "sourceTypes": [
+        "AMiner",
+        "Suricata",
+        "Wazuh"
+      ],
+      "summary": "russellmitchell 场景中的 凭据破解尝试 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "1685988860.12209392",
+          "time": "2026-08-07 09:39:48",
+          "action": "Suricata: Alert - SURICATA HTTP unable to match response to requ",
+          "actor": "10.143.2.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.131.174",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.131.174\", \"name\": \"wazuh-client\", \"id\": \"9\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"http\": {\"anomaly\": {\"count\": \"1\"}}}}, \"tx_id\": \"1\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"10.143.2.4\", \"src_port\": \"80\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2221010\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA HTTP unable to match response to request\", \"action\": \"allowed\", \"category\": \"Generic Protocol Co",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685988860.12210994",
+          "time": "2026-08-07 09:39:48",
+          "action": "IDS event.",
+          "actor": "172.19.131.174",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.143.2.4",
+          "source": "Suricata",
+          "raw": "01/24/2022-04:00:28.654726  [**] [1:2221010:1] SURICATA HTTP unable to match response to request [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 10.143.2.4:80 -> 172.19.131.174:38630",
+          "confidence": 0.91
+        },
+        {
+          "id": "WIN-russellmitchell-cracking-20220124-035922-E0011",
+          "time": "2026-08-07 09:38:42",
+          "action": "AMiner: High entropy in Apache Access request.",
+          "actor": null,
+          "host": null,
+          "process": "ekmkimzkps-1642996700.9285.php",
+          "ip": "172.19.131.174",
+          "source": "AMiner",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:59:22 +0000] \"GET /wp-content/uploads/2022/01/ekmkimzkps-1642996700.9285.php?wp_meta=WyJ3Z2V0IiwgImh0dHBzOi8vZ2l0aHViLmNvbS9haXQtYWVjaWQvd3BoYXNoY3JhY2svYXJjaGl2ZS9yZWZzL3RhZ3MvdjAuMS50YXIuZ3oiXQ%3D%3D HTTP/1.1\" 200 506741 \"-\" \"python-requests/2.27.1\"",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-russellmitchell-cracking-20220124-035922-E0012",
+          "time": "2026-08-07 09:39:08",
+          "action": "AMiner: High entropy in Apache Access request.",
+          "actor": null,
+          "host": null,
+          "process": "ekmkimzkps-1642996700.9285.php",
+          "ip": "172.19.131.174",
+          "source": "AMiner",
+          "raw": "172.19.131.174 - - [24/Jan/2022:03:59:48 +0000] \"GET /wp-content/uploads/2022/01/ekmkimzkps-1642996700.9285.php?wp_meta=WyIuL3dwaGFzaGNyYWNrLTAuMS93cGhhc2hjcmFjay5zaCIsICItdyIsICIkUFdEL3JvY2t5b3UudHh0IiwgIi1qIiwgIi4vd3BoYXNoY3JhY2stMC4xL2pvaG4tMS43LjYtanVtYm8tMTItTGludXg2NC9ydW4iLCAiLXUiLCAiamhhbGwiXQ%3D%3D HTTP/1.1\" 200 506902 \"-\" \"python-requests/2.27.1\"",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-russellmitchell-cracking-20220124-035922-E0013",
+          "time": "2026-08-07 09:40:27",
+          "action": "AMiner: CPU value out of expected range in monitoring logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "{\"service\":{\"type\":\"system\"},\"agent\":{\"hostname\":\"intranet-server\",\"name\":\"intranet-server\",\"id\":\"d8e6f857-ec88-4cf5-bc5e-7b72a6fd1e33\",\"ephemeral_id\":\"c6b20ae2-38c0-4ada-8be2-2d607fddf7e9\",\"version\":\"7.13.2\",\"type\":\"metricbeat\"},\"event\":{\"module\":\"system\",\"dataset\":\"system.cpu\",\"duration\":245697},\"@version\":\"1\",\"metricset\":{\"period\":45000,\"name\":\"cpu\"},\"host\":{\"cpu\":{\"pct\":1},\"name\":\"intranet-server\"},\"ecs\":{\"version\":\"1.9.0\"},\"@timestamp\":\"2022-01-24T04:01:07.284Z\",\"tags\":[\"beats_input_raw_eve",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-russellmitchell-cracking-20220124-035922-E0014",
+          "time": "2026-08-07 09:53:57",
+          "action": "AMiner: CPU value deviates from average in monitoring logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "{\"service\":{\"type\":\"system\"},\"agent\":{\"hostname\":\"intranet-server\",\"name\":\"intranet-server\",\"id\":\"d8e6f857-ec88-4cf5-bc5e-7b72a6fd1e33\",\"ephemeral_id\":\"c6b20ae2-38c0-4ada-8be2-2d607fddf7e9\",\"version\":\"7.13.2\",\"type\":\"metricbeat\"},\"event\":{\"module\":\"system\",\"dataset\":\"system.cpu\",\"duration\":218629},\"@version\":\"1\",\"metricset\":{\"period\":45000,\"name\":\"cpu\"},\"host\":{\"cpu\":{\"pct\":1},\"name\":\"intranet-server\"},\"ecs\":{\"version\":\"1.9.0\"},\"@timestamp\":\"2022-01-24T04:14:37.284Z\",\"tags\":[\"beats_input_raw_eve",
+          "confidence": 0.87
+        },
+        {
+          "id": "1685990344.12211412",
+          "time": "2026-08-07 10:04:34",
+          "action": "ClamAV database update",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": null,
+          "source": "Wazuh",
+          "raw": "Jan 24 04:25:14 davey-mail freshclam[29822]: Mon Jan 24 04:25:14 2022 -> ClamAV update process started at Mon Jan 24 04:25:14 2022",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685990354.12211787",
+          "time": "2026-08-07 10:04:44",
+          "action": "ClamAV database update",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": null,
+          "source": "Wazuh",
+          "raw": "Jan 24 04:25:24 morris-mail freshclam[29586]: Mon Jan 24 04:25:24 2022 -> ClamAV update process started at Mon Jan 24 04:25:24 2022",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685990780.12212163",
+          "time": "2026-08-07 10:11:49",
+          "action": "ClamAV database update",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": null,
+          "source": "Wazuh",
+          "raw": "Jan 24 04:32:29 mail freshclam[31104]: Mon Jan 24 04:32:29 2022 -> ClamAV update process started at Mon Jan 24 04:32:29 2022",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685990785.12212531",
+          "time": "2026-08-07 10:11:54",
+          "action": "ClamAV database update",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": null,
+          "source": "Wazuh",
+          "raw": "Jan 24 04:32:34 mail freshclam[31104]: Mon Jan 24 04:32:34 2022 -> ClamAV update process started at Mon Jan 24 04:32:34 2022",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685990790.12212899",
+          "time": "2026-08-07 10:11:59",
+          "action": "ClamAV database update",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": null,
+          "source": "Wazuh",
+          "raw": "Jan 24 04:32:39 mail freshclam[31104]: Mon Jan 24 04:32:39 2022 -> ClamAV update process started at Mon Jan 24 04:32:39 2022",
+          "confidence": 0.91
+        },
+        {
+          "id": "1685990795.12213267",
+          "time": "2026-08-07 10:12:04",
+          "action": "ClamAV database update",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": null,
+          "source": "Wazuh",
+          "raw": "Jan 24 04:32:44 mail freshclam[31104]: Mon Jan 24 04:32:44 2022 -> ClamAV update process started at Mon Jan 24 04:32:44 2022",
+          "confidence": 0.91
+        }
+      ]
+    },
+    {
+      "id": "WIN-russellmitchell-reverse_shell-20220124-043656",
+      "title": "反向 Shell 建立",
+      "severity": "critical",
+      "score": 0.95,
+      "start": "2026-08-07 10:16:16",
+      "end": "2026-08-07 10:16:59",
+      "status": "investigating",
+      "eventCount": 3,
+      "entities": [
+        "172.19.131.174",
+        "ekmkimzkps-1642996700.9285.php"
+      ],
+      "hosts": [],
+      "sourceTypes": [
+        "AMiner"
+      ],
+      "summary": "russellmitchell 场景中的 反向 Shell 建立 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "WIN-russellmitchell-reverse_shell-20220124-043656-E0001",
+          "time": "2026-08-07 10:16:45",
+          "action": "AMiner: High entropy in Apache Access request.",
+          "actor": null,
+          "host": null,
+          "process": "ekmkimzkps-1642996700.9285.php",
+          "ip": "172.19.131.174",
+          "source": "AMiner",
+          "raw": "172.19.131.174 - - [24/Jan/2022:04:37:25 +0000] \"GET /wp-content/uploads/2022/01/ekmkimzkps-1642996700.9285.php?wp_meta=WyJiYXNoIiwgIi1jIiwgIiAnMDwmMTk2O2V4ZWMgMTk2PD4vZGV2L3RjcC8xOTIuMTY4LjIzMC4xMjIvNDcxMjQ7IHNoIDwmMTk2ID4mMTk2IDI%2BJjE5NiciLCAiJiJd HTTP/1.1\" 200 506741 \"-\" \"python-requests/2.27.1\"",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-russellmitchell-reverse_shell-20220124-043656-E0002",
+          "time": "2026-08-07 10:16:45",
+          "action": "AMiner: Unusual occurrence frequencies of Apache Access request ",
+          "actor": null,
+          "host": null,
+          "process": "ekmkimzkps-1642996700.9285.php",
+          "ip": "172.19.131.174",
+          "source": "AMiner",
+          "raw": "172.19.131.174 - - [24/Jan/2022:04:37:25 +0000] \"GET /wp-content/uploads/2022/01/ekmkimzkps-1642996700.9285.php?wp_meta=WyJiYXNoIiwgIi1jIiwgIiAnMDwmMTk2O2V4ZWMgMTk2PD4vZGV2L3RjcC8xOTIuMTY4LjIzMC4xMjIvNDcxMjQ7IHNoIDwmMTk2ID4mMTk2IDI%2BJjE5NiciLCAiJiJd HTTP/1.1\" 200 506741 \"-\" \"python-requests/2.27.1\"",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-russellmitchell-reverse_shell-20220124-043656-E0003",
+          "time": "2026-08-07 10:16:45",
+          "action": "AMiner: Unusual occurrence frequencies of Apache Access logs.",
+          "actor": null,
+          "host": null,
+          "process": "ekmkimzkps-1642996700.9285.php",
+          "ip": "172.19.131.174",
+          "source": "AMiner",
+          "raw": "172.19.131.174 - - [24/Jan/2022:04:37:25 +0000] \"GET /wp-content/uploads/2022/01/ekmkimzkps-1642996700.9285.php?wp_meta=WyJiYXNoIiwgIi1jIiwgIiAnMDwmMTk2O2V4ZWMgMTk2PD4vZGV2L3RjcC8xOTIuMTY4LjIzMC4xMjIvNDcxMjQ7IHNoIDwmMTk2ID4mMTk2IDI%2BJjE5NiciLCAiJiJd HTTP/1.1\" 200 506741 \"-\" \"python-requests/2.27.1\"",
+          "confidence": 0.87
+        }
+      ]
+    },
+    {
+      "id": "WIN-russellmitchell-privilege_escalation-20220124-043739",
+      "title": "权限提升行为",
+      "severity": "critical",
+      "score": 0.96,
+      "start": "2026-08-07 10:16:59",
+      "end": "2026-08-07 10:17:33",
+      "status": "investigating",
+      "eventCount": 24,
+      "entities": [],
+      "hosts": [],
+      "sourceTypes": [
+        "AMiner"
+      ],
+      "summary": "russellmitchell 场景中的 权限提升行为 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "WIN-russellmitchell-privilege_escalation-20220124-043739-E0010",
+          "time": "2026-08-07 10:17:00",
+          "action": "AMiner: New user_auth parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=USER_AUTH msg=audit(1642999060.603:2226): pid=27950 uid=33 auid=4294967295 ses=4294967295 msg='op=PAM:authentication acct=\"jhall\" exe=\"/bin/su\" hostname=? addr=? terminal=/dev/pts/1 res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-russellmitchell-privilege_escalation-20220124-043739-E0011",
+          "time": "2026-08-07 10:17:00",
+          "action": "AMiner: New user_acct parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=USER_ACCT msg=audit(1642999060.603:2227): pid=27950 uid=33 auid=4294967295 ses=4294967295 msg='op=PAM:accounting acct=\"jhall\" exe=\"/bin/su\" hostname=? addr=? terminal=/dev/pts/1 res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-russellmitchell-privilege_escalation-20220124-043739-E0012",
+          "time": "2026-08-07 10:17:00",
+          "action": "AMiner: New cred_acq parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=CRED_ACQ msg=audit(1642999060.615:2228): pid=27950 uid=33 auid=4294967295 ses=4294967295 msg='op=PAM:setcred acct=\"jhall\" exe=\"/bin/su\" hostname=? addr=? terminal=/dev/pts/1 res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-russellmitchell-privilege_escalation-20220124-043739-E0013",
+          "time": "2026-08-07 10:17:00",
+          "action": "AMiner: New user_start parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=USER_START msg=audit(1642999060.627:2229): pid=27950 uid=33 auid=4294967295 ses=4294967295 msg='op=PAM:session_open acct=\"jhall\" exe=\"/bin/su\" hostname=? addr=? terminal=/dev/pts/1 res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-russellmitchell-privilege_escalation-20220124-043739-E0018",
+          "time": "2026-08-07 10:17:26",
+          "action": "AMiner: New event type.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=USER_CMD msg=audit(1642999086.239:2230): pid=27966 uid=1002 auid=4294967295 ses=4294967295 msg='cwd=\"/var/www/intranet.smith.russellmitchell.com/wp-content/uploads/2022/01\" cmd=636174202F6574632F736861646F77 terminal=pts/1 res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-russellmitchell-privilege_escalation-20220124-043739-E0019",
+          "time": "2026-08-07 10:17:26",
+          "action": "AMiner: New user_cmd parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=USER_CMD msg=audit(1642999086.239:2230): pid=27966 uid=1002 auid=4294967295 ses=4294967295 msg='cwd=\"/var/www/intranet.smith.russellmitchell.com/wp-content/uploads/2022/01\" cmd=636174202F6574632F736861646F77 terminal=pts/1 res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-russellmitchell-privilege_escalation-20220124-043739-E0020",
+          "time": "2026-08-07 10:17:26",
+          "action": "AMiner: New event type.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=CRED_REFR msg=audit(1642999086.239:2231): pid=27966 uid=0 auid=4294967295 ses=4294967295 msg='op=PAM:setcred acct=\"root\" exe=\"/usr/bin/sudo\" hostname=? addr=? terminal=/dev/pts/1 res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-russellmitchell-privilege_escalation-20220124-043739-E0021",
+          "time": "2026-08-07 10:17:26",
+          "action": "AMiner: New cred_refr parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=CRED_REFR msg=audit(1642999086.239:2231): pid=27966 uid=0 auid=4294967295 ses=4294967295 msg='op=PAM:setcred acct=\"root\" exe=\"/usr/bin/sudo\" hostname=? addr=? terminal=/dev/pts/1 res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-russellmitchell-privilege_escalation-20220124-043739-E0022",
+          "time": "2026-08-07 10:17:26",
+          "action": "AMiner: New user_start parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=USER_START msg=audit(1642999086.243:2232): pid=27966 uid=0 auid=4294967295 ses=4294967295 msg='op=PAM:session_open acct=\"root\" exe=\"/usr/bin/sudo\" hostname=? addr=? terminal=/dev/pts/1 res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-russellmitchell-privilege_escalation-20220124-043739-E0023",
+          "time": "2026-08-07 10:17:26",
+          "action": "AMiner: New user_end parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=USER_END msg=audit(1642999086.247:2233): pid=27966 uid=0 auid=4294967295 ses=4294967295 msg='op=PAM:session_close acct=\"root\" exe=\"/usr/bin/sudo\" hostname=? addr=? terminal=/dev/pts/1 res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-russellmitchell-privilege_escalation-20220124-043739-E0024",
+          "time": "2026-08-07 10:17:26",
+          "action": "AMiner: New cred_disp parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=CRED_DISP msg=audit(1642999086.247:2234): pid=27966 uid=0 auid=4294967295 ses=4294967295 msg='op=PAM:setcred acct=\"root\" exe=\"/usr/bin/sudo\" hostname=? addr=? terminal=/dev/pts/1 res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-russellmitchell-privilege_escalation-20220124-043739-E0007",
+          "time": "2026-08-07 10:17:00",
+          "action": "AMiner: New event type.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "Jan 24 04:37:40 intranet-server su[27950]: Successful su for jhall by www-data",
+          "confidence": 0.87
+        }
+      ]
+    },
+    {
+      "id": "WIN-russellmitchell-service_stop-20220124-135038",
+      "title": "关键服务中断",
+      "severity": "medium",
+      "score": 0.7,
+      "start": "2026-08-07 19:29:58",
+      "end": "2026-08-07 19:30:00",
+      "status": "reviewing",
+      "eventCount": 2,
+      "entities": [],
+      "hosts": [],
+      "sourceTypes": [
+        "AMiner"
+      ],
+      "summary": "russellmitchell 场景中的 关键服务中断 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "WIN-russellmitchell-service_stop-20220124-135038-E0001",
+          "time": "2026-08-07 19:29:59",
+          "action": "AMiner: New service_start parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=SERVICE_START msg=audit(1643032239.298:807): pid=1 uid=0 auid=4294967295 ses=4294967295 msg='unit=put comm=\"systemd\" exe=\"/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-russellmitchell-service_stop-20220124-135038-E0002",
+          "time": "2026-08-07 19:29:59",
+          "action": "AMiner: New service_stop parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=SERVICE_STOP msg=audit(1643032239.298:808): pid=1 uid=0 auid=4294967295 ses=4294967295 msg='unit=put comm=\"systemd\" exe=\"/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
+          "confidence": 0.87
+        }
+      ]
+    },
+    {
+      "id": "WIN-russellmitchell-dnsteal-20220124-135040",
+      "title": "疑似 DNS 数据外传",
+      "severity": "critical",
+      "score": 0.94,
+      "start": "2026-08-07 19:30:00",
+      "end": "2026-08-07 20:30:00",
+      "status": "investigating",
+      "eventCount": 711,
+      "entities": [
+        "172.19.130.4",
+        "172.19.130.68",
+        "192.168.230.4",
+        "34.238.185.255",
+        "wazuh-client"
+      ],
+      "hosts": [
+        "wazuh-client"
+      ],
+      "sourceTypes": [
+        "Suricata"
+      ],
+      "summary": "russellmitchell 场景中的 疑似 DNS 数据外传 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "1686024692.2727967",
+          "time": "2026-08-07 19:37:00",
+          "action": "First time this IDS alert is generated.",
+          "actor": "172.19.130.68",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.130.4",
+          "source": "Suricata",
+          "raw": "01/24/2022-13:57:40.737349  [**] [1:2230010:1] SURICATA TLS invalid record/traffic [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 172.19.130.4:443 -> 172.19.130.68:37786",
+          "confidence": 0.91
+        },
+        {
+          "id": "1686026648.3012955",
+          "time": "2026-08-07 20:09:35",
+          "action": "Multiple IDS alerts for same id.",
+          "actor": "172.19.130.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.130.68",
+          "source": "Suricata",
+          "raw": "01/24/2022-14:30:15.966818  [**] [1:2230003:1] SURICATA TLS invalid handshake message [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 172.19.130.68:38640 -> 172.19.130.4:443",
+          "confidence": 0.91
+        },
+        {
+          "id": "1686027825.3195551",
+          "time": "2026-08-07 20:29:12",
+          "action": "Multiple IDS alerts for same id.",
+          "actor": "34.238.185.255",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "192.168.230.4",
+          "source": "Suricata",
+          "raw": "01/24/2022-14:49:52.818944  [**] [1:2230003:1] SURICATA TLS invalid handshake message [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 192.168.230.4:36636 -> 34.238.185.255:443",
+          "confidence": 0.91
+        },
+        {
+          "id": "1686024692.2720820",
+          "time": "2026-08-07 19:37:00",
+          "action": "Suricata: Alert - SURICATA TLS invalid record/traffic",
+          "actor": "172.19.130.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.130.68",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.130.68\", \"name\": \"wazuh-client\", \"id\": \"6\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"172.19.130.4\", \"src_port\": \"443\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230010\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid record/traffic\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"}",
+          "confidence": 0.91
+        },
+        {
+          "id": "1686024692.2718709",
+          "time": "2026-08-07 19:37:00",
+          "action": "Suricata: Alert - SURICATA TLS invalid handshake message",
+          "actor": "172.19.130.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.130.68",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.130.68\", \"name\": \"wazuh-client\", \"id\": \"6\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"172.19.130.4\", \"src_port\": \"443\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230003\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid handshake message\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decod",
+          "confidence": 0.91
+        },
+        {
+          "id": "1686024692.2722922",
+          "time": "2026-08-07 19:37:00",
+          "action": "Suricata: Alert - SURICATA TLS invalid handshake message",
+          "actor": "172.19.130.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.130.68",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.130.68\", \"name\": \"wazuh-client\", \"id\": \"6\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"4\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"172.19.130.68\", \"src_port\": \"37786\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230003\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid handshake message\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command De",
+          "confidence": 0.91
+        },
+        {
+          "id": "1686024692.2725035",
+          "time": "2026-08-07 19:37:00",
+          "action": "Suricata: Alert - SURICATA TLS invalid record/traffic",
+          "actor": "172.19.130.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.130.68",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.130.68\", \"name\": \"wazuh-client\", \"id\": \"6\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"4\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"172.19.130.68\", \"src_port\": \"37786\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230010\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid record/traffic\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decod",
+          "confidence": 0.91
+        },
+        {
+          "id": "1686024740.2734085",
+          "time": "2026-08-07 19:37:48",
+          "action": "Suricata: Alert - SURICATA TLS invalid record/traffic",
+          "actor": "172.19.130.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.130.68",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.130.68\", \"name\": \"wazuh-client\", \"id\": \"6\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"172.19.130.4\", \"src_port\": \"443\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230010\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid record/traffic\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"}",
+          "confidence": 0.91
+        },
+        {
+          "id": "1686024740.2731974",
+          "time": "2026-08-07 19:37:48",
+          "action": "Suricata: Alert - SURICATA TLS invalid handshake message",
+          "actor": "172.19.130.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.130.68",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.130.68\", \"name\": \"wazuh-client\", \"id\": \"6\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"172.19.130.4\", \"src_port\": \"443\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230003\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid handshake message\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decod",
+          "confidence": 0.91
+        },
+        {
+          "id": "1686024740.2738300",
+          "time": "2026-08-07 19:37:48",
+          "action": "Suricata: Alert - SURICATA TLS invalid record/traffic",
+          "actor": "172.19.130.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.130.68",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.130.68\", \"name\": \"wazuh-client\", \"id\": \"6\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"4\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"172.19.130.68\", \"src_port\": \"37806\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230010\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid record/traffic\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decod",
+          "confidence": 0.91
+        },
+        {
+          "id": "1686024740.2736187",
+          "time": "2026-08-07 19:37:48",
+          "action": "Suricata: Alert - SURICATA TLS invalid handshake message",
+          "actor": "172.19.130.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.130.68",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.130.68\", \"name\": \"wazuh-client\", \"id\": \"6\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"4\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"172.19.130.68\", \"src_port\": \"37806\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230003\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid handshake message\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command De",
+          "confidence": 0.91
+        },
+        {
+          "id": "1686024958.2753712",
+          "time": "2026-08-07 19:41:26",
+          "action": "Suricata: Alert - SURICATA TLS invalid handshake message",
+          "actor": "172.19.130.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.19.130.68",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.19.130.68\", \"name\": \"wazuh-client\", \"id\": \"6\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"172.19.130.4\", \"src_port\": \"443\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230003\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid handshake message\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decod",
+          "confidence": 0.91
+        }
+      ]
+    },
+    {
+      "id": "WIN-santos-service_stop-20220116-071617",
+      "title": "关键服务中断",
+      "severity": "medium",
+      "score": 0.7,
+      "start": "2026-07-30 12:55:37",
+      "end": "2026-07-30 12:55:39",
+      "status": "reviewing",
+      "eventCount": 3,
+      "entities": [],
+      "hosts": [],
+      "sourceTypes": [
+        "AMiner"
+      ],
+      "summary": "santos 场景中的 关键服务中断 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "WIN-santos-service_stop-20220116-071617-E0002",
+          "time": "2026-07-30 12:55:38",
+          "action": "AMiner: New service_start parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=SERVICE_START msg=audit(1642317378.019:579): pid=1 uid=0 auid=4294967295 ses=4294967295 msg='unit=ut comm=\"systemd\" exe=\"/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-service_stop-20220116-071617-E0003",
+          "time": "2026-07-30 12:55:38",
+          "action": "AMiner: New service_stop parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=SERVICE_STOP msg=audit(1642317378.019:580): pid=1 uid=0 auid=4294967295 ses=4294967295 msg='unit=ut comm=\"systemd\" exe=\"/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-service_stop-20220116-071617-E0001",
+          "time": "2026-07-30 12:55:38",
+          "action": "AMiner: New event type.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "Jan 16 07:16:18 internal-share ut[29155]: dig: '3x6-.10-.M6TOLK6vTIuiMb1a77D9vXnYFoaY6n82j9bPDoPwr83DwMbe6I/2ERk3KtNL-.Dy/y6CmSIK0SuquEjExSClKCVRIgjBCS*aO40mxH7aHe7D2Le6UeQbvm9tcG-.R1Zw/HLuUCYPOpVkojszOA8YMl2g0umch*7Em8fkj6EEPbdS/Hvzmg3qNvHm-.DavisPooleAndMiller.docx.kiirjekuimkpcrcioastvkeodpnimx.biz' is not a legal name (ran out of space)",
+          "confidence": 0.87
+        }
+      ]
+    },
+    {
+      "id": "WIN-santos-dnsteal-20220116-071619",
+      "title": "疑似 DNS 数据外传",
+      "severity": "critical",
+      "score": 0.94,
+      "start": "2026-07-30 12:55:39",
+      "end": "2026-07-30 13:55:39",
+      "status": "investigating",
+      "eventCount": 832,
+      "entities": [
+        "10.229.0.4",
+        "204.79.197.203",
+        "52.11.104.45",
+        "52.202.42.171",
+        "81.3.192.66",
+        "81.3.192.80",
+        "wazuh-client"
+      ],
+      "hosts": [
+        "wazuh-client"
+      ],
+      "sourceTypes": [
+        "Suricata"
+      ],
+      "summary": "santos 场景中的 疑似 DNS 数据外传 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "1687374435.34413860",
+          "time": "2026-07-30 12:56:47",
+          "action": "Multiple IDS events from same source ip.",
+          "actor": "81.3.192.66",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "01/16/2022-07:17:27.615248  [**] [1:2230010:1] SURICATA TLS invalid record/traffic [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 10.229.0.4:48070 -> 81.3.192.66:443",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687374437.34460496",
+          "time": "2026-07-30 12:56:50",
+          "action": "Multiple IDS alerts for same id.",
+          "actor": "10.229.0.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "204.79.197.203",
+          "source": "Suricata",
+          "raw": "01/16/2022-07:17:30.248087  [**] [1:2230010:1] SURICATA TLS invalid record/traffic [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 204.79.197.203:443 -> 10.229.0.4:42348",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687374607.34551165",
+          "time": "2026-07-30 12:59:41",
+          "action": "Multiple IDS alerts for same id.",
+          "actor": "10.229.0.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "81.3.192.80",
+          "source": "Suricata",
+          "raw": "01/16/2022-07:20:21.746841  [**] [1:2230003:1] SURICATA TLS invalid handshake message [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 81.3.192.80:443 -> 10.229.0.4:46362",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687374607.34552552",
+          "time": "2026-07-30 12:59:41",
+          "action": "Multiple IDS events from same source ip.",
+          "actor": "81.3.192.80",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "01/16/2022-07:20:21.757139  [**] [1:2230010:1] SURICATA TLS invalid record/traffic [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 10.229.0.4:46364 -> 81.3.192.80:443",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687375413.34786470",
+          "time": "2026-07-30 13:13:05",
+          "action": "First time this IDS alert is generated.",
+          "actor": "10.229.0.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "52.11.104.45",
+          "source": "Suricata",
+          "raw": "01/16/2022-07:33:45.949267  [**] [1:2230003:1] SURICATA TLS invalid handshake message [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 52.11.104.45:443 -> 10.229.0.4:54752",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687376930.34985424",
+          "time": "2026-07-30 13:38:23",
+          "action": "Multiple IDS alerts for same id.",
+          "actor": "52.202.42.171",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "01/16/2022-07:59:03.440535  [**] [1:2230003:1] SURICATA TLS invalid handshake message [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 10.229.0.4:43560 -> 52.202.42.171:443",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687374435.34414431",
+          "time": "2026-07-30 12:56:47",
+          "action": "Suricata: Alert - SURICATA TLS invalid handshake message",
+          "actor": "81.3.192.66",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"81.3.192.66\", \"src_port\": \"443\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230003\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid handshake message\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"}",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687374435.34416451",
+          "time": "2026-07-30 12:56:47",
+          "action": "Suricata: Alert - SURICATA TLS invalid record/traffic",
+          "actor": "81.3.192.66",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"81.3.192.66\", \"src_port\": \"443\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230010\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid record/traffic\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"}, \"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687374435.34420476",
+          "time": "2026-07-30 12:56:47",
+          "action": "Suricata: Alert - SURICATA TLS invalid record/traffic",
+          "actor": "81.3.192.66",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"81.3.192.66\", \"src_port\": \"443\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230010\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid record/traffic\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"}, \"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687374435.34418462",
+          "time": "2026-07-30 12:56:47",
+          "action": "Suricata: Alert - SURICATA TLS invalid handshake message",
+          "actor": "81.3.192.66",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"81.3.192.66\", \"src_port\": \"443\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230003\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid handshake message\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"}",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687374435.34424501",
+          "time": "2026-07-30 12:56:47",
+          "action": "Suricata: Alert - SURICATA TLS invalid record/traffic",
+          "actor": "81.3.192.66",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"4\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"10.229.0.4\", \"src_port\": \"48080\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230010\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid record/traffic\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"}, ",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687374435.34422481",
+          "time": "2026-07-30 12:56:47",
+          "action": "Suricata: Alert - SURICATA TLS invalid handshake message",
+          "actor": "81.3.192.66",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"4\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"10.229.0.4\", \"src_port\": \"48080\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230003\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid handshake message\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"",
+          "confidence": 0.91
+        }
+      ]
+    },
+    {
+      "id": "WIN-santos-network_scans-20220117-111500",
+      "title": "外部网络扫描",
+      "severity": "medium",
+      "score": 0.68,
+      "start": "2026-07-31 16:54:20",
+      "end": "2026-07-31 17:00:50",
+      "status": "reviewing",
+      "eventCount": 104,
+      "entities": [
+        "10.229.0.4",
+        "18.200.14.71",
+        "185.54.150.22",
+        "185.54.150.85",
+        "54.173.41.153",
+        "wazuh-client"
+      ],
+      "hosts": [
+        "wazuh-client"
+      ],
+      "sourceTypes": [
+        "Suricata"
+      ],
+      "summary": "santos 场景中的 外部网络扫描 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "1687475312.10047154",
+          "time": "2026-07-31 16:58:04",
+          "action": "Multiple IDS alerts for same id.",
+          "actor": "185.54.150.85",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "01/17/2022-11:18:44.834046  [**] [1:2230003:1] SURICATA TLS invalid handshake message [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 10.229.0.4:51256 -> 185.54.150.85:443",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475310.10001877",
+          "time": "2026-07-31 16:58:03",
+          "action": "Suricata: Alert - SURICATA TLS invalid handshake message",
+          "actor": "54.173.41.153",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"54.173.41.153\", \"src_port\": \"443\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230003\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid handshake message\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475310.10003847",
+          "time": "2026-07-31 16:58:03",
+          "action": "Suricata: Alert - SURICATA TLS invalid record/traffic",
+          "actor": "54.173.41.153",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"54.173.41.153\", \"src_port\": \"443\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230010\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid record/traffic\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"},",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475310.10005808",
+          "time": "2026-07-31 16:58:03",
+          "action": "Suricata: Alert - SURICATA TLS invalid handshake message",
+          "actor": "54.173.41.153",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"4\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"10.229.0.4\", \"src_port\": \"58774\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230003\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid handshake message\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475310.10007778",
+          "time": "2026-07-31 16:58:03",
+          "action": "Suricata: Alert - SURICATA TLS invalid record/traffic",
+          "actor": "54.173.41.153",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"4\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"10.229.0.4\", \"src_port\": \"58774\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230010\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid record/traffic\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"}, ",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475312.10011729",
+          "time": "2026-07-31 16:58:04",
+          "action": "Suricata: Alert - SURICATA TLS invalid record/traffic",
+          "actor": "185.54.150.22",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"185.54.150.22\", \"src_port\": \"443\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230010\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid record/traffic\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"},",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475312.10009739",
+          "time": "2026-07-31 16:58:04",
+          "action": "Suricata: Alert - SURICATA TLS invalid handshake message",
+          "actor": "185.54.150.22",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"185.54.150.22\", \"src_port\": \"443\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230003\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid handshake message\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475312.10013710",
+          "time": "2026-07-31 16:58:04",
+          "action": "Suricata: Alert - SURICATA TLS invalid handshake message",
+          "actor": "185.54.150.22",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"4\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"10.229.0.4\", \"src_port\": \"53762\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230003\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid handshake message\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475312.10015702",
+          "time": "2026-07-31 16:58:04",
+          "action": "Suricata: Alert - SURICATA TLS invalid record/traffic",
+          "actor": "185.54.150.22",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"4\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"10.229.0.4\", \"src_port\": \"53762\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230010\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid record/traffic\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"}, ",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475312.10019667",
+          "time": "2026-07-31 16:58:04",
+          "action": "Suricata: Alert - SURICATA TLS invalid record/traffic",
+          "actor": "18.200.14.71",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"18.200.14.71\", \"src_port\": \"443\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230010\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid record/traffic\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"}, ",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475312.10017685",
+          "time": "2026-07-31 16:58:04",
+          "action": "Suricata: Alert - SURICATA TLS invalid handshake message",
+          "actor": "18.200.14.71",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"18.200.14.71\", \"src_port\": \"443\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230003\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid handshake message\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475312.10021640",
+          "time": "2026-07-31 16:58:04",
+          "action": "Suricata: Alert - SURICATA TLS invalid handshake message",
+          "actor": "18.200.14.71",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"4\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"10.229.0.4\", \"src_port\": \"41386\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230003\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid handshake message\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"",
+          "confidence": 0.91
+        }
+      ]
+    },
+    {
+      "id": "WIN-santos-service_scans-20220117-112130",
+      "title": "服务枚举探测",
+      "severity": "medium",
+      "score": 0.72,
+      "start": "2026-07-31 17:00:50",
+      "end": "2026-07-31 17:01:20",
+      "status": "reviewing",
+      "eventCount": 123,
+      "entities": [
+        "172.21.128.119",
+        "172.21.131.50",
+        "192.168.104.155",
+        "wazuh-client"
+      ],
+      "hosts": [
+        "wazuh-client"
+      ],
+      "sourceTypes": [
+        "Suricata"
+      ],
+      "summary": "santos 场景中的 服务枚举探测 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "1687475490.10109725",
+          "time": "2026-07-31 17:01:03",
+          "action": "First time this IDS alert is generated.",
+          "actor": "172.21.128.119",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.131.50",
+          "source": "Suricata",
+          "raw": "01/17/2022-11:21:43.696785  [**] [1:2220006:1] SURICATA SMTP no server welcome message [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 172.21.131.50:587 -> 172.21.128.119:34318",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475492.10122984",
+          "time": "2026-07-31 17:01:04",
+          "action": "First time this IDS alert is generated.",
+          "actor": "172.21.128.119",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.131.50",
+          "source": "Suricata",
+          "raw": "01/17/2022-11:21:44.233176  [**] [1:2220000:1] SURICATA SMTP invalid reply [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 172.21.131.50:587 -> 172.21.128.119:34318",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475494.10145514",
+          "time": "2026-07-31 17:01:06",
+          "action": "First time this IDS alert is generated.",
+          "actor": "172.21.131.50",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Suricata",
+          "raw": "01/17/2022-11:21:46.454900  [**] [1:2230000:1] SURICATA TLS invalid SSLv2 header [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 172.21.128.119:34328 -> 172.21.131.50:587",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475494.10146365",
+          "time": "2026-07-31 17:01:06",
+          "action": "First time this IDS alert is generated.",
+          "actor": "172.21.128.119",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.131.50",
+          "source": "Suricata",
+          "raw": "01/17/2022-11:21:46.496814  [**] [1:2230000:1] SURICATA TLS invalid SSLv2 header [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 172.21.131.50:587 -> 172.21.128.119:34328",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475494.10147220",
+          "time": "2026-07-31 17:01:06",
+          "action": "Suricata: Alert - ET SCAN Possible Nmap User-Agent Observed",
+          "actor": "172.21.131.50",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.21.128.119\", \"name\": \"wazuh-client\", \"id\": \"24\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"tx_id\": \"0\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"172.21.128.119\", \"src_port\": \"51526\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"1\", \"signature_id\": \"2024364\", \"rev\": \"4\", \"metadata\": {\"performance_impact\": [\"Low\"], \"affected_product\": [\"Any\"], \"attack_target\": [\"Client_and_Server\"], \"updated_at\": [\"2020_08_06\"], \"former_category\": [\"SCAN\"], \"created_at\": [\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475494.10170571",
+          "time": "2026-07-31 17:01:06",
+          "action": "First time this IDS alert is generated.",
+          "actor": "172.21.131.50",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Suricata",
+          "raw": "01/17/2022-11:21:46.619580  [**] [1:2024364:4] ET SCAN Possible Nmap User-Agent Observed [**] [Classification: Web Application Attack] [Priority: 1] {TCP} 172.21.128.119:51526 -> 172.21.131.50:80",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475494.10150021",
+          "time": "2026-07-31 17:01:06",
+          "action": "Suricata: Alert - ET SCAN Possible Nmap User-Agent Observed",
+          "actor": "172.21.131.50",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.21.128.119\", \"name\": \"wazuh-client\", \"id\": \"24\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"tx_id\": \"0\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"172.21.128.119\", \"src_port\": \"51536\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"1\", \"signature_id\": \"2024364\", \"rev\": \"4\", \"metadata\": {\"performance_impact\": [\"Low\"], \"affected_product\": [\"Any\"], \"attack_target\": [\"Client_and_Server\"], \"updated_at\": [\"2020_08_06\"], \"former_category\": [\"SCAN\"], \"created_at\": [\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475494.10152665",
+          "time": "2026-07-31 17:01:06",
+          "action": "Suricata: Alert - ET SCAN Possible Nmap User-Agent Observed",
+          "actor": "192.168.104.155",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.21.128.119\", \"name\": \"wazuh-client\", \"id\": \"24\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"tx_id\": \"0\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"172.21.128.119\", \"src_port\": \"52334\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"1\", \"signature_id\": \"2024364\", \"rev\": \"4\", \"metadata\": {\"performance_impact\": [\"Low\"], \"affected_product\": [\"Any\"], \"attack_target\": [\"Client_and_Server\"], \"updated_at\": [\"2020_08_06\"], \"former_category\": [\"SCAN\"], \"created_at\": [\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475493.10131747",
+          "time": "2026-07-31 17:01:06",
+          "action": "Suricata: Alert - ET SCAN Possible Nmap User-Agent Observed",
+          "actor": "172.21.128.119",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "192.168.104.155",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"192.168.104.155\", \"name\": \"wazuh-client\", \"id\": \"26\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"tx_id\": \"0\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"172.21.128.119\", \"src_port\": \"52334\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"1\", \"signature_id\": \"2024364\", \"rev\": \"4\", \"metadata\": {\"performance_impact\": [\"Low\"], \"affected_product\": [\"Any\"], \"attack_target\": [\"Client_and_Server\"], \"updated_at\": [\"2020_08_06\"], \"former_category\": [\"SCAN\"], \"created_at\": [",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475493.10139446",
+          "time": "2026-07-31 17:01:06",
+          "action": "First time this IDS alert is generated.",
+          "actor": "192.168.104.155",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Suricata",
+          "raw": "01/17/2022-11:21:46.623285  [**] [1:2024364:4] ET SCAN Possible Nmap User-Agent Observed [**] [Classification: Web Application Attack] [Priority: 1] {TCP} 172.21.128.119:52334 -> 192.168.104.155:80",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475494.10155165",
+          "time": "2026-07-31 17:01:06",
+          "action": "Suricata: Alert - ET SCAN Possible Nmap User-Agent Observed",
+          "actor": "192.168.104.155",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.21.128.119\", \"name\": \"wazuh-client\", \"id\": \"24\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"tx_id\": \"0\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"172.21.128.119\", \"src_port\": \"52324\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"1\", \"signature_id\": \"2024364\", \"rev\": \"4\", \"metadata\": {\"performance_impact\": [\"Low\"], \"affected_product\": [\"Any\"], \"attack_target\": [\"Client_and_Server\"], \"updated_at\": [\"2020_08_06\"], \"former_category\": [\"SCAN\"], \"created_at\": [\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475493.10134261",
+          "time": "2026-07-31 17:01:06",
+          "action": "Suricata: Alert - ET SCAN Possible Nmap User-Agent Observed",
+          "actor": "172.21.128.119",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "192.168.104.155",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"192.168.104.155\", \"name\": \"wazuh-client\", \"id\": \"26\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"tx_id\": \"0\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"172.21.128.119\", \"src_port\": \"52324\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"1\", \"signature_id\": \"2024364\", \"rev\": \"4\", \"metadata\": {\"performance_impact\": [\"Low\"], \"affected_product\": [\"Any\"], \"attack_target\": [\"Client_and_Server\"], \"updated_at\": [\"2020_08_06\"], \"former_category\": [\"SCAN\"], \"created_at\": [",
+          "confidence": 0.91
+        }
+      ]
+    },
+    {
+      "id": "WIN-santos-dirb-20220117-112200",
+      "title": "目录扫描与路径发现",
+      "severity": "medium",
+      "score": 0.74,
+      "start": "2026-07-31 17:01:20",
+      "end": "2026-07-31 17:01:41",
+      "status": "reviewing",
+      "eventCount": 4522,
+      "entities": [
+        "172.21.128.119",
+        "wazuh-client"
+      ],
+      "hosts": [
+        "wazuh-client"
+      ],
+      "sourceTypes": [
+        "Wazuh"
+      ],
+      "summary": "santos 场景中的 目录扫描与路径发现 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "1687475508.10284993",
+          "time": "2026-07-31 17:01:22",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:02 +0000] \"GET /~test HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475508.10293753",
+          "time": "2026-07-31 17:01:22",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:02 +0000] \"GET /08 HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475508.10311201",
+          "time": "2026-07-31 17:01:22",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:02 +0000] \"GET /20 HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475508.10222599",
+          "time": "2026-07-31 17:01:22",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:02 +0000] \"GET /.web HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475508.10231418",
+          "time": "2026-07-31 17:01:22",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:02 +0000] \"GET /_common HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475508.10267292",
+          "time": "2026-07-31 17:01:22",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:02 +0000] \"GET /_vti_inf HTTP/1.1\" 404 3365 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475508.10302471",
+          "time": "2026-07-31 17:01:22",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:02 +0000] \"GET /14 HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475508.10213240",
+          "time": "2026-07-31 17:01:22",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:02 +0000] \"GET /.htpasswd HTTP/1.1\" 403 366 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475508.10240232",
+          "time": "2026-07-31 17:01:22",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:02 +0000] \"GET /_img HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475508.10249577",
+          "time": "2026-07-31 17:01:22",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:02 +0000] \"GET /_old HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475508.10258403",
+          "time": "2026-07-31 17:01:22",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:02 +0000] \"GET /_temp HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475508.10276182",
+          "time": "2026-07-31 17:01:22",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:02 +0000] \"GET /~ftp HTTP/1.1\" 404 363 \"-\" \"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\"",
+          "confidence": 0.91
+        }
+      ]
+    },
+    {
+      "id": "WIN-santos-wpscan-20220117-112221",
+      "title": "WordPress 资产探测",
+      "severity": "medium",
+      "score": 0.76,
+      "start": "2026-07-31 17:01:41",
+      "end": "2026-07-31 17:02:18",
+      "status": "reviewing",
+      "eventCount": 6567,
+      "entities": [
+        "172.21.128.119",
+        "172.21.131.50",
+        "wazuh-client"
+      ],
+      "hosts": [
+        "wazuh-client"
+      ],
+      "sourceTypes": [
+        "Suricata",
+        "Wazuh"
+      ],
+      "summary": "santos 场景中的 WordPress 资产探测 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "1687475564.15551905",
+          "time": "2026-07-31 17:02:16",
+          "action": "First time this IDS alert is generated.",
+          "actor": "172.21.128.119",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.131.50",
+          "source": "Suricata",
+          "raw": "01/17/2022-11:22:56.688774  [**] [1:2230002:1] SURICATA TLS invalid record type [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 172.21.131.50:465 -> 172.21.128.119:52494",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475530.13017053",
+          "time": "2026-07-31 17:01:44",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:24 +0000] \"GET /wp-content/mu-plugins/ HTTP/1.1\" 404 363 \"https://intranet.smith.santos.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475536.13059890",
+          "time": "2026-07-31 17:01:50",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:30 +0000] \"HEAD /wp-content/themes/blessing/ HTTP/1.1\" 404 146 \"https://intranet.smith.santos.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475536.13070359",
+          "time": "2026-07-31 17:01:50",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:30 +0000] \"HEAD /wp-content/themes/broadscope/ HTTP/1.1\" 404 146 \"https://intranet.smith.santos.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475536.13154069",
+          "time": "2026-07-31 17:01:50",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:30 +0000] \"HEAD /wp-content/themes/jobroller/ HTTP/1.1\" 404 146 \"https://intranet.smith.santos.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475536.13101780",
+          "time": "2026-07-31 17:01:50",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:30 +0000] \"HEAD /wp-content/themes/designfolio-plus/ HTTP/1.1\" 404 146 \"https://intranet.smith.santos.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475536.13122688",
+          "time": "2026-07-31 17:01:50",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:30 +0000] \"HEAD /wp-content/themes/findeo/ HTTP/1.1\" 404 146 \"https://intranet.smith.santos.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475536.13185476",
+          "time": "2026-07-31 17:01:50",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:30 +0000] \"HEAD /wp-content/themes/newspaper-x/ HTTP/1.1\" 404 146 \"https://intranet.smith.santos.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475536.13195946",
+          "time": "2026-07-31 17:01:50",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:30 +0000] \"HEAD /wp-content/themes/parallelus-traject/ HTTP/1.1\" 404 146 \"https://intranet.smith.santos.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475536.13206487",
+          "time": "2026-07-31 17:01:50",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:30 +0000] \"HEAD /wp-content/themes/pixiv-custom/ HTTP/1.1\" 404 146 \"https://intranet.smith.santos.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475536.13028432",
+          "time": "2026-07-31 17:01:50",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:30 +0000] \"HEAD /wp-content/themes/Grimag/ HTTP/1.1\" 404 146 \"https://intranet.smith.santos.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475536.13038899",
+          "time": "2026-07-31 17:01:50",
+          "action": "Multiple web server 400 error codes from same source ip.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Wazuh",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:22:30 +0000] \"HEAD /wp-content/themes/allegiant/ HTTP/1.1\" 404 146 \"https://intranet.smith.santos.com\" \"WPScan v3.8.20 (https://wpscan.com/wordpress-security-scanner)\"",
+          "confidence": 0.91
+        }
+      ]
+    },
+    {
+      "id": "WIN-santos-webshell-20220117-112258",
+      "title": "可疑 WebShell 落地",
+      "severity": "high",
+      "score": 0.89,
+      "start": "2026-07-31 17:02:18",
+      "end": "2026-07-31 17:03:36",
+      "status": "investigating",
+      "eventCount": 16,
+      "entities": [
+        "10.229.0.32",
+        "172.21.128.119",
+        "172.21.131.50",
+        "wazuh-client",
+        "yvmuplzucm-1642418578.1653.php"
+      ],
+      "hosts": [
+        "wazuh-client"
+      ],
+      "sourceTypes": [
+        "AMiner",
+        "Suricata",
+        "Wazuh"
+      ],
+      "summary": "santos 场景中的 可疑 WebShell 落地 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "1687475590.15555764",
+          "time": "2026-07-31 17:02:43",
+          "action": "First time this IDS alert is generated.",
+          "actor": "172.21.128.119",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.131.50",
+          "source": "Suricata",
+          "raw": "01/17/2022-11:23:23.357553  [**] [1:2230002:1] SURICATA TLS invalid record type [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 172.21.131.50:587 -> 172.21.128.119:34330",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475590.15556205",
+          "time": "2026-07-31 17:02:43",
+          "action": "Multiple IDS alerts for same id.",
+          "actor": "172.21.128.119",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.131.50",
+          "source": "Suricata",
+          "raw": "01/17/2022-11:23:23.357553  [**] [1:2230010:1] SURICATA TLS invalid record/traffic [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 172.21.131.50:587 -> 172.21.128.119:34330",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475590.15556772",
+          "time": "2026-07-31 17:02:43",
+          "action": "Suricata: Alert - SURICATA TLS invalid record type",
+          "actor": "172.21.131.50",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.21.128.119\", \"name\": \"wazuh-client\", \"id\": \"24\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"172.21.131.50\", \"src_port\": \"587\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230002\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid record type\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decode\"}",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475590.15560654",
+          "time": "2026-07-31 17:02:43",
+          "action": "Suricata: Alert - SURICATA TLS invalid record/traffic",
+          "actor": "172.21.131.50",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"172.21.128.119\", \"name\": \"wazuh-client\", \"id\": \"24\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"tls\": {\"anomaly\": {\"count\": \"2\"}}}}, \"tx_id\": \"0\", \"app_proto\": \"tls\", \"in_iface\": \"ens3\", \"src_ip\": \"172.21.131.50\", \"src_port\": \"587\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2230010\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA TLS invalid record/traffic\", \"action\": \"allowed\", \"category\": \"Generic Protocol Command Decod",
+          "confidence": 0.91
+        },
+        {
+          "id": "WIN-santos-webshell-20220117-112258-E0014",
+          "time": "2026-07-31 17:03:34",
+          "action": "AMiner: High entropy in Apache Access request.",
+          "actor": null,
+          "host": null,
+          "process": "yvmuplzucm-1642418578.1653.php",
+          "ip": "172.21.128.119",
+          "source": "AMiner",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:24:14 +0000] \"GET /wp-content/uploads/2022/01/yvmuplzucm-1642418578.1653.php?wp_meta=WyJteXNxbCIsICItdSIsICJ3b3JkcHJlc3MiLCAiLXB0YWlub294M2FlZGVlU2giLCAid29yZHByZXNzX2RiIiwgIi1lIiwgIlwic2VsZWN0ICogZnJvbSB3cF91c2Vyc1wiIl0%3D HTTP/1.1\" 200 507755 \"-\" \"python-requests/2.27.1\"",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-webshell-20220117-112258-E0015",
+          "time": "2026-07-31 17:03:34",
+          "action": "AMiner: Unusual occurrence frequencies of Apache Access request ",
+          "actor": null,
+          "host": null,
+          "process": "yvmuplzucm-1642418578.1653.php",
+          "ip": "172.21.128.119",
+          "source": "AMiner",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:24:14 +0000] \"GET /wp-content/uploads/2022/01/yvmuplzucm-1642418578.1653.php?wp_meta=WyJteXNxbCIsICItdSIsICJ3b3JkcHJlc3MiLCAiLXB0YWlub294M2FlZGVlU2giLCAid29yZHByZXNzX2RiIiwgIi1lIiwgIlwic2VsZWN0ICogZnJvbSB3cF91c2Vyc1wiIl0%3D HTTP/1.1\" 200 507755 \"-\" \"python-requests/2.27.1\"",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-webshell-20220117-112258-E0016",
+          "time": "2026-07-31 17:03:36",
+          "action": "AMiner: High entropy in Apache Access request.",
+          "actor": null,
+          "host": null,
+          "process": "yvmuplzucm-1642418578.1653.php",
+          "ip": "172.21.128.119",
+          "source": "AMiner",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:24:16 +0000] \"GET /wp-content/uploads/2022/01/yvmuplzucm-1642418578.1653.php?wp_meta=WyJ3Z2V0IiwgImh0dHBzOi8vZ2l0aHViLmNvbS9haXQtYWVjaWQvd3BoYXNoY3JhY2svYXJjaGl2ZS9yZWZzL3RhZ3MvdjAuMS50YXIuZ3oiXQ%3D%3D HTTP/1.1\" 200 506723 \"-\" \"python-requests/2.27.1\"",
+          "confidence": 0.87
+        },
+        {
+          "id": "1687475574.15553252",
+          "time": "2026-07-31 17:02:27",
+          "action": "Dovecot Authentication Success.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.131.50",
+          "source": "Wazuh",
+          "raw": "Jan 17 11:23:07 mail dovecot: imap-login: Login: user=<cindy.turner>, method=PLAIN, rip=172.21.131.50, lip=172.21.131.50, mpid=21514, TLS, session=<NB94YMXVkL6sFYMy>",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475574.15552757",
+          "time": "2026-07-31 17:02:27",
+          "action": "Dovecot Authentication Success.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.131.50",
+          "source": "Wazuh",
+          "raw": "Jan 17 11:23:07 mail dovecot: imap-login: Login: user=<cindy.turner>, method=PLAIN, rip=172.21.131.50, lip=172.21.131.50, mpid=21514, TLS, session=<NB94YMXVkL6sFYMy>",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475574.15553746",
+          "time": "2026-07-31 17:02:27",
+          "action": "Dovecot Authentication Success.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.131.50",
+          "source": "Wazuh",
+          "raw": "Jan 17 11:23:07 mail dovecot: imap-login: Login: user=<cindy.turner>, method=PLAIN, rip=172.21.131.50, lip=172.21.131.50, mpid=21514, TLS, session=<NB94YMXVkL6sFYMy>",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475578.15555257",
+          "time": "2026-07-31 17:02:31",
+          "action": "Dovecot Authentication Success.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.32",
+          "source": "Wazuh",
+          "raw": "Jan 17 11:23:11 rogersturnbull-mail dovecot: imap-login: Login: user=<katelyn.clayton>, method=PLAIN, rip=10.229.0.32, lip=10.229.0.32, mpid=31234, TLS, session=<R8mwYMXVsI0K5QAg>",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475578.15554238",
+          "time": "2026-07-31 17:02:31",
+          "action": "Dovecot Authentication Success.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.32",
+          "source": "Wazuh",
+          "raw": "Jan 17 11:23:11 rogersturnbull-mail dovecot: imap-login: Login: user=<katelyn.clayton>, method=PLAIN, rip=10.229.0.32, lip=10.229.0.32, mpid=31234, TLS, session=<R8mwYMXVsI0K5QAg>",
+          "confidence": 0.91
+        }
+      ]
+    },
+    {
+      "id": "WIN-santos-cracking-20220117-112416",
+      "title": "凭据破解尝试",
+      "severity": "high",
+      "score": 0.9,
+      "start": "2026-07-31 17:03:36",
+      "end": "2026-07-31 17:36:55",
+      "status": "investigating",
+      "eventCount": 777,
+      "entities": [
+        "10.229.0.4",
+        "10.229.2.216",
+        "10.229.255.254",
+        "151.101.193.108",
+        "172.21.128.119",
+        "172.21.129.224",
+        "172.21.131.50",
+        "185.54.150.123"
+      ],
+      "hosts": [
+        "wazuh-client"
+      ],
+      "sourceTypes": [
+        "Suricata"
+      ],
+      "summary": "santos 场景中的 凭据破解尝试 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "1687477109.16057929",
+          "time": "2026-07-31 17:28:03",
+          "action": "Multiple IDS alerts for same id (ignoring now this id).",
+          "actor": "52.215.58.231",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "01/17/2022-11:48:43.092112  [**] [1:2230003:1] SURICATA TLS invalid handshake message [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 10.229.0.4:55926 -> 52.215.58.231:443",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475666.15572286",
+          "time": "2026-07-31 17:03:59",
+          "action": "First time this IDS alert is generated.",
+          "actor": "10.229.0.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.2.216",
+          "source": "Suricata",
+          "raw": "01/17/2022-11:24:39.481555  [**] [1:2221010:1] SURICATA HTTP unable to match response to request [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 10.229.2.216:80 -> 10.229.0.4:44636",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475722.15632515",
+          "time": "2026-07-31 17:04:55",
+          "action": "Multiple IDS alerts for same id.",
+          "actor": "185.54.150.85",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "01/17/2022-11:25:35.062045  [**] [1:2230003:1] SURICATA TLS invalid handshake message [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 10.229.0.4:51470 -> 185.54.150.85:443",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687476029.15703790",
+          "time": "2026-07-31 17:10:02",
+          "action": "Multiple IDS alerts for same id.",
+          "actor": "185.54.150.123",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "01/17/2022-11:30:42.300788  [**] [1:2230003:1] SURICATA TLS invalid handshake message [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 10.229.0.4:55614 -> 185.54.150.123:443",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687476827.15873910",
+          "time": "2026-07-31 17:23:19",
+          "action": "Multiple IDS alerts for same id.",
+          "actor": "40.90.65.21",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.128.119",
+          "source": "Suricata",
+          "raw": "01/17/2022-11:43:59.648190  [**] [1:2230003:1] SURICATA TLS invalid handshake message [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 172.21.128.119:41892 -> 40.90.65.21:443",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687477062.16001319",
+          "time": "2026-07-31 17:27:14",
+          "action": "Multiple IDS alerts for same id.",
+          "actor": "10.229.0.4",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "151.101.193.108",
+          "source": "Suricata",
+          "raw": "01/17/2022-11:47:54.758573  [**] [1:2230003:1] SURICATA TLS invalid handshake message [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 151.101.193.108:443 -> 10.229.0.4:44976",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687477285.16116770",
+          "time": "2026-07-31 17:30:57",
+          "action": "Multiple IDS alerts for same id.",
+          "actor": "172.21.131.50",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "172.21.129.224",
+          "source": "Suricata",
+          "raw": "01/17/2022-11:51:37.820481  [**] [1:2230003:1] SURICATA TLS invalid handshake message [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 172.21.129.224:41250 -> 172.21.131.50:443",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687477287.16146487",
+          "time": "2026-07-31 17:30:58",
+          "action": "Multiple IDS events from same source ip.",
+          "actor": "198.47.127.20",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "01/17/2022-11:51:38.627249  [**] [1:2230010:1] SURICATA TLS invalid record/traffic [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 10.229.0.4:39914 -> 198.47.127.20:443",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687477292.16163797",
+          "time": "2026-07-31 17:31:05",
+          "action": "Suricata: Alert - ET INFO Observed DNS Query to .cloud TLD",
+          "actor": "10.229.255.254",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"dns\": {\"query\": [{\"rrname\": \"overlay-track.sailthru.cloud\", \"id\": 23712, \"type\": \"query\", \"tx_id\": 0, \"rrtype\": \"A\"}]}, \"tx_id\": \"0\", \"app_proto\": \"dns\", \"in_iface\": \"ens3\", \"src_ip\": \"10.229.0.4\", \"src_port\": \"43487\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"2\", \"signature_id\": \"2027865\", \"rev\": \"4\", \"metadata\": {\"affected_product\": [\"Any\"], \"attack_target\": [\"Client_Endpoint",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687477292.16165858",
+          "time": "2026-07-31 17:31:05",
+          "action": "Suricata: Alert - ET INFO Observed DNS Query to .cloud TLD",
+          "actor": "10.229.255.254",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"dns\": {\"query\": [{\"rrname\": \"overlay-track.sailthru.cloud\", \"id\": 16654, \"type\": \"query\", \"tx_id\": 0, \"rrtype\": \"AAAA\"}]}, \"tx_id\": \"0\", \"app_proto\": \"dns\", \"in_iface\": \"ens3\", \"src_ip\": \"10.229.0.4\", \"src_port\": \"16664\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"2\", \"signature_id\": \"2027865\", \"rev\": \"4\", \"metadata\": {\"affected_product\": [\"Any\"], \"attack_target\": [\"Client_Endpo",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475666.15573167",
+          "time": "2026-07-31 17:03:59",
+          "action": "Suricata: Alert - SURICATA HTTP unable to match response to requ",
+          "actor": "10.229.2.216",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "192.168.104.155",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"192.168.104.155\", \"name\": \"wazuh-client\", \"id\": \"26\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"http\": {\"anomaly\": {\"count\": \"1\"}}}}, \"tx_id\": \"1\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"10.229.2.216\", \"src_port\": \"80\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2221010\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA HTTP unable to match response to request\", \"action\": \"allowed\", \"category\": \"Generic Protoco",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687475666.15569078",
+          "time": "2026-07-31 17:03:59",
+          "action": "Suricata: Alert - SURICATA HTTP unable to match response to requ",
+          "actor": "10.229.2.216",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.4",
+          "source": "Suricata",
+          "raw": "{\"agent\": {\"ip\": \"10.229.0.4\", \"name\": \"wazuh-client\", \"id\": \"30\"}, \"manager\": {\"name\": \"wazuh.manager\"}, \"data\": {\"metadata\": {\"flowints\": {\"http\": {\"anomaly\": {\"count\": \"1\"}}}}, \"tx_id\": \"1\", \"app_proto\": \"http\", \"in_iface\": \"ens3\", \"src_ip\": \"10.229.2.216\", \"src_port\": \"80\", \"event_type\": \"alert\", \"alert\": {\"severity\": \"3\", \"signature_id\": \"2221010\", \"rev\": \"1\", \"gid\": \"1\", \"signature\": \"SURICATA HTTP unable to match response to request\", \"action\": \"allowed\", \"category\": \"Generic Protocol Com",
+          "confidence": 0.91
+        }
+      ]
+    },
+    {
+      "id": "WIN-santos-reverse_shell-20220117-115735",
+      "title": "反向 Shell 建立",
+      "severity": "critical",
+      "score": 0.95,
+      "start": "2026-07-31 17:36:55",
+      "end": "2026-07-31 17:37:37",
+      "status": "investigating",
+      "eventCount": 12,
+      "entities": [
+        "10.229.0.32",
+        "172.21.128.119",
+        "gmorgan",
+        "wazuh-client",
+        "yvmuplzucm-1642418578.1653.php"
+      ],
+      "hosts": [
+        "wazuh-client"
+      ],
+      "sourceTypes": [
+        "AMiner",
+        "Linux Auth",
+        "Wazuh"
+      ],
+      "summary": "santos 场景中的 反向 Shell 建立 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "WIN-santos-reverse_shell-20220117-115735-E0007",
+          "time": "2026-07-31 17:37:24",
+          "action": "AMiner: High entropy in Apache Access request.",
+          "actor": null,
+          "host": null,
+          "process": "yvmuplzucm-1642418578.1653.php",
+          "ip": "172.21.128.119",
+          "source": "AMiner",
+          "raw": "172.21.128.119 - - [17/Jan/2022:11:58:04 +0000] \"GET /wp-content/uploads/2022/01/yvmuplzucm-1642418578.1653.php?wp_meta=WyJiYXNoIiwgIi1jIiwgIiAnMDwmMTk2O2V4ZWMgMTk2PD4vZGV2L3RjcC8xMC4yMjkuMi4yMTYvMTY0ODY7IHNoIDwmMTk2ID4mMTk2IDI%2BJjE5NiciLCAiJiJd HTTP/1.1\" 200 506723 \"-\" \"python-requests/2.27.1\"",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-reverse_shell-20220117-115735-E0008",
+          "time": "2026-07-31 17:37:37",
+          "action": "AMiner: New event type.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "Jan 17 11:58:17 intranet-server su[20749]: Successful su for gmorgan by www-data",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-reverse_shell-20220117-115735-E0009",
+          "time": "2026-07-31 17:37:37",
+          "action": "AMiner: New event type.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "Jan 17 11:58:17 intranet-server su[20749]: + /dev/pts/1 www-data:gmorgan",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-reverse_shell-20220117-115735-E0010",
+          "time": "2026-07-31 17:37:37",
+          "action": "AMiner: New event type.",
+          "actor": "gmorgan",
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "Jan 17 11:58:17 intranet-server su[20749]: pam_unix(su:session): session opened for user gmorgan by (uid=33)",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-reverse_shell-20220117-115735-E0011",
+          "time": "2026-07-31 17:37:37",
+          "action": "AMiner: New event type.",
+          "actor": "gmorgan",
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "Jan 17 11:58:17 intranet-server systemd-logind[987]: New session c1 of user gmorgan.",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-reverse_shell-20220117-115735-E0012",
+          "time": "2026-07-31 17:37:37",
+          "action": "AMiner: New event type.",
+          "actor": "gmorgan",
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "Jan 17 11:58:17 intranet-server systemd: pam_unix(systemd-user:session): session opened for user gmorgan by (uid=0)",
+          "confidence": 0.87
+        },
+        {
+          "id": "1687477677.16222759",
+          "time": "2026-07-31 17:37:31",
+          "action": "Dovecot Authentication Success.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.32",
+          "source": "Wazuh",
+          "raw": "Jan 17 11:58:11 rogersturnbull-mail dovecot: imap-login: Login: user=<katelyn.clayton>, method=PLAIN, rip=10.229.0.32, lip=10.229.0.32, mpid=31537, TLS, session=<uCze3cXVFo4K5QAg>",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687477677.16223268",
+          "time": "2026-07-31 17:37:31",
+          "action": "Dovecot Authentication Success.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.32",
+          "source": "Wazuh",
+          "raw": "Jan 17 11:58:11 rogersturnbull-mail dovecot: imap-login: Login: user=<katelyn.clayton>, method=PLAIN, rip=10.229.0.32, lip=10.229.0.32, mpid=31537, TLS, session=<uCze3cXVFo4K5QAg>",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687477677.16222249",
+          "time": "2026-07-31 17:37:31",
+          "action": "Dovecot Authentication Success.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": "10.229.0.32",
+          "source": "Wazuh",
+          "raw": "Jan 17 11:58:11 rogersturnbull-mail dovecot: imap-login: Login: user=<katelyn.clayton>, method=PLAIN, rip=10.229.0.32, lip=10.229.0.32, mpid=31537, TLS, session=<uCze3cXVFo4K5QAg>",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687477683.16223775",
+          "time": "2026-07-31 17:37:37",
+          "action": "User successfully changed UID.",
+          "actor": null,
+          "host": "wazuh-client",
+          "process": null,
+          "ip": null,
+          "source": "Linux Auth",
+          "raw": "Jan 17 11:58:17 intranet-server su[20749]: + /dev/pts/1 www-data:gmorgan",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687477683.16224222",
+          "time": "2026-07-31 17:37:37",
+          "action": "PAM: Login session opened.",
+          "actor": "gmorgan",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": null,
+          "source": "Linux Auth",
+          "raw": "Jan 17 11:58:17 intranet-server su[20749]: pam_unix(su:session): session opened for user gmorgan by (uid=33)",
+          "confidence": 0.91
+        },
+        {
+          "id": "1687477683.16224690",
+          "time": "2026-07-31 17:37:37",
+          "action": "PAM: Login session opened.",
+          "actor": "gmorgan",
+          "host": "wazuh-client",
+          "process": null,
+          "ip": null,
+          "source": "Linux Auth",
+          "raw": "Jan 17 11:58:17 intranet-server systemd: pam_unix(systemd-user:session): session opened for user gmorgan by (uid=0)",
+          "confidence": 0.91
+        }
+      ]
+    },
+    {
+      "id": "WIN-santos-privilege_escalation-20220117-115817",
+      "title": "权限提升行为",
+      "severity": "critical",
+      "score": 0.96,
+      "start": "2026-07-31 17:37:37",
+      "end": "2026-07-31 17:38:19",
+      "status": "investigating",
+      "eventCount": 57,
+      "entities": [],
+      "hosts": [],
+      "sourceTypes": [
+        "AMiner"
+      ],
+      "summary": "santos 场景中的 权限提升行为 阶段，来自 AIT-ADS 的关联告警已聚合为调查窗口。",
+      "events": [
+        {
+          "id": "WIN-santos-privilege_escalation-20220117-115817-E0028",
+          "time": "2026-07-31 17:37:37",
+          "action": "AMiner: New user_auth parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=USER_AUTH msg=audit(1642420697.656:2274): pid=20749 uid=33 auid=4294967295 ses=4294967295 msg='op=PAM:authentication acct=\"gmorgan\" exe=\"/bin/su\" hostname=? addr=? terminal=/dev/pts/1 res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-privilege_escalation-20220117-115817-E0029",
+          "time": "2026-07-31 17:37:37",
+          "action": "AMiner: New user_acct parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=USER_ACCT msg=audit(1642420697.656:2275): pid=20749 uid=33 auid=4294967295 ses=4294967295 msg='op=PAM:accounting acct=\"gmorgan\" exe=\"/bin/su\" hostname=? addr=? terminal=/dev/pts/1 res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-privilege_escalation-20220117-115817-E0030",
+          "time": "2026-07-31 17:37:37",
+          "action": "AMiner: New cred_acq parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=CRED_ACQ msg=audit(1642420697.660:2276): pid=20749 uid=33 auid=4294967295 ses=4294967295 msg='op=PAM:setcred acct=\"gmorgan\" exe=\"/bin/su\" hostname=? addr=? terminal=/dev/pts/1 res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-privilege_escalation-20220117-115817-E0031",
+          "time": "2026-07-31 17:37:37",
+          "action": "AMiner: New user_acct parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=USER_ACCT msg=audit(1642420697.748:2277): pid=20750 uid=0 auid=4294967295 ses=4294967295 msg='op=PAM:accounting acct=\"gmorgan\" exe=\"/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-privilege_escalation-20220117-115817-E0032",
+          "time": "2026-07-31 17:37:37",
+          "action": "AMiner: New cred_acq parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=CRED_ACQ msg=audit(1642420697.748:2278): pid=20750 uid=0 auid=4294967295 ses=4294967295 msg='op=PAM:setcred acct=\"gmorgan\" exe=\"/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-privilege_escalation-20220117-115817-E0033",
+          "time": "2026-07-31 17:37:37",
+          "action": "AMiner: New login parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=LOGIN msg=audit(1642420697.752:2279): pid=20750 uid=0 old-auid=4294967295 auid=1002 tty=(none) old-ses=4294967295 ses=318 res=1",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-privilege_escalation-20220117-115817-E0034",
+          "time": "2026-07-31 17:37:37",
+          "action": "AMiner: New user_start parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=USER_START msg=audit(1642420697.752:2280): pid=20750 uid=0 auid=1002 ses=318 msg='op=PAM:session_open acct=\"gmorgan\" exe=\"/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-privilege_escalation-20220117-115817-E0035",
+          "time": "2026-07-31 17:37:38",
+          "action": "AMiner: New service_start parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=SERVICE_START msg=audit(1642420698.020:2281): pid=1 uid=0 auid=4294967295 ses=4294967295 msg='unit=user@1002 comm=\"systemd\" exe=\"/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-privilege_escalation-20220117-115817-E0036",
+          "time": "2026-07-31 17:37:38",
+          "action": "AMiner: New user_start parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=USER_START msg=audit(1642420698.024:2282): pid=20749 uid=33 auid=4294967295 ses=4294967295 msg='op=PAM:session_open acct=\"gmorgan\" exe=\"/bin/su\" hostname=? addr=? terminal=/dev/pts/1 res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-privilege_escalation-20220117-115817-E0041",
+          "time": "2026-07-31 17:37:49",
+          "action": "AMiner: New event type.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=USER_CMD msg=audit(1642420709.056:2283): pid=20772 uid=1002 auid=4294967295 ses=4294967295 msg='cwd=\"/var/www/intranet.smith.santos.com/wp-content/uploads/2022/01\" cmd=636174202F6574632F736861646F77 terminal=pts/1 res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-privilege_escalation-20220117-115817-E0042",
+          "time": "2026-07-31 17:37:49",
+          "action": "AMiner: New user_cmd parameter combination in Audit logs.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=USER_CMD msg=audit(1642420709.056:2283): pid=20772 uid=1002 auid=4294967295 ses=4294967295 msg='cwd=\"/var/www/intranet.smith.santos.com/wp-content/uploads/2022/01\" cmd=636174202F6574632F736861646F77 terminal=pts/1 res=success'",
+          "confidence": 0.87
+        },
+        {
+          "id": "WIN-santos-privilege_escalation-20220117-115817-E0043",
+          "time": "2026-07-31 17:37:49",
+          "action": "AMiner: New event type.",
+          "actor": null,
+          "host": null,
+          "process": null,
+          "ip": null,
+          "source": "AMiner",
+          "raw": "type=CRED_REFR msg=audit(1642420709.056:2284): pid=20772 uid=0 auid=4294967295 ses=4294967295 msg='op=PAM:setcred acct=\"root\" exe=\"/usr/bin/sudo\" hostname=? addr=? terminal=/dev/pts/1 res=success'",
+          "confidence": 0.87
+        }
+      ]
+    }
+  ],
+  "investigations": [
+    {
+      "id": "CASE-001",
+      "investigation_id": "CASE-001",
+      "title": "russellmitchell 多阶段攻击调查",
+      "severity": "critical",
+      "status": "investigating",
+      "owner": "Analyst-01",
+      "createdAt": "2026-08-07 08:40:20",
+      "windowIds": [
+        "WIN-russellmitchell-network_scans-20220124-030100",
+        "WIN-russellmitchell-service_scans-20220124-035646",
+        "WIN-russellmitchell-dirb-20220124-035725",
+        "WIN-russellmitchell-wpscan-20220124-035748",
+        "WIN-russellmitchell-webshell-20220124-035819",
+        "WIN-russellmitchell-cracking-20220124-035922",
+        "WIN-russellmitchell-reverse_shell-20220124-043656",
+        "WIN-russellmitchell-privilege_escalation-20220124-043739",
+        "WIN-russellmitchell-service_stop-20220124-135038",
+        "WIN-russellmitchell-dnsteal-20220124-135040"
+      ],
+      "finding_ids": [
+        "WIN-russellmitchell-network_scans-20220124-030100",
+        "WIN-russellmitchell-service_scans-20220124-035646",
+        "WIN-russellmitchell-dirb-20220124-035725",
+        "WIN-russellmitchell-wpscan-20220124-035748",
+        "WIN-russellmitchell-webshell-20220124-035819",
+        "WIN-russellmitchell-cracking-20220124-035922",
+        "WIN-russellmitchell-reverse_shell-20220124-043656",
+        "WIN-russellmitchell-privilege_escalation-20220124-043739",
+        "WIN-russellmitchell-service_stop-20220124-135038",
+        "WIN-russellmitchell-dnsteal-20220124-135040"
+      ],
+      "summary": "russellmitchell 场景共整理 10 个攻击阶段窗口，用于长程调查和证据串联。"
+    },
+    {
+      "id": "CASE-002",
+      "investigation_id": "CASE-002",
+      "title": "santos 多阶段攻击调查",
+      "severity": "critical",
+      "status": "investigating",
+      "owner": "Analyst-01",
+      "createdAt": "2026-07-30 12:55:37",
+      "windowIds": [
+        "WIN-santos-service_stop-20220116-071617",
+        "WIN-santos-dnsteal-20220116-071619",
+        "WIN-santos-network_scans-20220117-111500",
+        "WIN-santos-service_scans-20220117-112130",
+        "WIN-santos-dirb-20220117-112200",
+        "WIN-santos-wpscan-20220117-112221",
+        "WIN-santos-webshell-20220117-112258",
+        "WIN-santos-cracking-20220117-112416",
+        "WIN-santos-reverse_shell-20220117-115735",
+        "WIN-santos-privilege_escalation-20220117-115817"
+      ],
+      "finding_ids": [
+        "WIN-santos-service_stop-20220116-071617",
+        "WIN-santos-dnsteal-20220116-071619",
+        "WIN-santos-network_scans-20220117-111500",
+        "WIN-santos-service_scans-20220117-112130",
+        "WIN-santos-dirb-20220117-112200",
+        "WIN-santos-wpscan-20220117-112221",
+        "WIN-santos-webshell-20220117-112258",
+        "WIN-santos-cracking-20220117-112416",
+        "WIN-santos-reverse_shell-20220117-115735",
+        "WIN-santos-privilege_escalation-20220117-115817"
+      ],
+      "summary": "santos 场景共整理 10 个攻击阶段窗口，用于长程调查和证据串联。"
+    }
+  ],
+  "logSources": [
+    {
+      "id": "SRC-001",
+      "name": "AIT-ADS Alert Bundle",
+      "path": "D:\\CODE\\ait_ads\\ait_ads.zip",
+      "kind": "ZIP",
+      "status": "online",
+      "size": "91.7 MB",
+      "lastRead": "已生成平台数据包"
+    },
+    {
+      "id": "SRC-002",
+      "name": "EVTX Attack Samples",
+      "path": "D:\\CODE\\EVTX-ATTACK-SAMPLES-master",
+      "kind": "EVTX",
+      "status": "online",
+      "size": "4.1 MB",
+      "lastRead": "已索引 EVTX 元数据"
+    },
+    {
+      "id": "SRC-003",
+      "name": "russellmitchell",
+      "path": "D:\\CODE\\russellmitchell",
+      "kind": "RAW",
+      "status": "online",
+      "size": "已挂载场景目录",
+      "lastRead": "已提取标签与原始日志"
+    },
+    {
+      "id": "SRC-004",
+      "name": "santos",
+      "path": "D:\\CODE\\santos",
+      "kind": "RAW",
+      "status": "online",
+      "size": "已挂载场景目录",
+      "lastRead": "已提取标签与原始日志"
+    }
+  ],
+  "knowledgeDocs": [
+    {
+      "id": "KB-001",
+      "name": "AIT-ADS_Scenarios.md",
+      "category": "数据集映射",
+      "kind": "Markdown",
+      "status": "indexed",
+      "chunks": 48,
+      "updatedAt": "2026-08-13"
+    },
+    {
+      "id": "KB-002",
+      "name": "AIT-LDSv2_Label_Rules.md",
+      "category": "标签参考",
+      "kind": "Markdown",
+      "status": "indexed",
+      "chunks": 36,
+      "updatedAt": "2026-08-13"
+    },
+    {
+      "id": "KB-003",
+      "name": "EVTX_ATT&CK_Metadata.csv",
+      "category": "Windows 样本",
+      "kind": "CSV",
+      "status": "indexed",
+      "chunks": 64,
+      "updatedAt": "2026-08-13"
+    },
+    {
+      "id": "KB-004",
+      "name": "EVTX_README.md",
+      "category": "Windows 样本",
+      "kind": "Markdown",
+      "status": "indexed",
+      "chunks": 12,
+      "updatedAt": "2026-08-13"
+    }
+  ]
+}

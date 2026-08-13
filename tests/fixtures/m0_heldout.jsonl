@@ -1,0 +1,2 @@
+{"dataset_id":"heldout","source_file":"fixture.log","source_line":1,"message":"login from 10.0.0.1","gold_template":"login from <IP>"}
+{"dataset_id":"heldout","source_file":"fixture.log","source_line":2,"message":"login from 10.0.0.2","gold_template":"login from <IP>"}
