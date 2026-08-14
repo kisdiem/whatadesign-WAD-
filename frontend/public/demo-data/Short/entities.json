@@ -1,0 +1,282 @@
+[
+  {
+    "event_id": "SHORT-0001",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0001",
+    "entity_type": "user",
+    "canonical_value": "www-data",
+    "role": "actor",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0001",
+    "entity_type": "user",
+    "canonical_value": "jward",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0002",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0002",
+    "entity_type": "user",
+    "canonical_value": "www-data",
+    "role": "actor",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0002",
+    "entity_type": "user",
+    "canonical_value": "jward",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0003",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0003",
+    "entity_type": "user",
+    "canonical_value": "jward",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0004",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0004",
+    "entity_type": "user",
+    "canonical_value": "jward",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0005",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0005",
+    "entity_type": "user",
+    "canonical_value": "jward",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0006",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0006",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0006",
+    "entity_type": "user",
+    "canonical_value": "jward",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0007",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0007",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0007",
+    "entity_type": "user",
+    "canonical_value": "jward",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0008",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0008",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0009",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0009",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0010",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0010",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0010",
+    "entity_type": "user",
+    "canonical_value": "jward",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0011",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0011",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0012",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0012",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0013",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0013",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0013",
+    "entity_type": "user",
+    "canonical_value": "jward",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0014",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0014",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0015",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0015",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0016",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0016",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0017",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "SHORT-0017",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  }
+]

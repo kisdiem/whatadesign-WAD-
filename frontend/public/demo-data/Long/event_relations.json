@@ -1,0 +1,82 @@
+[
+  {
+    "source_event_id": "LONG-0189",
+    "target_event_id": "LONG-0198",
+    "relation_type": "temporal_causal_candidate",
+    "confidence": 0.825,
+    "evidence": {
+      "reason": "ordered privileged/authentication context",
+      "formal_model_relation": false
+    }
+  },
+  {
+    "source_event_id": "LONG-0198",
+    "target_event_id": "LONG-0219",
+    "relation_type": "temporal_causal_candidate",
+    "confidence": 0.855,
+    "evidence": {
+      "reason": "ordered privileged/authentication context",
+      "formal_model_relation": false
+    }
+  },
+  {
+    "source_event_id": "LONG-0219",
+    "target_event_id": "LONG-0220",
+    "relation_type": "temporal_causal_candidate",
+    "confidence": 0.935,
+    "evidence": {
+      "reason": "ordered privileged/authentication context",
+      "formal_model_relation": false
+    }
+  },
+  {
+    "source_event_id": "LONG-0220",
+    "target_event_id": "LONG-0221",
+    "relation_type": "temporal_causal_candidate",
+    "confidence": 0.95,
+    "evidence": {
+      "reason": "ordered privileged/authentication context",
+      "formal_model_relation": false
+    }
+  },
+  {
+    "source_event_id": "LONG-0221",
+    "target_event_id": "LONG-0222",
+    "relation_type": "temporal_causal_candidate",
+    "confidence": 0.88,
+    "evidence": {
+      "reason": "ordered privileged/authentication context",
+      "formal_model_relation": false
+    }
+  },
+  {
+    "source_event_id": "LONG-0222",
+    "target_event_id": "LONG-0223",
+    "relation_type": "temporal_causal_candidate",
+    "confidence": 0.945,
+    "evidence": {
+      "reason": "ordered privileged/authentication context",
+      "formal_model_relation": false
+    }
+  },
+  {
+    "source_event_id": "LONG-0223",
+    "target_event_id": "LONG-0224",
+    "relation_type": "temporal_causal_candidate",
+    "confidence": 0.945,
+    "evidence": {
+      "reason": "ordered privileged/authentication context",
+      "formal_model_relation": false
+    }
+  },
+  {
+    "source_event_id": "LONG-0224",
+    "target_event_id": "LONG-0225",
+    "relation_type": "temporal_causal_candidate",
+    "confidence": 0.88,
+    "evidence": {
+      "reason": "ordered privileged/authentication context",
+      "formal_model_relation": false
+    }
+  }
+]

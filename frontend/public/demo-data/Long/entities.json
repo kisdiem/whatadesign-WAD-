@@ -1,0 +1,4517 @@
+[
+  {
+    "event_id": "LONG-0001",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0001",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0002",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0002",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0003",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0003",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0004",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0005",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0006",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0006",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0007",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0007",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0008",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0008",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0009",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0009",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0010",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0010",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0011",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0011",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0012",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0013",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0014",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0014",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0015",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0015",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0016",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0016",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0017",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0017",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0018",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0018",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0019",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0019",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0020",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0021",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0022",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0022",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0023",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0023",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0024",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0024",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0025",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0025",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0026",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0026",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0027",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0027",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0028",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0029",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0030",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0030",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0031",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0031",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0032",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0032",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0033",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0034",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0035",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0036",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0037",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0037",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0038",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0038",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0039",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0039",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0040",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0040",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0041",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0041",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0042",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0042",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0043",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0044",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0045",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0045",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0046",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0046",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0047",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0047",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0048",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0049",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0050",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0050",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0051",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0051",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0052",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0052",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0053",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0053",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0054",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0054",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0055",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0055",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0056",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0057",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0058",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0059",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0060",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0060",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0061",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0061",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0062",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0062",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0063",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0064",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0065",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0065",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0066",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0066",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0067",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0067",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0068",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0068",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0069",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0069",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0070",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0070",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0071",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0072",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0073",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0073",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0074",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0074",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0075",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0075",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0076",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0077",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0078",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0078",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0079",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0079",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0080",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0080",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0081",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0081",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0082",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0082",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0083",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0083",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0084",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0085",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0086",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0086",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0087",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0087",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0088",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0088",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0089",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0090",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0091",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0092",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0093",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0094",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0095",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0096",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0096",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0097",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0097",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0098",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0098",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0099",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0099",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0100",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0100",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0101",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0102",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0103",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0103",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0104",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0104",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0105",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0106",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0107",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0107",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0108",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0108",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0109",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0109",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0110",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0111",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0112",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0112",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0113",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0113",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0114",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0114",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0115",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0116",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0117",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0117",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0118",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0118",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0119",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0119",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0120",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0120",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0121",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0121",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0122",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0122",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0123",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0124",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0125",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0126",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0127",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0127",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0128",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0128",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0129",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0129",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0130",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0131",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0132",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0132",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0133",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0133",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0134",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0134",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0135",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0135",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0136",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0136",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0137",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0137",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0138",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0139",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0140",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0140",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0141",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0141",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0142",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0142",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0143",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0144",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0145",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0145",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0146",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0146",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0147",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0147",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0148",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0149",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0150",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0151",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0151",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0152",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0152",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0153",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0153",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0154",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0155",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0156",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0156",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0157",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0157",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0158",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0158",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0159",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0160",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0161",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0161",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0162",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0162",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0163",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0163",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0164",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0164",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0165",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0165",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0166",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0166",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0167",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0168",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0169",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0170",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0171",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0171",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0172",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0172",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0173",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0173",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0174",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0175",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0176",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0176",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0177",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0177",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0178",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0178",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0179",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0179",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0180",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0180",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0181",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0181",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0182",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0183",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0184",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0184",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0185",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0185",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0186",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0186",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0187",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0188",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0189",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0190",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0190",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0191",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0191",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0192",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0192",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0193",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0193",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0194",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0194",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0195",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0195",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0196",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0197",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0198",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0198",
+    "entity_type": "user",
+    "canonical_value": "www-data",
+    "role": "actor",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0198",
+    "entity_type": "user",
+    "canonical_value": "blord",
+    "role": "actor",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0199",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0199",
+    "entity_type": "user",
+    "canonical_value": "www-data",
+    "role": "actor",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0199",
+    "entity_type": "user",
+    "canonical_value": "blord",
+    "role": "actor",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0200",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0200",
+    "entity_type": "user",
+    "canonical_value": "blord",
+    "role": "actor",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0201",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0201",
+    "entity_type": "user",
+    "canonical_value": "blord",
+    "role": "actor",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0202",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0202",
+    "entity_type": "user",
+    "canonical_value": "blord",
+    "role": "actor",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0203",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0203",
+    "entity_type": "user",
+    "canonical_value": "blord",
+    "role": "actor",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0204",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0204",
+    "entity_type": "user",
+    "canonical_value": "blord",
+    "role": "actor",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0205",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0206",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0207",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0208",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0209",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0210",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0211",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0212",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0213",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0214",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0215",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0216",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0217",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0218",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0219",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0219",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0219",
+    "entity_type": "user",
+    "canonical_value": "blord",
+    "role": "actor",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0220",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0220",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0220",
+    "entity_type": "user",
+    "canonical_value": "blord",
+    "role": "actor",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0221",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0221",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0222",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0222",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0223",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0223",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0223",
+    "entity_type": "user",
+    "canonical_value": "blord",
+    "role": "actor",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0224",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0224",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0225",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0225",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0226",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0226",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0227",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0227",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0228",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0228",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0229",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0230",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0231",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0231",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0232",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0232",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0233",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0233",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0234",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0234",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0235",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0235",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0236",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0236",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0237",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0238",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0239",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0239",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0240",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0240",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0241",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0241",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0242",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0243",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0244",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0244",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0245",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0245",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0246",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0246",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0247",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0247",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0248",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0248",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0249",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0249",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0250",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0251",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0252",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0252",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0253",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0253",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0254",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0254",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0255",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0255",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0256",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0256",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0257",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0257",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0258",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0259",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0260",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0260",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0261",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0261",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0262",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0262",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0263",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0264",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0265",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0265",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0266",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0266",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0267",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0267",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0268",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0269",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0270",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0270",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0271",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0271",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0272",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0272",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0273",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0274",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0275",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0275",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0276",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0276",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0277",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0277",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0278",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0278",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0279",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0279",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0280",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0280",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0281",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0282",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0283",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0283",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0284",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0284",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0285",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0285",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0286",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0287",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0288",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0288",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0289",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0289",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0290",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0290",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0291",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0291",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0292",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0292",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0293",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0293",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0294",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0295",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0296",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0296",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0297",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0297",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0298",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0298",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0299",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0300",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0301",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0301",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0302",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0302",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0303",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0303",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0304",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0304",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0305",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0305",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0306",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0306",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0307",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0308",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0309",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0310",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0311",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0312",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0313",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0314",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0314",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0315",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0315",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0316",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0316",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0317",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0318",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0319",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0319",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0320",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0320",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0321",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0321",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0322",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0322",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0323",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0323",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0324",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0324",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0325",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0326",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0327",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0327",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0328",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0328",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0329",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0329",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0330",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0331",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0332",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0332",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0333",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0333",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0334",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0334",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0335",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0336",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0337",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0338",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0338",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0339",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0339",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0340",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0340",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0341",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0342",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0343",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0343",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0344",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0344",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0345",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0345",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0346",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0347",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0348",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0348",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0349",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0349",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0350",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0350",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0351",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0351",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0352",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0352",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0353",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0353",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0354",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0355",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0356",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0356",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0357",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0357",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0358",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0358",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0359",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0360",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0361",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0361",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0362",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0362",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0363",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0363",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0364",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0365",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0366",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0367",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0368",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0369",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0370",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0371",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0372",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0373",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0374",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0375",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0376",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0377",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0378",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0379",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0380",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0381",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0382",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0383",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0383",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0384",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0384",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0385",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0385",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0386",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0387",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0388",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0388",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0389",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0389",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0390",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0390",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0391",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0392",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0393",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0393",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0394",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0394",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0395",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0395",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0396",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0396",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0397",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0397",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0398",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0398",
+    "entity_type": "user",
+    "canonical_value": "root",
+    "role": "target_user",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0399",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  },
+  {
+    "event_id": "LONG-0400",
+    "entity_type": "host",
+    "canonical_value": "intranet-server",
+    "role": "host",
+    "confidence": 0.98
+  }
+]

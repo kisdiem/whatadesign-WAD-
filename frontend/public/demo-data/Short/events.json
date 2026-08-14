@@ -1,0 +1,138 @@
+[
+  {
+    "event_id": "SHORT-0001",
+    "timestamp": "2022-02-08T08:36:38Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 313,
+    "raw": "Feb  8 08:36:38 intranet-server su[28321]: Successful su for jward by www-data",
+    "facts_only": true
+  },
+  {
+    "event_id": "SHORT-0002",
+    "timestamp": "2022-02-08T08:36:38Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 314,
+    "raw": "Feb  8 08:36:38 intranet-server su[28321]: + /dev/pts/0 www-data:jward",
+    "facts_only": true
+  },
+  {
+    "event_id": "SHORT-0003",
+    "timestamp": "2022-02-08T08:36:38Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 315,
+    "raw": "Feb  8 08:36:38 intranet-server su[28321]: pam_unix(su:session): session opened for user jward by (uid=33)",
+    "facts_only": true
+  },
+  {
+    "event_id": "SHORT-0004",
+    "timestamp": "2022-02-08T08:36:38Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 316,
+    "raw": "Feb  8 08:36:38 intranet-server systemd-logind[935]: New session c1 of user jward.",
+    "facts_only": true
+  },
+  {
+    "event_id": "SHORT-0005",
+    "timestamp": "2022-02-08T08:36:38Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 317,
+    "raw": "Feb  8 08:36:38 intranet-server systemd: pam_unix(systemd-user:session): session opened for user jward by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "SHORT-0006",
+    "timestamp": "2022-02-08T08:36:54Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 318,
+    "raw": "Feb  8 08:36:54 intranet-server sudo:    jward : TTY=pts/0 ; PWD=/var/www/intranet.mannsmith.harrison.com/wp-content/uploads/2022/02 ; USER=root ; COMMAND=list",
+    "facts_only": true
+  },
+  {
+    "event_id": "SHORT-0007",
+    "timestamp": "2022-02-08T08:36:57Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 319,
+    "raw": "Feb  8 08:36:57 intranet-server sudo:    jward : TTY=pts/0 ; PWD=/var/www/intranet.mannsmith.harrison.com/wp-content/uploads/2022/02 ; USER=root ; COMMAND=/bin/cat /etc/shadow",
+    "facts_only": true
+  },
+  {
+    "event_id": "SHORT-0008",
+    "timestamp": "2022-02-08T08:36:57Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 320,
+    "raw": "Feb  8 08:36:57 intranet-server sudo: pam_unix(sudo:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "SHORT-0009",
+    "timestamp": "2022-02-08T08:36:57Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 321,
+    "raw": "Feb  8 08:36:57 intranet-server sudo: pam_unix(sudo:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "SHORT-0010",
+    "timestamp": "2022-02-08T08:36:59Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 322,
+    "raw": "Feb  8 08:36:59 intranet-server sudo:    jward : TTY=pts/0 ; PWD=/var/www/intranet.mannsmith.harrison.com/wp-content/uploads/2022/02 ; USER=root ; COMMAND=/bin/ls -laR /root/",
+    "facts_only": true
+  },
+  {
+    "event_id": "SHORT-0011",
+    "timestamp": "2022-02-08T08:36:59Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 323,
+    "raw": "Feb  8 08:36:59 intranet-server sudo: pam_unix(sudo:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "SHORT-0012",
+    "timestamp": "2022-02-08T08:36:59Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 324,
+    "raw": "Feb  8 08:36:59 intranet-server sudo: pam_unix(sudo:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "SHORT-0013",
+    "timestamp": "2022-02-08T08:37:08Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 325,
+    "raw": "Feb  8 08:37:08 intranet-server sudo:    jward : TTY=pts/0 ; PWD=/var/www/intranet.mannsmith.harrison.com/wp-content/uploads/2022/02 ; USER=root ; COMMAND=/bin/ls -l /home",
+    "facts_only": true
+  },
+  {
+    "event_id": "SHORT-0014",
+    "timestamp": "2022-02-08T08:37:08Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 326,
+    "raw": "Feb  8 08:37:08 intranet-server sudo: pam_unix(sudo:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "SHORT-0015",
+    "timestamp": "2022-02-08T08:37:08Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 327,
+    "raw": "Feb  8 08:37:08 intranet-server sudo: pam_unix(sudo:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "SHORT-0016",
+    "timestamp": "2022-02-08T08:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 328,
+    "raw": "Feb  8 08:39:01 intranet-server CRON[28361]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "SHORT-0017",
+    "timestamp": "2022-02-08T08:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 329,
+    "raw": "Feb  8 08:39:01 intranet-server CRON[28361]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  }
+]

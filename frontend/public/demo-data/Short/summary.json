@@ -1,0 +1,108 @@
+{
+  "dataset_id": "Short",
+  "kind": "demo_system_projection",
+  "model_execution": false,
+  "synthetic_scores": true,
+  "formal_evaluation": false,
+  "event_count": 17,
+  "threat_level_counts": {
+    "high": 9,
+    "medium": 4,
+    "info": 2,
+    "critical": 1,
+    "low": 1
+  },
+  "highest_threat_events": [
+    {
+      "event_id": "SHORT-0007",
+      "threat_level": "critical",
+      "final_score": 0.98,
+      "reasons": [
+        "????????",
+        "root ???????"
+      ]
+    },
+    {
+      "event_id": "SHORT-0010",
+      "threat_level": "high",
+      "final_score": 0.91,
+      "reasons": [
+        "root ????",
+        "root ???????"
+      ]
+    },
+    {
+      "event_id": "SHORT-0001",
+      "threat_level": "high",
+      "final_score": 0.82,
+      "reasons": [
+        "www-data ?????????"
+      ]
+    },
+    {
+      "event_id": "SHORT-0008",
+      "threat_level": "high",
+      "final_score": 0.78,
+      "reasons": [
+        "??????"
+      ]
+    },
+    {
+      "event_id": "SHORT-0009",
+      "threat_level": "high",
+      "final_score": 0.78,
+      "reasons": [
+        "??????"
+      ]
+    },
+    {
+      "event_id": "SHORT-0011",
+      "threat_level": "high",
+      "final_score": 0.78,
+      "reasons": [
+        "??????"
+      ]
+    },
+    {
+      "event_id": "SHORT-0012",
+      "threat_level": "high",
+      "final_score": 0.78,
+      "reasons": [
+        "??????"
+      ]
+    },
+    {
+      "event_id": "SHORT-0013",
+      "threat_level": "high",
+      "final_score": 0.78,
+      "reasons": [
+        "??????"
+      ]
+    },
+    {
+      "event_id": "SHORT-0014",
+      "threat_level": "high",
+      "final_score": 0.78,
+      "reasons": [
+        "??????"
+      ]
+    },
+    {
+      "event_id": "SHORT-0015",
+      "threat_level": "high",
+      "final_score": 0.78,
+      "reasons": [
+        "??????"
+      ]
+    }
+  ],
+  "candidate_chain_id": "SHORT-CANDIDATE-001",
+  "candidate_chain_status": "candidate",
+  "files": {
+    "timeline": "timeline.json",
+    "detection_results": "detection_results.json",
+    "entities": "entities.json",
+    "event_relations": "event_relations.json",
+    "attack_chain": "attack_chain.json"
+  }
+}

@@ -1,0 +1,480 @@
+[
+  {
+    "event_id": "SHORT-0001",
+    "timestamp": "2022-02-08T08:36:38Z",
+    "threat_level": "high",
+    "alert_level": "high",
+    "final_score": 0.82,
+    "raw_event_score": 0.82,
+    "micro_window_score": 0.85,
+    "macro_window_score": 0.87,
+    "long_horizon_score": 0.86,
+    "reasons": [
+      "www-data ?????????"
+    ],
+    "module_projection": {
+      "M1": "semantic_embedding_available",
+      "M2": "entity_roles_resolved_from_event_facts",
+      "M3": "causal_history_context_available",
+      "M4": "current_event_multiscale_context_scored",
+      "M5": "long_horizon_link_candidate",
+      "M6": "fused_demo_alert_level"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_projection",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "SHORT-0002",
+    "timestamp": "2022-02-08T08:36:38Z",
+    "threat_level": "medium",
+    "alert_level": "medium",
+    "final_score": 0.58,
+    "raw_event_score": 0.58,
+    "micro_window_score": 0.61,
+    "macro_window_score": 0.58,
+    "long_horizon_score": 0.58,
+    "reasons": [
+      "?????????????"
+    ],
+    "module_projection": {
+      "M1": "semantic_embedding_available",
+      "M2": "entity_roles_resolved_from_event_facts",
+      "M3": "causal_history_context_available",
+      "M4": "current_event_multiscale_context_scored",
+      "M5": "no_strong_long_horizon_link",
+      "M6": "fused_demo_alert_level"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_projection",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "SHORT-0003",
+    "timestamp": "2022-02-08T08:36:38Z",
+    "threat_level": "medium",
+    "alert_level": "medium",
+    "final_score": 0.58,
+    "raw_event_score": 0.58,
+    "micro_window_score": 0.61,
+    "macro_window_score": 0.58,
+    "long_horizon_score": 0.58,
+    "reasons": [
+      "?????????????"
+    ],
+    "module_projection": {
+      "M1": "semantic_embedding_available",
+      "M2": "entity_roles_resolved_from_event_facts",
+      "M3": "causal_history_context_available",
+      "M4": "current_event_multiscale_context_scored",
+      "M5": "no_strong_long_horizon_link",
+      "M6": "fused_demo_alert_level"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_projection",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "SHORT-0004",
+    "timestamp": "2022-02-08T08:36:38Z",
+    "threat_level": "info",
+    "alert_level": "info",
+    "final_score": 0.03,
+    "raw_event_score": 0.03,
+    "micro_window_score": 0.03,
+    "macro_window_score": 0.03,
+    "long_horizon_score": 0.03,
+    "reasons": [
+      "?????????"
+    ],
+    "module_projection": {
+      "M1": "semantic_embedding_available",
+      "M2": "entity_roles_resolved_from_event_facts",
+      "M3": "causal_history_context_available",
+      "M4": "current_event_multiscale_context_scored",
+      "M5": "no_strong_long_horizon_link",
+      "M6": "fused_demo_alert_level"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_projection",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "SHORT-0005",
+    "timestamp": "2022-02-08T08:36:38Z",
+    "threat_level": "medium",
+    "alert_level": "medium",
+    "final_score": 0.58,
+    "raw_event_score": 0.58,
+    "micro_window_score": 0.61,
+    "macro_window_score": 0.58,
+    "long_horizon_score": 0.58,
+    "reasons": [
+      "?????????????"
+    ],
+    "module_projection": {
+      "M1": "semantic_embedding_available",
+      "M2": "entity_roles_resolved_from_event_facts",
+      "M3": "causal_history_context_available",
+      "M4": "current_event_multiscale_context_scored",
+      "M5": "no_strong_long_horizon_link",
+      "M6": "fused_demo_alert_level"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_projection",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "SHORT-0006",
+    "timestamp": "2022-02-08T08:36:54Z",
+    "threat_level": "medium",
+    "alert_level": "medium",
+    "final_score": 0.69,
+    "raw_event_score": 0.69,
+    "micro_window_score": 0.72,
+    "macro_window_score": 0.74,
+    "long_horizon_score": 0.69,
+    "reasons": [
+      "sudo ????"
+    ],
+    "module_projection": {
+      "M1": "semantic_embedding_available",
+      "M2": "entity_roles_resolved_from_event_facts",
+      "M3": "causal_history_context_available",
+      "M4": "current_event_multiscale_context_scored",
+      "M5": "no_strong_long_horizon_link",
+      "M6": "fused_demo_alert_level"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_projection",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "SHORT-0007",
+    "timestamp": "2022-02-08T08:36:57Z",
+    "threat_level": "critical",
+    "alert_level": "critical",
+    "final_score": 0.98,
+    "raw_event_score": 0.98,
+    "micro_window_score": 1.0,
+    "macro_window_score": 1.0,
+    "long_horizon_score": 1.0,
+    "reasons": [
+      "????????",
+      "root ???????"
+    ],
+    "module_projection": {
+      "M1": "semantic_embedding_available",
+      "M2": "entity_roles_resolved_from_event_facts",
+      "M3": "causal_history_context_available",
+      "M4": "current_event_multiscale_context_scored",
+      "M5": "long_horizon_link_candidate",
+      "M6": "fused_demo_alert_level"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_projection",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "SHORT-0008",
+    "timestamp": "2022-02-08T08:36:57Z",
+    "threat_level": "high",
+    "alert_level": "high",
+    "final_score": 0.78,
+    "raw_event_score": 0.78,
+    "micro_window_score": 0.81,
+    "macro_window_score": 0.83,
+    "long_horizon_score": 0.82,
+    "reasons": [
+      "??????"
+    ],
+    "module_projection": {
+      "M1": "semantic_embedding_available",
+      "M2": "entity_roles_resolved_from_event_facts",
+      "M3": "causal_history_context_available",
+      "M4": "current_event_multiscale_context_scored",
+      "M5": "long_horizon_link_candidate",
+      "M6": "fused_demo_alert_level"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_projection",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "SHORT-0009",
+    "timestamp": "2022-02-08T08:36:57Z",
+    "threat_level": "high",
+    "alert_level": "high",
+    "final_score": 0.78,
+    "raw_event_score": 0.78,
+    "micro_window_score": 0.81,
+    "macro_window_score": 0.83,
+    "long_horizon_score": 0.82,
+    "reasons": [
+      "??????"
+    ],
+    "module_projection": {
+      "M1": "semantic_embedding_available",
+      "M2": "entity_roles_resolved_from_event_facts",
+      "M3": "causal_history_context_available",
+      "M4": "current_event_multiscale_context_scored",
+      "M5": "long_horizon_link_candidate",
+      "M6": "fused_demo_alert_level"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_projection",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "SHORT-0010",
+    "timestamp": "2022-02-08T08:36:59Z",
+    "threat_level": "high",
+    "alert_level": "high",
+    "final_score": 0.91,
+    "raw_event_score": 0.91,
+    "micro_window_score": 0.94,
+    "macro_window_score": 0.96,
+    "long_horizon_score": 0.95,
+    "reasons": [
+      "root ????",
+      "root ???????"
+    ],
+    "module_projection": {
+      "M1": "semantic_embedding_available",
+      "M2": "entity_roles_resolved_from_event_facts",
+      "M3": "causal_history_context_available",
+      "M4": "current_event_multiscale_context_scored",
+      "M5": "long_horizon_link_candidate",
+      "M6": "fused_demo_alert_level"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_projection",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "SHORT-0011",
+    "timestamp": "2022-02-08T08:36:59Z",
+    "threat_level": "high",
+    "alert_level": "high",
+    "final_score": 0.78,
+    "raw_event_score": 0.78,
+    "micro_window_score": 0.81,
+    "macro_window_score": 0.83,
+    "long_horizon_score": 0.82,
+    "reasons": [
+      "??????"
+    ],
+    "module_projection": {
+      "M1": "semantic_embedding_available",
+      "M2": "entity_roles_resolved_from_event_facts",
+      "M3": "causal_history_context_available",
+      "M4": "current_event_multiscale_context_scored",
+      "M5": "long_horizon_link_candidate",
+      "M6": "fused_demo_alert_level"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_projection",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "SHORT-0012",
+    "timestamp": "2022-02-08T08:36:59Z",
+    "threat_level": "high",
+    "alert_level": "high",
+    "final_score": 0.78,
+    "raw_event_score": 0.78,
+    "micro_window_score": 0.81,
+    "macro_window_score": 0.83,
+    "long_horizon_score": 0.82,
+    "reasons": [
+      "??????"
+    ],
+    "module_projection": {
+      "M1": "semantic_embedding_available",
+      "M2": "entity_roles_resolved_from_event_facts",
+      "M3": "causal_history_context_available",
+      "M4": "current_event_multiscale_context_scored",
+      "M5": "long_horizon_link_candidate",
+      "M6": "fused_demo_alert_level"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_projection",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "SHORT-0013",
+    "timestamp": "2022-02-08T08:37:08Z",
+    "threat_level": "high",
+    "alert_level": "high",
+    "final_score": 0.78,
+    "raw_event_score": 0.78,
+    "micro_window_score": 0.81,
+    "macro_window_score": 0.83,
+    "long_horizon_score": 0.82,
+    "reasons": [
+      "??????"
+    ],
+    "module_projection": {
+      "M1": "semantic_embedding_available",
+      "M2": "entity_roles_resolved_from_event_facts",
+      "M3": "causal_history_context_available",
+      "M4": "current_event_multiscale_context_scored",
+      "M5": "long_horizon_link_candidate",
+      "M6": "fused_demo_alert_level"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_projection",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "SHORT-0014",
+    "timestamp": "2022-02-08T08:37:08Z",
+    "threat_level": "high",
+    "alert_level": "high",
+    "final_score": 0.78,
+    "raw_event_score": 0.78,
+    "micro_window_score": 0.81,
+    "macro_window_score": 0.83,
+    "long_horizon_score": 0.82,
+    "reasons": [
+      "??????"
+    ],
+    "module_projection": {
+      "M1": "semantic_embedding_available",
+      "M2": "entity_roles_resolved_from_event_facts",
+      "M3": "causal_history_context_available",
+      "M4": "current_event_multiscale_context_scored",
+      "M5": "long_horizon_link_candidate",
+      "M6": "fused_demo_alert_level"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_projection",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "SHORT-0015",
+    "timestamp": "2022-02-08T08:37:08Z",
+    "threat_level": "high",
+    "alert_level": "high",
+    "final_score": 0.78,
+    "raw_event_score": 0.78,
+    "micro_window_score": 0.81,
+    "macro_window_score": 0.83,
+    "long_horizon_score": 0.82,
+    "reasons": [
+      "??????"
+    ],
+    "module_projection": {
+      "M1": "semantic_embedding_available",
+      "M2": "entity_roles_resolved_from_event_facts",
+      "M3": "causal_history_context_available",
+      "M4": "current_event_multiscale_context_scored",
+      "M5": "long_horizon_link_candidate",
+      "M6": "fused_demo_alert_level"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_projection",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "SHORT-0016",
+    "timestamp": "2022-02-08T08:39:01Z",
+    "threat_level": "low",
+    "alert_level": "low",
+    "final_score": 0.32,
+    "raw_event_score": 0.32,
+    "micro_window_score": 0.32,
+    "macro_window_score": 0.32,
+    "long_horizon_score": 0.32,
+    "reasons": [
+      "root ???????????"
+    ],
+    "module_projection": {
+      "M1": "semantic_embedding_available",
+      "M2": "entity_roles_resolved_from_event_facts",
+      "M3": "causal_history_context_available",
+      "M4": "current_event_multiscale_context_scored",
+      "M5": "no_strong_long_horizon_link",
+      "M6": "fused_demo_alert_level"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_projection",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "SHORT-0017",
+    "timestamp": "2022-02-08T08:39:01Z",
+    "threat_level": "info",
+    "alert_level": "info",
+    "final_score": 0.08,
+    "raw_event_score": 0.08,
+    "micro_window_score": 0.08,
+    "macro_window_score": 0.08,
+    "long_horizon_score": 0.08,
+    "reasons": [
+      "??????"
+    ],
+    "module_projection": {
+      "M1": "semantic_embedding_available",
+      "M2": "entity_roles_resolved_from_event_facts",
+      "M3": "causal_history_context_available",
+      "M4": "current_event_multiscale_context_scored",
+      "M5": "no_strong_long_horizon_link",
+      "M6": "fused_demo_alert_level"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_projection",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  }
+]

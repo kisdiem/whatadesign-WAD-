@@ -1,0 +1,3202 @@
+[
+  {
+    "event_id": "LONG-0001",
+    "timestamp": "2022-01-23T00:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 650,
+    "raw": "Jan 23 00:09:01 intranet-server CRON[25556]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0002",
+    "timestamp": "2022-01-23T00:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 651,
+    "raw": "Jan 23 00:09:01 intranet-server CRON[25556]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0003",
+    "timestamp": "2022-01-23T00:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 143,
+    "raw": "Jan 23 00:09:01 intranet-server CRON[25557]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0004",
+    "timestamp": "2022-01-23T00:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 144,
+    "raw": "Jan 23 00:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0005",
+    "timestamp": "2022-01-23T00:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 145,
+    "raw": "Jan 23 00:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0006",
+    "timestamp": "2022-01-23T00:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 652,
+    "raw": "Jan 23 00:17:01 intranet-server CRON[25629]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0007",
+    "timestamp": "2022-01-23T00:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 653,
+    "raw": "Jan 23 00:17:01 intranet-server CRON[25629]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0008",
+    "timestamp": "2022-01-23T00:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 146,
+    "raw": "Jan 23 00:17:01 intranet-server CRON[25630]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0009",
+    "timestamp": "2022-01-23T00:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 654,
+    "raw": "Jan 23 00:39:01 intranet-server CRON[25638]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0010",
+    "timestamp": "2022-01-23T00:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 655,
+    "raw": "Jan 23 00:39:01 intranet-server CRON[25638]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0011",
+    "timestamp": "2022-01-23T00:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 147,
+    "raw": "Jan 23 00:39:01 intranet-server CRON[25639]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0012",
+    "timestamp": "2022-01-23T00:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 148,
+    "raw": "Jan 23 00:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0013",
+    "timestamp": "2022-01-23T00:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 149,
+    "raw": "Jan 23 00:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0014",
+    "timestamp": "2022-01-23T00:57:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 656,
+    "raw": "Jan 23 00:57:01 intranet-server CRON[25709]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0015",
+    "timestamp": "2022-01-23T00:57:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 657,
+    "raw": "Jan 23 00:57:01 intranet-server CRON[25709]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0016",
+    "timestamp": "2022-01-23T00:57:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 150,
+    "raw": "Jan 23 00:57:01 intranet-server CRON[25710]: (root) CMD (if [ -x /usr/share/mdadm/checkarray ] && [ $(date +%d) -le 7 ]; then /usr/share/mdadm/checkarray --cron --all --idle --quiet; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0017",
+    "timestamp": "2022-01-23T01:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 658,
+    "raw": "Jan 23 01:09:01 intranet-server CRON[25715]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0018",
+    "timestamp": "2022-01-23T01:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 659,
+    "raw": "Jan 23 01:09:01 intranet-server CRON[25715]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0019",
+    "timestamp": "2022-01-23T01:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 151,
+    "raw": "Jan 23 01:09:01 intranet-server CRON[25716]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0020",
+    "timestamp": "2022-01-23T01:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 152,
+    "raw": "Jan 23 01:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0021",
+    "timestamp": "2022-01-23T01:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 153,
+    "raw": "Jan 23 01:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0022",
+    "timestamp": "2022-01-23T01:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 660,
+    "raw": "Jan 23 01:17:01 intranet-server CRON[25786]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0023",
+    "timestamp": "2022-01-23T01:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 661,
+    "raw": "Jan 23 01:17:01 intranet-server CRON[25786]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0024",
+    "timestamp": "2022-01-23T01:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 154,
+    "raw": "Jan 23 01:17:01 intranet-server CRON[25787]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0025",
+    "timestamp": "2022-01-23T01:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 662,
+    "raw": "Jan 23 01:39:01 intranet-server CRON[25790]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0026",
+    "timestamp": "2022-01-23T01:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 663,
+    "raw": "Jan 23 01:39:01 intranet-server CRON[25790]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0027",
+    "timestamp": "2022-01-23T01:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 155,
+    "raw": "Jan 23 01:39:01 intranet-server CRON[25791]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0028",
+    "timestamp": "2022-01-23T01:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 156,
+    "raw": "Jan 23 01:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0029",
+    "timestamp": "2022-01-23T01:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 157,
+    "raw": "Jan 23 01:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0030",
+    "timestamp": "2022-01-23T02:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 664,
+    "raw": "Jan 23 02:09:01 intranet-server CRON[25866]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0031",
+    "timestamp": "2022-01-23T02:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 665,
+    "raw": "Jan 23 02:09:01 intranet-server CRON[25866]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0032",
+    "timestamp": "2022-01-23T02:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 158,
+    "raw": "Jan 23 02:09:01 intranet-server CRON[25867]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0033",
+    "timestamp": "2022-01-23T02:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 159,
+    "raw": "Jan 23 02:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0034",
+    "timestamp": "2022-01-23T02:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 160,
+    "raw": "Jan 23 02:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0035",
+    "timestamp": "2022-01-23T02:10:34Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 161,
+    "raw": "Jan 23 02:10:34 intranet-server systemd[1]: Starting Daily apt download activities...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0036",
+    "timestamp": "2022-01-23T02:10:54Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 162,
+    "raw": "Jan 23 02:10:54 intranet-server systemd[1]: Started Daily apt download activities.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0037",
+    "timestamp": "2022-01-23T02:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 666,
+    "raw": "Jan 23 02:17:01 intranet-server CRON[26442]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0038",
+    "timestamp": "2022-01-23T02:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 667,
+    "raw": "Jan 23 02:17:01 intranet-server CRON[26442]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0039",
+    "timestamp": "2022-01-23T02:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 163,
+    "raw": "Jan 23 02:17:01 intranet-server CRON[26443]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0040",
+    "timestamp": "2022-01-23T02:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 668,
+    "raw": "Jan 23 02:39:01 intranet-server CRON[26449]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0041",
+    "timestamp": "2022-01-23T02:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 669,
+    "raw": "Jan 23 02:39:01 intranet-server CRON[26449]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0042",
+    "timestamp": "2022-01-23T02:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 164,
+    "raw": "Jan 23 02:39:01 intranet-server CRON[26450]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0043",
+    "timestamp": "2022-01-23T02:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 165,
+    "raw": "Jan 23 02:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0044",
+    "timestamp": "2022-01-23T02:39:05Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 166,
+    "raw": "Jan 23 02:39:05 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0045",
+    "timestamp": "2022-01-23T03:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 670,
+    "raw": "Jan 23 03:09:01 intranet-server CRON[26527]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0046",
+    "timestamp": "2022-01-23T03:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 671,
+    "raw": "Jan 23 03:09:01 intranet-server CRON[26527]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0047",
+    "timestamp": "2022-01-23T03:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 167,
+    "raw": "Jan 23 03:09:01 intranet-server CRON[26528]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0048",
+    "timestamp": "2022-01-23T03:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 168,
+    "raw": "Jan 23 03:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0049",
+    "timestamp": "2022-01-23T03:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 169,
+    "raw": "Jan 23 03:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0050",
+    "timestamp": "2022-01-23T03:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 672,
+    "raw": "Jan 23 03:17:01 intranet-server CRON[26595]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0051",
+    "timestamp": "2022-01-23T03:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 673,
+    "raw": "Jan 23 03:17:01 intranet-server CRON[26595]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0052",
+    "timestamp": "2022-01-23T03:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 170,
+    "raw": "Jan 23 03:17:01 intranet-server CRON[26596]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0053",
+    "timestamp": "2022-01-23T03:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 674,
+    "raw": "Jan 23 03:39:01 intranet-server CRON[26602]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0054",
+    "timestamp": "2022-01-23T03:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 675,
+    "raw": "Jan 23 03:39:01 intranet-server CRON[26602]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0055",
+    "timestamp": "2022-01-23T03:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 171,
+    "raw": "Jan 23 03:39:01 intranet-server CRON[26603]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0056",
+    "timestamp": "2022-01-23T03:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 172,
+    "raw": "Jan 23 03:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0057",
+    "timestamp": "2022-01-23T03:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 173,
+    "raw": "Jan 23 03:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0058",
+    "timestamp": "2022-01-23T03:56:37Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 174,
+    "raw": "Jan 23 03:56:37 intranet-server systemd[1]: Starting Ubuntu Advantage APT and MOTD Messages...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0059",
+    "timestamp": "2022-01-23T03:56:38Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 175,
+    "raw": "Jan 23 03:56:38 intranet-server systemd[1]: Started Ubuntu Advantage APT and MOTD Messages.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0060",
+    "timestamp": "2022-01-23T04:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 676,
+    "raw": "Jan 23 04:09:01 intranet-server CRON[26704]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0061",
+    "timestamp": "2022-01-23T04:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 677,
+    "raw": "Jan 23 04:09:01 intranet-server CRON[26704]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0062",
+    "timestamp": "2022-01-23T04:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 176,
+    "raw": "Jan 23 04:09:01 intranet-server CRON[26705]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0063",
+    "timestamp": "2022-01-23T04:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 177,
+    "raw": "Jan 23 04:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0064",
+    "timestamp": "2022-01-23T04:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 178,
+    "raw": "Jan 23 04:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0065",
+    "timestamp": "2022-01-23T04:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 678,
+    "raw": "Jan 23 04:17:01 intranet-server CRON[26777]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0066",
+    "timestamp": "2022-01-23T04:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 679,
+    "raw": "Jan 23 04:17:01 intranet-server CRON[26777]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0067",
+    "timestamp": "2022-01-23T04:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 179,
+    "raw": "Jan 23 04:17:01 intranet-server CRON[26778]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0068",
+    "timestamp": "2022-01-23T04:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 680,
+    "raw": "Jan 23 04:39:01 intranet-server CRON[26789]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0069",
+    "timestamp": "2022-01-23T04:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 681,
+    "raw": "Jan 23 04:39:01 intranet-server CRON[26789]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0070",
+    "timestamp": "2022-01-23T04:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 180,
+    "raw": "Jan 23 04:39:01 intranet-server CRON[26790]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0071",
+    "timestamp": "2022-01-23T04:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 181,
+    "raw": "Jan 23 04:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0072",
+    "timestamp": "2022-01-23T04:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 182,
+    "raw": "Jan 23 04:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0073",
+    "timestamp": "2022-01-23T05:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 682,
+    "raw": "Jan 23 05:09:01 intranet-server CRON[26857]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0074",
+    "timestamp": "2022-01-23T05:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 683,
+    "raw": "Jan 23 05:09:01 intranet-server CRON[26857]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0075",
+    "timestamp": "2022-01-23T05:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 183,
+    "raw": "Jan 23 05:09:01 intranet-server CRON[26858]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0076",
+    "timestamp": "2022-01-23T05:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 184,
+    "raw": "Jan 23 05:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0077",
+    "timestamp": "2022-01-23T05:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 185,
+    "raw": "Jan 23 05:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0078",
+    "timestamp": "2022-01-23T05:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 684,
+    "raw": "Jan 23 05:17:01 intranet-server CRON[26927]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0079",
+    "timestamp": "2022-01-23T05:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 685,
+    "raw": "Jan 23 05:17:01 intranet-server CRON[26927]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0080",
+    "timestamp": "2022-01-23T05:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 186,
+    "raw": "Jan 23 05:17:01 intranet-server CRON[26928]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0081",
+    "timestamp": "2022-01-23T05:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 686,
+    "raw": "Jan 23 05:39:01 intranet-server CRON[26936]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0082",
+    "timestamp": "2022-01-23T05:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 687,
+    "raw": "Jan 23 05:39:01 intranet-server CRON[26936]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0083",
+    "timestamp": "2022-01-23T05:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 187,
+    "raw": "Jan 23 05:39:01 intranet-server CRON[26937]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0084",
+    "timestamp": "2022-01-23T05:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 188,
+    "raw": "Jan 23 05:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0085",
+    "timestamp": "2022-01-23T05:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 189,
+    "raw": "Jan 23 05:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0086",
+    "timestamp": "2022-01-23T06:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 688,
+    "raw": "Jan 23 06:09:01 intranet-server CRON[27007]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0087",
+    "timestamp": "2022-01-23T06:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 689,
+    "raw": "Jan 23 06:09:01 intranet-server CRON[27007]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0088",
+    "timestamp": "2022-01-23T06:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 190,
+    "raw": "Jan 23 06:09:01 intranet-server CRON[27008]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0089",
+    "timestamp": "2022-01-23T06:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 191,
+    "raw": "Jan 23 06:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0090",
+    "timestamp": "2022-01-23T06:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 192,
+    "raw": "Jan 23 06:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0091",
+    "timestamp": "2022-01-23T06:14:37Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 193,
+    "raw": "Jan 23 06:14:37 intranet-server systemd[1]: Starting Message of the Day...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0092",
+    "timestamp": "2022-01-23T06:15:11Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 194,
+    "raw": "Jan 23 06:15:11 intranet-server 50-motd-news[27075]:  * Super-optimized for small spaces - read how we shrank the memory",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0093",
+    "timestamp": "2022-01-23T06:15:11Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 195,
+    "raw": "Jan 23 06:15:11 intranet-server 50-motd-news[27075]:    footprint of MicroK8s to make it the smallest full K8s around.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0094",
+    "timestamp": "2022-01-23T06:15:11Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 196,
+    "raw": "Jan 23 06:15:11 intranet-server 50-motd-news[27075]:    https://ubuntu.com/blog/microk8s-memory-optimisation",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0095",
+    "timestamp": "2022-01-23T06:15:11Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 197,
+    "raw": "Jan 23 06:15:11 intranet-server systemd[1]: Started Message of the Day.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0096",
+    "timestamp": "2022-01-23T06:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 690,
+    "raw": "Jan 23 06:17:01 intranet-server CRON[27131]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0097",
+    "timestamp": "2022-01-23T06:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 691,
+    "raw": "Jan 23 06:17:01 intranet-server CRON[27131]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0098",
+    "timestamp": "2022-01-23T06:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 198,
+    "raw": "Jan 23 06:17:01 intranet-server CRON[27132]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0099",
+    "timestamp": "2022-01-23T06:25:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log.1",
+    "source_line": 692,
+    "raw": "Jan 23 06:25:01 intranet-server CRON[27138]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0100",
+    "timestamp": "2022-01-23T06:25:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 199,
+    "raw": "Jan 23 06:25:01 intranet-server CRON[27139]: (root) CMD (test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily ))",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0101",
+    "timestamp": "2022-01-23T06:25:06Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 200,
+    "raw": "Jan 23 06:25:06 intranet-server systemd[1]: Reloading The Apache HTTP Server.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0102",
+    "timestamp": "2022-01-23T06:25:06Z",
+    "source_file": "gather/intranet_server/logs/syslog.2",
+    "source_line": 201,
+    "raw": "Jan 23 06:25:06 intranet-server systemd[1]: Reloaded The Apache HTTP Server.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0103",
+    "timestamp": "2022-01-23T06:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 2,
+    "raw": "Jan 23 06:39:01 intranet-server CRON[27297]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0104",
+    "timestamp": "2022-01-23T06:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 3,
+    "raw": "Jan 23 06:39:01 intranet-server CRON[27297]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0105",
+    "timestamp": "2022-01-23T06:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 2,
+    "raw": "Jan 23 06:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0106",
+    "timestamp": "2022-01-23T06:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 3,
+    "raw": "Jan 23 06:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0107",
+    "timestamp": "2022-01-23T06:47:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 4,
+    "raw": "Jan 23 06:47:01 intranet-server CRON[27367]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0108",
+    "timestamp": "2022-01-23T06:47:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 4,
+    "raw": "Jan 23 06:47:01 intranet-server CRON[27368]: (root) CMD (test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly ))",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0109",
+    "timestamp": "2022-01-23T06:47:05Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 5,
+    "raw": "Jan 23 06:47:05 intranet-server CRON[27367]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0110",
+    "timestamp": "2022-01-23T06:57:49Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 5,
+    "raw": "Jan 23 06:57:49 intranet-server systemd[1]: Starting Daily apt upgrade and clean activities...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0111",
+    "timestamp": "2022-01-23T06:57:55Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 6,
+    "raw": "Jan 23 06:57:55 intranet-server systemd[1]: Started Daily apt upgrade and clean activities.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0112",
+    "timestamp": "2022-01-23T07:09:02Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 6,
+    "raw": "Jan 23 07:09:02 intranet-server CRON[27481]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0113",
+    "timestamp": "2022-01-23T07:09:02Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 7,
+    "raw": "Jan 23 07:09:02 intranet-server CRON[27481]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0114",
+    "timestamp": "2022-01-23T07:09:02Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 7,
+    "raw": "Jan 23 07:09:02 intranet-server CRON[27482]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0115",
+    "timestamp": "2022-01-23T07:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 8,
+    "raw": "Jan 23 07:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0116",
+    "timestamp": "2022-01-23T07:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 9,
+    "raw": "Jan 23 07:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0117",
+    "timestamp": "2022-01-23T07:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 8,
+    "raw": "Jan 23 07:17:01 intranet-server CRON[27551]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0118",
+    "timestamp": "2022-01-23T07:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 9,
+    "raw": "Jan 23 07:17:01 intranet-server CRON[27551]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0119",
+    "timestamp": "2022-01-23T07:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 10,
+    "raw": "Jan 23 07:17:01 intranet-server CRON[27552]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0120",
+    "timestamp": "2022-01-23T07:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 10,
+    "raw": "Jan 23 07:39:01 intranet-server CRON[27561]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0121",
+    "timestamp": "2022-01-23T07:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 11,
+    "raw": "Jan 23 07:39:01 intranet-server CRON[27561]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0122",
+    "timestamp": "2022-01-23T07:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 11,
+    "raw": "Jan 23 07:39:01 intranet-server CRON[27562]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0123",
+    "timestamp": "2022-01-23T07:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 12,
+    "raw": "Jan 23 07:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0124",
+    "timestamp": "2022-01-23T07:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 13,
+    "raw": "Jan 23 07:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0125",
+    "timestamp": "2022-01-23T07:42:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 14,
+    "raw": "Jan 23 07:42:04 intranet-server systemd[1]: Starting Cleanup of Temporary Directories...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0126",
+    "timestamp": "2022-01-23T07:42:05Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 15,
+    "raw": "Jan 23 07:42:05 intranet-server systemd[1]: Started Cleanup of Temporary Directories.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0127",
+    "timestamp": "2022-01-23T08:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 12,
+    "raw": "Jan 23 08:09:01 intranet-server CRON[27656]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0128",
+    "timestamp": "2022-01-23T08:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 13,
+    "raw": "Jan 23 08:09:01 intranet-server CRON[27656]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0129",
+    "timestamp": "2022-01-23T08:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 16,
+    "raw": "Jan 23 08:09:01 intranet-server CRON[27657]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0130",
+    "timestamp": "2022-01-23T08:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 17,
+    "raw": "Jan 23 08:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0131",
+    "timestamp": "2022-01-23T08:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 18,
+    "raw": "Jan 23 08:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0132",
+    "timestamp": "2022-01-23T08:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 14,
+    "raw": "Jan 23 08:17:01 intranet-server CRON[27726]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0133",
+    "timestamp": "2022-01-23T08:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 15,
+    "raw": "Jan 23 08:17:01 intranet-server CRON[27726]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0134",
+    "timestamp": "2022-01-23T08:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 19,
+    "raw": "Jan 23 08:17:01 intranet-server CRON[27727]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0135",
+    "timestamp": "2022-01-23T08:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 16,
+    "raw": "Jan 23 08:39:01 intranet-server CRON[27732]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0136",
+    "timestamp": "2022-01-23T08:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 17,
+    "raw": "Jan 23 08:39:01 intranet-server CRON[27732]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0137",
+    "timestamp": "2022-01-23T08:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 20,
+    "raw": "Jan 23 08:39:01 intranet-server CRON[27733]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0138",
+    "timestamp": "2022-01-23T08:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 21,
+    "raw": "Jan 23 08:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0139",
+    "timestamp": "2022-01-23T08:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 22,
+    "raw": "Jan 23 08:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0140",
+    "timestamp": "2022-01-23T09:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 18,
+    "raw": "Jan 23 09:09:01 intranet-server CRON[27807]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0141",
+    "timestamp": "2022-01-23T09:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 19,
+    "raw": "Jan 23 09:09:01 intranet-server CRON[27807]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0142",
+    "timestamp": "2022-01-23T09:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 23,
+    "raw": "Jan 23 09:09:01 intranet-server CRON[27808]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0143",
+    "timestamp": "2022-01-23T09:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 24,
+    "raw": "Jan 23 09:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0144",
+    "timestamp": "2022-01-23T09:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 25,
+    "raw": "Jan 23 09:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0145",
+    "timestamp": "2022-01-23T09:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 20,
+    "raw": "Jan 23 09:17:01 intranet-server CRON[27891]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0146",
+    "timestamp": "2022-01-23T09:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 21,
+    "raw": "Jan 23 09:17:01 intranet-server CRON[27891]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0147",
+    "timestamp": "2022-01-23T09:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 26,
+    "raw": "Jan 23 09:17:01 intranet-server CRON[27892]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0148",
+    "timestamp": "2022-01-23T09:36:56Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 27,
+    "raw": "Jan 23 09:36:56 intranet-server systemd-timesyncd[587]: Network configuration changed, trying to establish connection.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0149",
+    "timestamp": "2022-01-23T09:36:56Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 28,
+    "raw": "Jan 23 09:36:56 intranet-server systemd-networkd[1364]: ens3: Configured",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0150",
+    "timestamp": "2022-01-23T09:36:56Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 29,
+    "raw": "Jan 23 09:36:56 intranet-server systemd-timesyncd[587]: Synchronized to time server 91.189.94.4:123 (ntp.ubuntu.com).",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0151",
+    "timestamp": "2022-01-23T09:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 22,
+    "raw": "Jan 23 09:39:01 intranet-server CRON[27911]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0152",
+    "timestamp": "2022-01-23T09:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 23,
+    "raw": "Jan 23 09:39:01 intranet-server CRON[27911]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0153",
+    "timestamp": "2022-01-23T09:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 30,
+    "raw": "Jan 23 09:39:01 intranet-server CRON[27912]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0154",
+    "timestamp": "2022-01-23T09:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 31,
+    "raw": "Jan 23 09:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0155",
+    "timestamp": "2022-01-23T09:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 32,
+    "raw": "Jan 23 09:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0156",
+    "timestamp": "2022-01-23T10:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 24,
+    "raw": "Jan 23 10:09:01 intranet-server CRON[27985]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0157",
+    "timestamp": "2022-01-23T10:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 25,
+    "raw": "Jan 23 10:09:01 intranet-server CRON[27985]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0158",
+    "timestamp": "2022-01-23T10:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 33,
+    "raw": "Jan 23 10:09:01 intranet-server CRON[27986]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0159",
+    "timestamp": "2022-01-23T10:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 34,
+    "raw": "Jan 23 10:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0160",
+    "timestamp": "2022-01-23T10:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 35,
+    "raw": "Jan 23 10:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0161",
+    "timestamp": "2022-01-23T10:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 26,
+    "raw": "Jan 23 10:17:01 intranet-server CRON[28054]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0162",
+    "timestamp": "2022-01-23T10:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 27,
+    "raw": "Jan 23 10:17:01 intranet-server CRON[28054]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0163",
+    "timestamp": "2022-01-23T10:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 36,
+    "raw": "Jan 23 10:17:01 intranet-server CRON[28055]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0164",
+    "timestamp": "2022-01-23T10:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 28,
+    "raw": "Jan 23 10:39:01 intranet-server CRON[28079]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0165",
+    "timestamp": "2022-01-23T10:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 29,
+    "raw": "Jan 23 10:39:01 intranet-server CRON[28079]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0166",
+    "timestamp": "2022-01-23T10:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 37,
+    "raw": "Jan 23 10:39:01 intranet-server CRON[28080]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0167",
+    "timestamp": "2022-01-23T10:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 38,
+    "raw": "Jan 23 10:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0168",
+    "timestamp": "2022-01-23T10:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 39,
+    "raw": "Jan 23 10:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0169",
+    "timestamp": "2022-01-23T10:49:34Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 40,
+    "raw": "Jan 23 10:49:34 intranet-server systemd[1]: Starting Daily apt download activities...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0170",
+    "timestamp": "2022-01-23T10:49:36Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 41,
+    "raw": "Jan 23 10:49:36 intranet-server systemd[1]: Started Daily apt download activities.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0171",
+    "timestamp": "2022-01-23T11:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 30,
+    "raw": "Jan 23 11:09:01 intranet-server CRON[28244]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0172",
+    "timestamp": "2022-01-23T11:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 31,
+    "raw": "Jan 23 11:09:01 intranet-server CRON[28244]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0173",
+    "timestamp": "2022-01-23T11:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 42,
+    "raw": "Jan 23 11:09:01 intranet-server CRON[28245]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0174",
+    "timestamp": "2022-01-23T11:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 43,
+    "raw": "Jan 23 11:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0175",
+    "timestamp": "2022-01-23T11:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 44,
+    "raw": "Jan 23 11:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0176",
+    "timestamp": "2022-01-23T11:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 32,
+    "raw": "Jan 23 11:17:01 intranet-server CRON[28325]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0177",
+    "timestamp": "2022-01-23T11:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 33,
+    "raw": "Jan 23 11:17:01 intranet-server CRON[28325]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0178",
+    "timestamp": "2022-01-23T11:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 45,
+    "raw": "Jan 23 11:17:01 intranet-server CRON[28326]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0179",
+    "timestamp": "2022-01-23T11:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 34,
+    "raw": "Jan 23 11:39:01 intranet-server CRON[28331]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0180",
+    "timestamp": "2022-01-23T11:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 35,
+    "raw": "Jan 23 11:39:01 intranet-server CRON[28331]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0181",
+    "timestamp": "2022-01-23T11:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 46,
+    "raw": "Jan 23 11:39:01 intranet-server CRON[28332]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0182",
+    "timestamp": "2022-01-23T11:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 47,
+    "raw": "Jan 23 11:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0183",
+    "timestamp": "2022-01-23T11:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 48,
+    "raw": "Jan 23 11:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0184",
+    "timestamp": "2022-01-23T12:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 36,
+    "raw": "Jan 23 12:09:01 intranet-server CRON[28403]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0185",
+    "timestamp": "2022-01-23T12:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 37,
+    "raw": "Jan 23 12:09:01 intranet-server CRON[28403]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0186",
+    "timestamp": "2022-01-23T12:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 49,
+    "raw": "Jan 23 12:09:01 intranet-server CRON[28404]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0187",
+    "timestamp": "2022-01-23T12:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 50,
+    "raw": "Jan 23 12:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0188",
+    "timestamp": "2022-01-23T12:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 51,
+    "raw": "Jan 23 12:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0189",
+    "timestamp": "2022-01-23T12:11:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 38,
+    "raw": "Jan 23 12:11:01 intranet-server sshd[28473]: Did not receive identification string from 10.132.56.81 port 41728",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0190",
+    "timestamp": "2022-01-23T12:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 39,
+    "raw": "Jan 23 12:17:01 intranet-server CRON[28580]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0191",
+    "timestamp": "2022-01-23T12:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 40,
+    "raw": "Jan 23 12:17:01 intranet-server CRON[28580]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0192",
+    "timestamp": "2022-01-23T12:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 52,
+    "raw": "Jan 23 12:17:01 intranet-server CRON[28581]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0193",
+    "timestamp": "2022-01-23T12:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 41,
+    "raw": "Jan 23 12:39:01 intranet-server CRON[28609]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0194",
+    "timestamp": "2022-01-23T12:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 42,
+    "raw": "Jan 23 12:39:01 intranet-server CRON[28609]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0195",
+    "timestamp": "2022-01-23T12:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 53,
+    "raw": "Jan 23 12:39:01 intranet-server CRON[28610]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0196",
+    "timestamp": "2022-01-23T12:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 54,
+    "raw": "Jan 23 12:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0197",
+    "timestamp": "2022-01-23T12:39:05Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 55,
+    "raw": "Jan 23 12:39:05 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0198",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 43,
+    "raw": "Jan 23 12:55:01 intranet-server su[28708]: Successful su for blord by www-data",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0199",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 44,
+    "raw": "Jan 23 12:55:01 intranet-server su[28708]: + /dev/pts/1 www-data:blord",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0200",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 45,
+    "raw": "Jan 23 12:55:01 intranet-server su[28708]: pam_unix(su:session): session opened for user blord by (uid=33)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0201",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 46,
+    "raw": "Jan 23 12:55:01 intranet-server systemd-logind[951]: New session c1 of user blord.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0202",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 47,
+    "raw": "Jan 23 12:55:01 intranet-server systemd: pam_unix(systemd-user:session): session opened for user blord by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0203",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 56,
+    "raw": "Jan 23 12:55:01 intranet-server systemd[1]: Created slice User Slice of blord.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0204",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 57,
+    "raw": "Jan 23 12:55:01 intranet-server systemd[1]: Started Session c1 of user blord.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0205",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 58,
+    "raw": "Jan 23 12:55:01 intranet-server systemd[1]: Starting User Manager for UID 1001...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0206",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 59,
+    "raw": "Jan 23 12:55:01 intranet-server systemd[28709]: Listening on GnuPG cryptographic agent (ssh-agent emulation).",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0207",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 60,
+    "raw": "Jan 23 12:55:01 intranet-server systemd[28709]: Listening on REST API socket for snapd user session agent.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0208",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 61,
+    "raw": "Jan 23 12:55:01 intranet-server systemd[28709]: Reached target Timers.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0209",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 62,
+    "raw": "Jan 23 12:55:01 intranet-server systemd[28709]: Listening on GnuPG cryptographic agent and passphrase cache.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0210",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 63,
+    "raw": "Jan 23 12:55:01 intranet-server systemd[28709]: Listening on GnuPG cryptographic agent and passphrase cache (restricted).",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0211",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 64,
+    "raw": "Jan 23 12:55:01 intranet-server systemd[28709]: Listening on GnuPG network certificate management daemon.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0212",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 65,
+    "raw": "Jan 23 12:55:01 intranet-server systemd[28709]: Listening on GnuPG cryptographic agent and passphrase cache (access for web browsers).",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0213",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 66,
+    "raw": "Jan 23 12:55:01 intranet-server systemd[28709]: Reached target Sockets.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0214",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 67,
+    "raw": "Jan 23 12:55:01 intranet-server systemd[28709]: Reached target Paths.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0215",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 68,
+    "raw": "Jan 23 12:55:01 intranet-server systemd[28709]: Reached target Basic System.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0216",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 69,
+    "raw": "Jan 23 12:55:01 intranet-server systemd[1]: Started User Manager for UID 1001.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0217",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 70,
+    "raw": "Jan 23 12:55:01 intranet-server systemd[28709]: Reached target Default.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0218",
+    "timestamp": "2022-01-23T12:55:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 71,
+    "raw": "Jan 23 12:55:01 intranet-server systemd[28709]: Startup finished in 93ms.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0219",
+    "timestamp": "2022-01-23T12:55:14Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 48,
+    "raw": "Jan 23 12:55:14 intranet-server sudo:    blord : TTY=pts/1 ; PWD=/var/www/intranet.hurstwong.wardbeck.info/wp-content/uploads/2022/01 ; USER=root ; COMMAND=list",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0220",
+    "timestamp": "2022-01-23T12:55:15Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 49,
+    "raw": "Jan 23 12:55:15 intranet-server sudo:    blord : TTY=pts/1 ; PWD=/var/www/intranet.hurstwong.wardbeck.info/wp-content/uploads/2022/01 ; USER=root ; COMMAND=/bin/cat /etc/shadow",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0221",
+    "timestamp": "2022-01-23T12:55:15Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 50,
+    "raw": "Jan 23 12:55:15 intranet-server sudo: pam_unix(sudo:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0222",
+    "timestamp": "2022-01-23T12:55:16Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 51,
+    "raw": "Jan 23 12:55:16 intranet-server sudo: pam_unix(sudo:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0223",
+    "timestamp": "2022-01-23T12:55:19Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 52,
+    "raw": "Jan 23 12:55:19 intranet-server sudo:    blord : TTY=pts/1 ; PWD=/var/www/intranet.hurstwong.wardbeck.info/wp-content/uploads/2022/01 ; USER=root ; COMMAND=/bin/ls -laR /root/",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0224",
+    "timestamp": "2022-01-23T12:55:19Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 53,
+    "raw": "Jan 23 12:55:19 intranet-server sudo: pam_unix(sudo:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0225",
+    "timestamp": "2022-01-23T12:55:19Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 54,
+    "raw": "Jan 23 12:55:19 intranet-server sudo: pam_unix(sudo:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0226",
+    "timestamp": "2022-01-23T13:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 55,
+    "raw": "Jan 23 13:09:01 intranet-server CRON[28743]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0227",
+    "timestamp": "2022-01-23T13:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 56,
+    "raw": "Jan 23 13:09:01 intranet-server CRON[28743]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0228",
+    "timestamp": "2022-01-23T13:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 72,
+    "raw": "Jan 23 13:09:01 intranet-server CRON[28744]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0229",
+    "timestamp": "2022-01-23T13:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 73,
+    "raw": "Jan 23 13:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0230",
+    "timestamp": "2022-01-23T13:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 74,
+    "raw": "Jan 23 13:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0231",
+    "timestamp": "2022-01-23T13:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 57,
+    "raw": "Jan 23 13:17:01 intranet-server CRON[28814]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0232",
+    "timestamp": "2022-01-23T13:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 58,
+    "raw": "Jan 23 13:17:01 intranet-server CRON[28814]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0233",
+    "timestamp": "2022-01-23T13:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 75,
+    "raw": "Jan 23 13:17:01 intranet-server CRON[28815]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0234",
+    "timestamp": "2022-01-23T13:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 59,
+    "raw": "Jan 23 13:39:01 intranet-server CRON[28830]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0235",
+    "timestamp": "2022-01-23T13:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 60,
+    "raw": "Jan 23 13:39:01 intranet-server CRON[28830]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0236",
+    "timestamp": "2022-01-23T13:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 76,
+    "raw": "Jan 23 13:39:01 intranet-server CRON[28831]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0237",
+    "timestamp": "2022-01-23T13:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 77,
+    "raw": "Jan 23 13:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0238",
+    "timestamp": "2022-01-23T13:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 78,
+    "raw": "Jan 23 13:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0239",
+    "timestamp": "2022-01-23T14:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 61,
+    "raw": "Jan 23 14:09:01 intranet-server CRON[28898]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0240",
+    "timestamp": "2022-01-23T14:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 62,
+    "raw": "Jan 23 14:09:01 intranet-server CRON[28898]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0241",
+    "timestamp": "2022-01-23T14:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 79,
+    "raw": "Jan 23 14:09:01 intranet-server CRON[28899]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0242",
+    "timestamp": "2022-01-23T14:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 80,
+    "raw": "Jan 23 14:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0243",
+    "timestamp": "2022-01-23T14:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 81,
+    "raw": "Jan 23 14:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0244",
+    "timestamp": "2022-01-23T14:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 63,
+    "raw": "Jan 23 14:17:01 intranet-server CRON[28969]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0245",
+    "timestamp": "2022-01-23T14:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 64,
+    "raw": "Jan 23 14:17:01 intranet-server CRON[28969]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0246",
+    "timestamp": "2022-01-23T14:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 82,
+    "raw": "Jan 23 14:17:01 intranet-server CRON[28970]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0247",
+    "timestamp": "2022-01-23T14:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 65,
+    "raw": "Jan 23 14:39:01 intranet-server CRON[28983]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0248",
+    "timestamp": "2022-01-23T14:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 66,
+    "raw": "Jan 23 14:39:01 intranet-server CRON[28983]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0249",
+    "timestamp": "2022-01-23T14:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 83,
+    "raw": "Jan 23 14:39:01 intranet-server CRON[28984]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0250",
+    "timestamp": "2022-01-23T14:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 84,
+    "raw": "Jan 23 14:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0251",
+    "timestamp": "2022-01-23T14:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 85,
+    "raw": "Jan 23 14:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0252",
+    "timestamp": "2022-01-23T15:08:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 67,
+    "raw": "Jan 23 15:08:01 intranet-server CRON[29058]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0253",
+    "timestamp": "2022-01-23T15:08:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 68,
+    "raw": "Jan 23 15:08:01 intranet-server CRON[29058]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0254",
+    "timestamp": "2022-01-23T15:08:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 86,
+    "raw": "Jan 23 15:08:01 intranet-server CRON[29059]: (root) CMD (   test -x /etc/cron.daily/popularity-contest && /etc/cron.daily/popularity-contest --crond)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0255",
+    "timestamp": "2022-01-23T15:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 69,
+    "raw": "Jan 23 15:09:01 intranet-server CRON[29061]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0256",
+    "timestamp": "2022-01-23T15:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 70,
+    "raw": "Jan 23 15:09:01 intranet-server CRON[29061]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0257",
+    "timestamp": "2022-01-23T15:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 87,
+    "raw": "Jan 23 15:09:01 intranet-server CRON[29062]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0258",
+    "timestamp": "2022-01-23T15:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 88,
+    "raw": "Jan 23 15:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0259",
+    "timestamp": "2022-01-23T15:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 89,
+    "raw": "Jan 23 15:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0260",
+    "timestamp": "2022-01-23T15:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 71,
+    "raw": "Jan 23 15:17:01 intranet-server CRON[29133]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0261",
+    "timestamp": "2022-01-23T15:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 72,
+    "raw": "Jan 23 15:17:01 intranet-server CRON[29133]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0262",
+    "timestamp": "2022-01-23T15:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 90,
+    "raw": "Jan 23 15:17:01 intranet-server CRON[29134]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0263",
+    "timestamp": "2022-01-23T15:21:17Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 91,
+    "raw": "Jan 23 15:21:17 intranet-server systemd[1]: Starting Ubuntu Advantage APT and MOTD Messages...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0264",
+    "timestamp": "2022-01-23T15:21:19Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 92,
+    "raw": "Jan 23 15:21:19 intranet-server systemd[1]: Started Ubuntu Advantage APT and MOTD Messages.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0265",
+    "timestamp": "2022-01-23T15:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 73,
+    "raw": "Jan 23 15:39:01 intranet-server CRON[29185]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0266",
+    "timestamp": "2022-01-23T15:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 74,
+    "raw": "Jan 23 15:39:01 intranet-server CRON[29185]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0267",
+    "timestamp": "2022-01-23T15:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 93,
+    "raw": "Jan 23 15:39:01 intranet-server CRON[29186]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0268",
+    "timestamp": "2022-01-23T15:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 94,
+    "raw": "Jan 23 15:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0269",
+    "timestamp": "2022-01-23T15:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 95,
+    "raw": "Jan 23 15:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0270",
+    "timestamp": "2022-01-23T16:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 75,
+    "raw": "Jan 23 16:09:01 intranet-server CRON[29276]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0271",
+    "timestamp": "2022-01-23T16:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 76,
+    "raw": "Jan 23 16:09:01 intranet-server CRON[29276]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0272",
+    "timestamp": "2022-01-23T16:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 96,
+    "raw": "Jan 23 16:09:01 intranet-server CRON[29277]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0273",
+    "timestamp": "2022-01-23T16:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 97,
+    "raw": "Jan 23 16:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0274",
+    "timestamp": "2022-01-23T16:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 98,
+    "raw": "Jan 23 16:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0275",
+    "timestamp": "2022-01-23T16:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 77,
+    "raw": "Jan 23 16:17:01 intranet-server CRON[29352]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0276",
+    "timestamp": "2022-01-23T16:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 78,
+    "raw": "Jan 23 16:17:01 intranet-server CRON[29352]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0277",
+    "timestamp": "2022-01-23T16:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 99,
+    "raw": "Jan 23 16:17:01 intranet-server CRON[29353]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0278",
+    "timestamp": "2022-01-23T16:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 79,
+    "raw": "Jan 23 16:39:01 intranet-server CRON[29363]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0279",
+    "timestamp": "2022-01-23T16:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 80,
+    "raw": "Jan 23 16:39:01 intranet-server CRON[29363]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0280",
+    "timestamp": "2022-01-23T16:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 100,
+    "raw": "Jan 23 16:39:01 intranet-server CRON[29364]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0281",
+    "timestamp": "2022-01-23T16:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 101,
+    "raw": "Jan 23 16:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0282",
+    "timestamp": "2022-01-23T16:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 102,
+    "raw": "Jan 23 16:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0283",
+    "timestamp": "2022-01-23T17:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 81,
+    "raw": "Jan 23 17:09:01 intranet-server CRON[29470]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0284",
+    "timestamp": "2022-01-23T17:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 82,
+    "raw": "Jan 23 17:09:01 intranet-server CRON[29470]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0285",
+    "timestamp": "2022-01-23T17:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 103,
+    "raw": "Jan 23 17:09:01 intranet-server CRON[29471]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0286",
+    "timestamp": "2022-01-23T17:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 104,
+    "raw": "Jan 23 17:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0287",
+    "timestamp": "2022-01-23T17:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 105,
+    "raw": "Jan 23 17:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0288",
+    "timestamp": "2022-01-23T17:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 83,
+    "raw": "Jan 23 17:17:01 intranet-server CRON[29545]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0289",
+    "timestamp": "2022-01-23T17:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 84,
+    "raw": "Jan 23 17:17:01 intranet-server CRON[29545]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0290",
+    "timestamp": "2022-01-23T17:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 106,
+    "raw": "Jan 23 17:17:01 intranet-server CRON[29546]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0291",
+    "timestamp": "2022-01-23T17:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 85,
+    "raw": "Jan 23 17:39:01 intranet-server CRON[29562]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0292",
+    "timestamp": "2022-01-23T17:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 86,
+    "raw": "Jan 23 17:39:01 intranet-server CRON[29562]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0293",
+    "timestamp": "2022-01-23T17:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 107,
+    "raw": "Jan 23 17:39:01 intranet-server CRON[29563]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0294",
+    "timestamp": "2022-01-23T17:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 108,
+    "raw": "Jan 23 17:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0295",
+    "timestamp": "2022-01-23T17:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 109,
+    "raw": "Jan 23 17:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0296",
+    "timestamp": "2022-01-23T18:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 87,
+    "raw": "Jan 23 18:09:01 intranet-server CRON[29641]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0297",
+    "timestamp": "2022-01-23T18:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 88,
+    "raw": "Jan 23 18:09:01 intranet-server CRON[29641]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0298",
+    "timestamp": "2022-01-23T18:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 110,
+    "raw": "Jan 23 18:09:01 intranet-server CRON[29642]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0299",
+    "timestamp": "2022-01-23T18:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 111,
+    "raw": "Jan 23 18:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0300",
+    "timestamp": "2022-01-23T18:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 112,
+    "raw": "Jan 23 18:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0301",
+    "timestamp": "2022-01-23T18:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 89,
+    "raw": "Jan 23 18:17:01 intranet-server CRON[29728]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0302",
+    "timestamp": "2022-01-23T18:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 90,
+    "raw": "Jan 23 18:17:01 intranet-server CRON[29728]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0303",
+    "timestamp": "2022-01-23T18:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 113,
+    "raw": "Jan 23 18:17:01 intranet-server CRON[29729]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0304",
+    "timestamp": "2022-01-23T18:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 91,
+    "raw": "Jan 23 18:39:01 intranet-server CRON[29738]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0305",
+    "timestamp": "2022-01-23T18:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 92,
+    "raw": "Jan 23 18:39:01 intranet-server CRON[29738]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0306",
+    "timestamp": "2022-01-23T18:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 114,
+    "raw": "Jan 23 18:39:01 intranet-server CRON[29739]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0307",
+    "timestamp": "2022-01-23T18:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 115,
+    "raw": "Jan 23 18:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0308",
+    "timestamp": "2022-01-23T18:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 116,
+    "raw": "Jan 23 18:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0309",
+    "timestamp": "2022-01-23T19:05:51Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 117,
+    "raw": "Jan 23 19:05:51 intranet-server systemd[1]: Starting Message of the Day...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0310",
+    "timestamp": "2022-01-23T19:05:54Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 118,
+    "raw": "Jan 23 19:05:54 intranet-server 50-motd-news[29810]:  * Super-optimized for small spaces - read how we shrank the memory",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0311",
+    "timestamp": "2022-01-23T19:05:54Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 119,
+    "raw": "Jan 23 19:05:54 intranet-server 50-motd-news[29810]:    footprint of MicroK8s to make it the smallest full K8s around.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0312",
+    "timestamp": "2022-01-23T19:05:54Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 120,
+    "raw": "Jan 23 19:05:54 intranet-server 50-motd-news[29810]:    https://ubuntu.com/blog/microk8s-memory-optimisation",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0313",
+    "timestamp": "2022-01-23T19:05:54Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 121,
+    "raw": "Jan 23 19:05:54 intranet-server systemd[1]: Started Message of the Day.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0314",
+    "timestamp": "2022-01-23T19:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 93,
+    "raw": "Jan 23 19:09:01 intranet-server CRON[29865]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0315",
+    "timestamp": "2022-01-23T19:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 94,
+    "raw": "Jan 23 19:09:01 intranet-server CRON[29865]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0316",
+    "timestamp": "2022-01-23T19:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 122,
+    "raw": "Jan 23 19:09:01 intranet-server CRON[29866]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0317",
+    "timestamp": "2022-01-23T19:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 123,
+    "raw": "Jan 23 19:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0318",
+    "timestamp": "2022-01-23T19:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 124,
+    "raw": "Jan 23 19:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0319",
+    "timestamp": "2022-01-23T19:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 95,
+    "raw": "Jan 23 19:17:01 intranet-server CRON[29938]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0320",
+    "timestamp": "2022-01-23T19:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 96,
+    "raw": "Jan 23 19:17:01 intranet-server CRON[29938]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0321",
+    "timestamp": "2022-01-23T19:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 125,
+    "raw": "Jan 23 19:17:01 intranet-server CRON[29939]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0322",
+    "timestamp": "2022-01-23T19:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 97,
+    "raw": "Jan 23 19:39:01 intranet-server CRON[29946]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0323",
+    "timestamp": "2022-01-23T19:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 98,
+    "raw": "Jan 23 19:39:01 intranet-server CRON[29946]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0324",
+    "timestamp": "2022-01-23T19:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 126,
+    "raw": "Jan 23 19:39:01 intranet-server CRON[29947]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0325",
+    "timestamp": "2022-01-23T19:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 127,
+    "raw": "Jan 23 19:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0326",
+    "timestamp": "2022-01-23T19:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 128,
+    "raw": "Jan 23 19:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0327",
+    "timestamp": "2022-01-23T20:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 99,
+    "raw": "Jan 23 20:09:01 intranet-server CRON[30024]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0328",
+    "timestamp": "2022-01-23T20:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 100,
+    "raw": "Jan 23 20:09:01 intranet-server CRON[30024]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0329",
+    "timestamp": "2022-01-23T20:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 129,
+    "raw": "Jan 23 20:09:01 intranet-server CRON[30025]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0330",
+    "timestamp": "2022-01-23T20:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 130,
+    "raw": "Jan 23 20:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0331",
+    "timestamp": "2022-01-23T20:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 131,
+    "raw": "Jan 23 20:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0332",
+    "timestamp": "2022-01-23T20:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 101,
+    "raw": "Jan 23 20:17:01 intranet-server CRON[30095]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0333",
+    "timestamp": "2022-01-23T20:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 102,
+    "raw": "Jan 23 20:17:01 intranet-server CRON[30095]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0334",
+    "timestamp": "2022-01-23T20:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 132,
+    "raw": "Jan 23 20:17:01 intranet-server CRON[30096]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0335",
+    "timestamp": "2022-01-23T20:35:53Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 133,
+    "raw": "Jan 23 20:35:53 intranet-server systemd-timesyncd[587]: Network configuration changed, trying to establish connection.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0336",
+    "timestamp": "2022-01-23T20:35:53Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 134,
+    "raw": "Jan 23 20:35:53 intranet-server systemd-networkd[1364]: ens3: Configured",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0337",
+    "timestamp": "2022-01-23T20:35:53Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 135,
+    "raw": "Jan 23 20:35:53 intranet-server systemd-timesyncd[587]: Synchronized to time server 91.189.94.4:123 (ntp.ubuntu.com).",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0338",
+    "timestamp": "2022-01-23T20:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 103,
+    "raw": "Jan 23 20:39:01 intranet-server CRON[30105]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0339",
+    "timestamp": "2022-01-23T20:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 104,
+    "raw": "Jan 23 20:39:01 intranet-server CRON[30105]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0340",
+    "timestamp": "2022-01-23T20:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 136,
+    "raw": "Jan 23 20:39:01 intranet-server CRON[30106]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0341",
+    "timestamp": "2022-01-23T20:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 137,
+    "raw": "Jan 23 20:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0342",
+    "timestamp": "2022-01-23T20:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 138,
+    "raw": "Jan 23 20:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0343",
+    "timestamp": "2022-01-23T21:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 105,
+    "raw": "Jan 23 21:09:01 intranet-server CRON[30178]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0344",
+    "timestamp": "2022-01-23T21:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 106,
+    "raw": "Jan 23 21:09:01 intranet-server CRON[30178]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0345",
+    "timestamp": "2022-01-23T21:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 139,
+    "raw": "Jan 23 21:09:01 intranet-server CRON[30179]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0346",
+    "timestamp": "2022-01-23T21:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 140,
+    "raw": "Jan 23 21:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0347",
+    "timestamp": "2022-01-23T21:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 141,
+    "raw": "Jan 23 21:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0348",
+    "timestamp": "2022-01-23T21:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 107,
+    "raw": "Jan 23 21:17:01 intranet-server CRON[30248]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0349",
+    "timestamp": "2022-01-23T21:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 108,
+    "raw": "Jan 23 21:17:01 intranet-server CRON[30248]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0350",
+    "timestamp": "2022-01-23T21:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 142,
+    "raw": "Jan 23 21:17:01 intranet-server CRON[30249]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0351",
+    "timestamp": "2022-01-23T21:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 109,
+    "raw": "Jan 23 21:39:01 intranet-server CRON[30253]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0352",
+    "timestamp": "2022-01-23T21:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 110,
+    "raw": "Jan 23 21:39:01 intranet-server CRON[30253]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0353",
+    "timestamp": "2022-01-23T21:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 143,
+    "raw": "Jan 23 21:39:01 intranet-server CRON[30254]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0354",
+    "timestamp": "2022-01-23T21:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 144,
+    "raw": "Jan 23 21:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0355",
+    "timestamp": "2022-01-23T21:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 145,
+    "raw": "Jan 23 21:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0356",
+    "timestamp": "2022-01-23T22:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 111,
+    "raw": "Jan 23 22:09:01 intranet-server CRON[30324]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0357",
+    "timestamp": "2022-01-23T22:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 112,
+    "raw": "Jan 23 22:09:01 intranet-server CRON[30324]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0358",
+    "timestamp": "2022-01-23T22:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 146,
+    "raw": "Jan 23 22:09:01 intranet-server CRON[30325]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0359",
+    "timestamp": "2022-01-23T22:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 147,
+    "raw": "Jan 23 22:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0360",
+    "timestamp": "2022-01-23T22:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 148,
+    "raw": "Jan 23 22:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0361",
+    "timestamp": "2022-01-23T22:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 113,
+    "raw": "Jan 23 22:17:01 intranet-server CRON[30402]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0362",
+    "timestamp": "2022-01-23T22:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 114,
+    "raw": "Jan 23 22:17:01 intranet-server CRON[30402]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0363",
+    "timestamp": "2022-01-23T22:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 149,
+    "raw": "Jan 23 22:17:01 intranet-server CRON[30403]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0364",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 115,
+    "raw": "Jan 23 22:23:43 intranet-server sshd[18815]: pam_unix(sshd:session): session closed for user kwhite",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0365",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 116,
+    "raw": "Jan 23 22:23:43 intranet-server systemd-logind[951]: Removed session 267.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0366",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 150,
+    "raw": "Jan 23 22:23:43 intranet-server systemd[1]: Stopping User Manager for UID 1004...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0367",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 151,
+    "raw": "Jan 23 22:23:43 intranet-server systemd[18817]: Stopped target Default.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0368",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 152,
+    "raw": "Jan 23 22:23:43 intranet-server systemd[18817]: Stopped target Basic System.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0369",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 153,
+    "raw": "Jan 23 22:23:43 intranet-server systemd[18817]: Stopped target Sockets.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0370",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 154,
+    "raw": "Jan 23 22:23:43 intranet-server systemd[18817]: Closed GnuPG network certificate management daemon.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0371",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 155,
+    "raw": "Jan 23 22:23:43 intranet-server systemd[18817]: Closed GnuPG cryptographic agent and passphrase cache (access for web browsers).",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0372",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 156,
+    "raw": "Jan 23 22:23:43 intranet-server systemd[18817]: Closed GnuPG cryptographic agent (ssh-agent emulation).",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0373",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 157,
+    "raw": "Jan 23 22:23:43 intranet-server systemd[18817]: Closed GnuPG cryptographic agent and passphrase cache.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0374",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 158,
+    "raw": "Jan 23 22:23:43 intranet-server systemd[18817]: Closed REST API socket for snapd user session agent.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0375",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 159,
+    "raw": "Jan 23 22:23:43 intranet-server systemd[18817]: Stopped target Paths.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0376",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 160,
+    "raw": "Jan 23 22:23:43 intranet-server systemd[18817]: Stopped target Timers.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0377",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 161,
+    "raw": "Jan 23 22:23:43 intranet-server systemd[18817]: Closed GnuPG cryptographic agent and passphrase cache (restricted).",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0378",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 162,
+    "raw": "Jan 23 22:23:43 intranet-server systemd[18817]: Reached target Shutdown.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0379",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 163,
+    "raw": "Jan 23 22:23:43 intranet-server systemd[18817]: Starting Exit the Session...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0380",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 164,
+    "raw": "Jan 23 22:23:43 intranet-server systemd[18817]: Received SIGRTMIN+24 from PID 30409 (kill).",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0381",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 165,
+    "raw": "Jan 23 22:23:43 intranet-server systemd[1]: Stopped User Manager for UID 1004.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0382",
+    "timestamp": "2022-01-23T22:23:43Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 166,
+    "raw": "Jan 23 22:23:43 intranet-server systemd[1]: Removed slice User Slice of kwhite.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0383",
+    "timestamp": "2022-01-23T22:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 117,
+    "raw": "Jan 23 22:39:01 intranet-server CRON[30412]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0384",
+    "timestamp": "2022-01-23T22:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 118,
+    "raw": "Jan 23 22:39:01 intranet-server CRON[30412]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0385",
+    "timestamp": "2022-01-23T22:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 167,
+    "raw": "Jan 23 22:39:01 intranet-server CRON[30413]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0386",
+    "timestamp": "2022-01-23T22:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 168,
+    "raw": "Jan 23 22:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0387",
+    "timestamp": "2022-01-23T22:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 169,
+    "raw": "Jan 23 22:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0388",
+    "timestamp": "2022-01-23T23:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 119,
+    "raw": "Jan 23 23:09:01 intranet-server CRON[30484]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0389",
+    "timestamp": "2022-01-23T23:09:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 120,
+    "raw": "Jan 23 23:09:01 intranet-server CRON[30484]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0390",
+    "timestamp": "2022-01-23T23:09:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 170,
+    "raw": "Jan 23 23:09:01 intranet-server CRON[30485]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0391",
+    "timestamp": "2022-01-23T23:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 171,
+    "raw": "Jan 23 23:09:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0392",
+    "timestamp": "2022-01-23T23:09:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 172,
+    "raw": "Jan 23 23:09:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0393",
+    "timestamp": "2022-01-23T23:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 121,
+    "raw": "Jan 23 23:17:01 intranet-server CRON[30553]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0394",
+    "timestamp": "2022-01-23T23:17:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 122,
+    "raw": "Jan 23 23:17:01 intranet-server CRON[30553]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0395",
+    "timestamp": "2022-01-23T23:17:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 173,
+    "raw": "Jan 23 23:17:01 intranet-server CRON[30554]: (root) CMD (   cd / && run-parts --report /etc/cron.hourly)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0396",
+    "timestamp": "2022-01-23T23:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 123,
+    "raw": "Jan 23 23:39:01 intranet-server CRON[30560]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0397",
+    "timestamp": "2022-01-23T23:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 124,
+    "raw": "Jan 23 23:39:01 intranet-server CRON[30560]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0398",
+    "timestamp": "2022-01-23T23:39:01Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 174,
+    "raw": "Jan 23 23:39:01 intranet-server CRON[30561]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0399",
+    "timestamp": "2022-01-23T23:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 175,
+    "raw": "Jan 23 23:39:04 intranet-server systemd[1]: Starting Clean php session files...",
+    "facts_only": true
+  },
+  {
+    "event_id": "LONG-0400",
+    "timestamp": "2022-01-23T23:39:04Z",
+    "source_file": "gather/intranet_server/logs/syslog.1",
+    "source_line": 176,
+    "raw": "Jan 23 23:39:04 intranet-server systemd[1]: Started Clean php session files.",
+    "facts_only": true
+  }
+]

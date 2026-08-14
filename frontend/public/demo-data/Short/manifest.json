@@ -1,0 +1,14 @@
+{
+  "dataset_id": "Short",
+  "kind": "demo_replay",
+  "source_archive": "harrison.zip",
+  "source_member": "gather/intranet_server/logs/auth.log",
+  "source_slice": "2022-02-08T08:30:00+00:00/2022-02-08T08:45:00+00:00",
+  "window_seconds": 900,
+  "event_count": 17,
+  "event_log_sha256": "47bb6a99b7577cad3a1f02680790b79b89fd6baa7391e2fe65db0fc87da2ac67",
+  "contains_labels": false,
+  "contains_facts_json": false,
+  "preserves_full_slice": true,
+  "generated_at": "2026-08-14T00:00:00Z"
+}

@@ -1,0 +1,21 @@
+{
+  "dataset_id": "Long",
+  "kind": "demo_replay",
+  "source_archive": "wardbeck.zip",
+  "source_members": [
+    "gather/intranet_server/logs/auth.log",
+    "gather/intranet_server/logs/auth.log.1",
+    "gather/intranet_server/logs/syslog.1",
+    "gather/intranet_server/logs/syslog.2",
+    "gather/intranet_server/logs/syslog.3",
+    "gather/intranet_server/logs/syslog.4",
+    "gather/intranet_server/logs/syslog.5"
+  ],
+  "source_slice": "2022-01-23T00:00:00+00:00/2022-01-23T23:59:59+00:00",
+  "event_count": 400,
+  "event_log_sha256": "86149b7f7e0d1bd2090fb615e119f526614de5695b7aca7496dc274d83b16021",
+  "contains_labels": false,
+  "contains_facts_json": false,
+  "preserves_full_day_slice": true,
+  "generated_at": "2026-08-14T00:00:00Z"
+}

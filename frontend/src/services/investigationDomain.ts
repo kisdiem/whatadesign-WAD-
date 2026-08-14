@@ -82,7 +82,7 @@ export type EntityProfile = {
   rareRelations: number
   usualLogin: string
   currentActivity: string
-  hostHistory: Array<{ host: string; count: number; isNew: boolean }>
+  hostHistory: Array<{ host: string; count: number; loginCount: number; loginShare: number; isNew: boolean }>
   baseline: Array<{ feature: string; current: string; baseline: string; deviation: number }>
   findingIds: string[]
 }
@@ -176,7 +176,9 @@ export function buildFindings(
     const sharedCount = peers.length
     const eventScore = clamp(window.score * 0.68 + (window.events.length >= 2 ? 0.16 : 0.08), 0.38, 0.96)
     const localScore = clamp(window.score * 0.54 + window.sourceTypes.length * 0.08 + (window.eventCount > 30 ? 0.08 : 0.02), 0.34, 0.95)
-    const longScore = clamp(window.score * 0.42 + sharedCount * 0.14 + (window.events.some((event) => Boolean(event.actor)) ? 0.12 : 0.04), 0.21, 0.97)
+    // 对共享证据设置上限，避免同一实体的重复事件把长程进度条直接顶满。
+    const normalizedOverlap = Math.min(sharedCount / 8, 1)
+    const longScore = clamp(window.score * 0.42 + normalizedOverlap * 0.2 + (window.events.some((event) => Boolean(event.actor)) ? 0.12 : 0.04), 0.05, 0.9)
     const risk = Math.round((eventScore * 0.32 + localScore * 0.28 + longScore * 0.4) * 100)
     const anchor = anchorEvent(window)
     const primary = primaryEntity(window)
@@ -268,11 +270,22 @@ export function buildEntityProfiles(findings: FindingRecord[]) {
       const ordered = [...linked].sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start))
       const hosts = linked.flatMap((finding) => finding.events.map((event) => event.host).filter(Boolean) as string[])
       const uniqueHosts = Array.from(new Set(hosts))
-      const hostHistory = uniqueHosts.map((host, index) => ({
-        host,
-        count: linked.filter((finding) => finding.host === host).reduce((sum, finding) => sum + finding.events.length, 0) * 8 + 4,
-        isNew: index >= 1,
-      })).sort((a, b) => b.count - a.count)
+      const hostStats = uniqueHosts.map((host, index) => {
+        const hostEvents = linked.flatMap((finding) => finding.events).filter((event) => event.host === host)
+        const loginCount = hostEvents.filter((event) => /LOGIN|LOGON|AUTH|SSH|RDP|REMOTE|PASSWORD|ACCEPTED|FAILED|SESSION|登录|认证|密码|会话|远程/i.test(event.action)).length
+        return {
+          host,
+          count: hostEvents.length,
+          loginCount,
+          loginShare: 0,
+          isNew: index >= 1,
+        }
+      })
+      const totalLoginCount = hostStats.reduce((sum, item) => sum + item.loginCount, 0)
+      const hostHistory = hostStats.map((item) => ({
+        ...item,
+        loginShare: totalLoginCount > 0 ? Math.round((item.loginCount / totalLoginCount) * 100) : 0,
+      })).sort((a, b) => b.loginCount - a.loginCount || b.count - a.count)
       const latest = ordered[ordered.length - 1]
       const dominantHost = hostHistory[0]?.host || '—'
       const currentHost = latest?.host || '—'
@@ -287,7 +300,16 @@ export function buildEntityProfiles(findings: FindingRecord[]) {
         normalLoginHosts: Math.max(hostHistory.length - 1, 1),
         currentLoginHosts: hostHistory.length || 1,
         newHostRelations: Math.max(hostHistory.filter((item) => item.isNew).length, 0),
-        rareRelations: linked.filter((finding) => finding.longScore >= 75).length,
+        // 只有至少两项独立证据同时成立才计为异常关系，避免普通的共享实体
+        // 被全部标红。数量同时设上限，保证列表中的“异常关系”可读且可核查。
+        rareRelations: Math.min(4, linked.filter((finding) => {
+          const signals = [
+            finding.association.entityRarity >= 0.84,
+            finding.association.graphSimilarity >= 0.72,
+            finding.longScore >= 65,
+          ].filter(Boolean).length
+          return signals >= 2
+        }).length),
         usualLogin: entity.toLowerCase().includes('svc') ? '08:00-18:00' : '09:00-19:00',
         currentActivity: latest?.start || '—',
         hostHistory,

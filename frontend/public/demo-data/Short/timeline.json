@@ -1,0 +1,1250 @@
+[
+  {
+    "event_id": "SHORT-0001",
+    "timestamp": "2022-02-08T08:36:38Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 313,
+    "raw": "Feb  8 08:36:38 intranet-server su[28321]: Successful su for jward by www-data",
+    "facts_only": true,
+    "system_projection": {
+      "event_id": "SHORT-0001",
+      "timestamp": "2022-02-08T08:36:38Z",
+      "threat_level": "high",
+      "alert_level": "high",
+      "final_score": 0.82,
+      "raw_event_score": 0.82,
+      "micro_window_score": 0.85,
+      "macro_window_score": 0.87,
+      "long_horizon_score": 0.86,
+      "reasons": [
+        "www-data ?????????"
+      ],
+      "module_projection": {
+        "M1": "semantic_embedding_available",
+        "M2": "entity_roles_resolved_from_event_facts",
+        "M3": "causal_history_context_available",
+        "M4": "current_event_multiscale_context_scored",
+        "M5": "long_horizon_link_candidate",
+        "M6": "fused_demo_alert_level"
+      },
+      "provenance": {
+        "kind": "analyst_curated_demo_projection",
+        "model_execution": false,
+        "synthetic_scores": true,
+        "formal_evaluation": false
+      }
+    },
+    "related_entities": [
+      {
+        "event_id": "SHORT-0001",
+        "entity_type": "host",
+        "canonical_value": "intranet-server",
+        "role": "host",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0001",
+        "entity_type": "user",
+        "canonical_value": "www-data",
+        "role": "actor",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0001",
+        "entity_type": "user",
+        "canonical_value": "jward",
+        "role": "target_user",
+        "confidence": 0.98
+      }
+    ],
+    "outgoing_relations": [
+      {
+        "source_event_id": "SHORT-0001",
+        "target_event_id": "SHORT-0002",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.8,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ],
+    "incoming_relations": []
+  },
+  {
+    "event_id": "SHORT-0002",
+    "timestamp": "2022-02-08T08:36:38Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 314,
+    "raw": "Feb  8 08:36:38 intranet-server su[28321]: + /dev/pts/0 www-data:jward",
+    "facts_only": true,
+    "system_projection": {
+      "event_id": "SHORT-0002",
+      "timestamp": "2022-02-08T08:36:38Z",
+      "threat_level": "medium",
+      "alert_level": "medium",
+      "final_score": 0.58,
+      "raw_event_score": 0.58,
+      "micro_window_score": 0.61,
+      "macro_window_score": 0.58,
+      "long_horizon_score": 0.58,
+      "reasons": [
+        "?????????????"
+      ],
+      "module_projection": {
+        "M1": "semantic_embedding_available",
+        "M2": "entity_roles_resolved_from_event_facts",
+        "M3": "causal_history_context_available",
+        "M4": "current_event_multiscale_context_scored",
+        "M5": "no_strong_long_horizon_link",
+        "M6": "fused_demo_alert_level"
+      },
+      "provenance": {
+        "kind": "analyst_curated_demo_projection",
+        "model_execution": false,
+        "synthetic_scores": true,
+        "formal_evaluation": false
+      }
+    },
+    "related_entities": [
+      {
+        "event_id": "SHORT-0002",
+        "entity_type": "host",
+        "canonical_value": "intranet-server",
+        "role": "host",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0002",
+        "entity_type": "user",
+        "canonical_value": "www-data",
+        "role": "actor",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0002",
+        "entity_type": "user",
+        "canonical_value": "jward",
+        "role": "target_user",
+        "confidence": 0.98
+      }
+    ],
+    "outgoing_relations": [
+      {
+        "source_event_id": "SHORT-0002",
+        "target_event_id": "SHORT-0003",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.68,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ],
+    "incoming_relations": [
+      {
+        "source_event_id": "SHORT-0001",
+        "target_event_id": "SHORT-0002",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.8,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ]
+  },
+  {
+    "event_id": "SHORT-0003",
+    "timestamp": "2022-02-08T08:36:38Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 315,
+    "raw": "Feb  8 08:36:38 intranet-server su[28321]: pam_unix(su:session): session opened for user jward by (uid=33)",
+    "facts_only": true,
+    "system_projection": {
+      "event_id": "SHORT-0003",
+      "timestamp": "2022-02-08T08:36:38Z",
+      "threat_level": "medium",
+      "alert_level": "medium",
+      "final_score": 0.58,
+      "raw_event_score": 0.58,
+      "micro_window_score": 0.61,
+      "macro_window_score": 0.58,
+      "long_horizon_score": 0.58,
+      "reasons": [
+        "?????????????"
+      ],
+      "module_projection": {
+        "M1": "semantic_embedding_available",
+        "M2": "entity_roles_resolved_from_event_facts",
+        "M3": "causal_history_context_available",
+        "M4": "current_event_multiscale_context_scored",
+        "M5": "no_strong_long_horizon_link",
+        "M6": "fused_demo_alert_level"
+      },
+      "provenance": {
+        "kind": "analyst_curated_demo_projection",
+        "model_execution": false,
+        "synthetic_scores": true,
+        "formal_evaluation": false
+      }
+    },
+    "related_entities": [
+      {
+        "event_id": "SHORT-0003",
+        "entity_type": "host",
+        "canonical_value": "intranet-server",
+        "role": "host",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0003",
+        "entity_type": "user",
+        "canonical_value": "jward",
+        "role": "target_user",
+        "confidence": 0.98
+      }
+    ],
+    "outgoing_relations": [
+      {
+        "source_event_id": "SHORT-0003",
+        "target_event_id": "SHORT-0005",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.68,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ],
+    "incoming_relations": [
+      {
+        "source_event_id": "SHORT-0002",
+        "target_event_id": "SHORT-0003",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.68,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ]
+  },
+  {
+    "event_id": "SHORT-0004",
+    "timestamp": "2022-02-08T08:36:38Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 316,
+    "raw": "Feb  8 08:36:38 intranet-server systemd-logind[935]: New session c1 of user jward.",
+    "facts_only": true,
+    "system_projection": {
+      "event_id": "SHORT-0004",
+      "timestamp": "2022-02-08T08:36:38Z",
+      "threat_level": "info",
+      "alert_level": "info",
+      "final_score": 0.03,
+      "raw_event_score": 0.03,
+      "micro_window_score": 0.03,
+      "macro_window_score": 0.03,
+      "long_horizon_score": 0.03,
+      "reasons": [
+        "?????????"
+      ],
+      "module_projection": {
+        "M1": "semantic_embedding_available",
+        "M2": "entity_roles_resolved_from_event_facts",
+        "M3": "causal_history_context_available",
+        "M4": "current_event_multiscale_context_scored",
+        "M5": "no_strong_long_horizon_link",
+        "M6": "fused_demo_alert_level"
+      },
+      "provenance": {
+        "kind": "analyst_curated_demo_projection",
+        "model_execution": false,
+        "synthetic_scores": true,
+        "formal_evaluation": false
+      }
+    },
+    "related_entities": [
+      {
+        "event_id": "SHORT-0004",
+        "entity_type": "host",
+        "canonical_value": "intranet-server",
+        "role": "host",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0004",
+        "entity_type": "user",
+        "canonical_value": "jward",
+        "role": "target_user",
+        "confidence": 0.98
+      }
+    ],
+    "outgoing_relations": [],
+    "incoming_relations": []
+  },
+  {
+    "event_id": "SHORT-0005",
+    "timestamp": "2022-02-08T08:36:38Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 317,
+    "raw": "Feb  8 08:36:38 intranet-server systemd: pam_unix(systemd-user:session): session opened for user jward by (uid=0)",
+    "facts_only": true,
+    "system_projection": {
+      "event_id": "SHORT-0005",
+      "timestamp": "2022-02-08T08:36:38Z",
+      "threat_level": "medium",
+      "alert_level": "medium",
+      "final_score": 0.58,
+      "raw_event_score": 0.58,
+      "micro_window_score": 0.61,
+      "macro_window_score": 0.58,
+      "long_horizon_score": 0.58,
+      "reasons": [
+        "?????????????"
+      ],
+      "module_projection": {
+        "M1": "semantic_embedding_available",
+        "M2": "entity_roles_resolved_from_event_facts",
+        "M3": "causal_history_context_available",
+        "M4": "current_event_multiscale_context_scored",
+        "M5": "no_strong_long_horizon_link",
+        "M6": "fused_demo_alert_level"
+      },
+      "provenance": {
+        "kind": "analyst_curated_demo_projection",
+        "model_execution": false,
+        "synthetic_scores": true,
+        "formal_evaluation": false
+      }
+    },
+    "related_entities": [
+      {
+        "event_id": "SHORT-0005",
+        "entity_type": "host",
+        "canonical_value": "intranet-server",
+        "role": "host",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0005",
+        "entity_type": "user",
+        "canonical_value": "jward",
+        "role": "target_user",
+        "confidence": 0.98
+      }
+    ],
+    "outgoing_relations": [
+      {
+        "source_event_id": "SHORT-0005",
+        "target_event_id": "SHORT-0006",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.735,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ],
+    "incoming_relations": [
+      {
+        "source_event_id": "SHORT-0003",
+        "target_event_id": "SHORT-0005",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.68,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ]
+  },
+  {
+    "event_id": "SHORT-0006",
+    "timestamp": "2022-02-08T08:36:54Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 318,
+    "raw": "Feb  8 08:36:54 intranet-server sudo:    jward : TTY=pts/0 ; PWD=/var/www/intranet.mannsmith.harrison.com/wp-content/uploads/2022/02 ; USER=root ; COMMAND=list",
+    "facts_only": true,
+    "system_projection": {
+      "event_id": "SHORT-0006",
+      "timestamp": "2022-02-08T08:36:54Z",
+      "threat_level": "medium",
+      "alert_level": "medium",
+      "final_score": 0.69,
+      "raw_event_score": 0.69,
+      "micro_window_score": 0.72,
+      "macro_window_score": 0.74,
+      "long_horizon_score": 0.69,
+      "reasons": [
+        "sudo ????"
+      ],
+      "module_projection": {
+        "M1": "semantic_embedding_available",
+        "M2": "entity_roles_resolved_from_event_facts",
+        "M3": "causal_history_context_available",
+        "M4": "current_event_multiscale_context_scored",
+        "M5": "no_strong_long_horizon_link",
+        "M6": "fused_demo_alert_level"
+      },
+      "provenance": {
+        "kind": "analyst_curated_demo_projection",
+        "model_execution": false,
+        "synthetic_scores": true,
+        "formal_evaluation": false
+      }
+    },
+    "related_entities": [
+      {
+        "event_id": "SHORT-0006",
+        "entity_type": "host",
+        "canonical_value": "intranet-server",
+        "role": "host",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0006",
+        "entity_type": "user",
+        "canonical_value": "root",
+        "role": "target_user",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0006",
+        "entity_type": "user",
+        "canonical_value": "jward",
+        "role": "target_user",
+        "confidence": 0.98
+      }
+    ],
+    "outgoing_relations": [
+      {
+        "source_event_id": "SHORT-0006",
+        "target_event_id": "SHORT-0007",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.935,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ],
+    "incoming_relations": [
+      {
+        "source_event_id": "SHORT-0005",
+        "target_event_id": "SHORT-0006",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.735,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ]
+  },
+  {
+    "event_id": "SHORT-0007",
+    "timestamp": "2022-02-08T08:36:57Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 319,
+    "raw": "Feb  8 08:36:57 intranet-server sudo:    jward : TTY=pts/0 ; PWD=/var/www/intranet.mannsmith.harrison.com/wp-content/uploads/2022/02 ; USER=root ; COMMAND=/bin/cat /etc/shadow",
+    "facts_only": true,
+    "system_projection": {
+      "event_id": "SHORT-0007",
+      "timestamp": "2022-02-08T08:36:57Z",
+      "threat_level": "critical",
+      "alert_level": "critical",
+      "final_score": 0.98,
+      "raw_event_score": 0.98,
+      "micro_window_score": 1.0,
+      "macro_window_score": 1.0,
+      "long_horizon_score": 1.0,
+      "reasons": [
+        "????????",
+        "root ???????"
+      ],
+      "module_projection": {
+        "M1": "semantic_embedding_available",
+        "M2": "entity_roles_resolved_from_event_facts",
+        "M3": "causal_history_context_available",
+        "M4": "current_event_multiscale_context_scored",
+        "M5": "long_horizon_link_candidate",
+        "M6": "fused_demo_alert_level"
+      },
+      "provenance": {
+        "kind": "analyst_curated_demo_projection",
+        "model_execution": false,
+        "synthetic_scores": true,
+        "formal_evaluation": false
+      }
+    },
+    "related_entities": [
+      {
+        "event_id": "SHORT-0007",
+        "entity_type": "host",
+        "canonical_value": "intranet-server",
+        "role": "host",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0007",
+        "entity_type": "user",
+        "canonical_value": "root",
+        "role": "target_user",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0007",
+        "entity_type": "user",
+        "canonical_value": "jward",
+        "role": "target_user",
+        "confidence": 0.98
+      }
+    ],
+    "outgoing_relations": [
+      {
+        "source_event_id": "SHORT-0007",
+        "target_event_id": "SHORT-0008",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.95,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ],
+    "incoming_relations": [
+      {
+        "source_event_id": "SHORT-0006",
+        "target_event_id": "SHORT-0007",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.935,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ]
+  },
+  {
+    "event_id": "SHORT-0008",
+    "timestamp": "2022-02-08T08:36:57Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 320,
+    "raw": "Feb  8 08:36:57 intranet-server sudo: pam_unix(sudo:session): session opened for user root by (uid=0)",
+    "facts_only": true,
+    "system_projection": {
+      "event_id": "SHORT-0008",
+      "timestamp": "2022-02-08T08:36:57Z",
+      "threat_level": "high",
+      "alert_level": "high",
+      "final_score": 0.78,
+      "raw_event_score": 0.78,
+      "micro_window_score": 0.81,
+      "macro_window_score": 0.83,
+      "long_horizon_score": 0.82,
+      "reasons": [
+        "??????"
+      ],
+      "module_projection": {
+        "M1": "semantic_embedding_available",
+        "M2": "entity_roles_resolved_from_event_facts",
+        "M3": "causal_history_context_available",
+        "M4": "current_event_multiscale_context_scored",
+        "M5": "long_horizon_link_candidate",
+        "M6": "fused_demo_alert_level"
+      },
+      "provenance": {
+        "kind": "analyst_curated_demo_projection",
+        "model_execution": false,
+        "synthetic_scores": true,
+        "formal_evaluation": false
+      }
+    },
+    "related_entities": [
+      {
+        "event_id": "SHORT-0008",
+        "entity_type": "host",
+        "canonical_value": "intranet-server",
+        "role": "host",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0008",
+        "entity_type": "user",
+        "canonical_value": "root",
+        "role": "target_user",
+        "confidence": 0.98
+      }
+    ],
+    "outgoing_relations": [
+      {
+        "source_event_id": "SHORT-0008",
+        "target_event_id": "SHORT-0009",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.88,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ],
+    "incoming_relations": [
+      {
+        "source_event_id": "SHORT-0007",
+        "target_event_id": "SHORT-0008",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.95,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ]
+  },
+  {
+    "event_id": "SHORT-0009",
+    "timestamp": "2022-02-08T08:36:57Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 321,
+    "raw": "Feb  8 08:36:57 intranet-server sudo: pam_unix(sudo:session): session closed for user root",
+    "facts_only": true,
+    "system_projection": {
+      "event_id": "SHORT-0009",
+      "timestamp": "2022-02-08T08:36:57Z",
+      "threat_level": "high",
+      "alert_level": "high",
+      "final_score": 0.78,
+      "raw_event_score": 0.78,
+      "micro_window_score": 0.81,
+      "macro_window_score": 0.83,
+      "long_horizon_score": 0.82,
+      "reasons": [
+        "??????"
+      ],
+      "module_projection": {
+        "M1": "semantic_embedding_available",
+        "M2": "entity_roles_resolved_from_event_facts",
+        "M3": "causal_history_context_available",
+        "M4": "current_event_multiscale_context_scored",
+        "M5": "long_horizon_link_candidate",
+        "M6": "fused_demo_alert_level"
+      },
+      "provenance": {
+        "kind": "analyst_curated_demo_projection",
+        "model_execution": false,
+        "synthetic_scores": true,
+        "formal_evaluation": false
+      }
+    },
+    "related_entities": [
+      {
+        "event_id": "SHORT-0009",
+        "entity_type": "host",
+        "canonical_value": "intranet-server",
+        "role": "host",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0009",
+        "entity_type": "user",
+        "canonical_value": "root",
+        "role": "target_user",
+        "confidence": 0.98
+      }
+    ],
+    "outgoing_relations": [
+      {
+        "source_event_id": "SHORT-0009",
+        "target_event_id": "SHORT-0010",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.945,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ],
+    "incoming_relations": [
+      {
+        "source_event_id": "SHORT-0008",
+        "target_event_id": "SHORT-0009",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.88,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ]
+  },
+  {
+    "event_id": "SHORT-0010",
+    "timestamp": "2022-02-08T08:36:59Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 322,
+    "raw": "Feb  8 08:36:59 intranet-server sudo:    jward : TTY=pts/0 ; PWD=/var/www/intranet.mannsmith.harrison.com/wp-content/uploads/2022/02 ; USER=root ; COMMAND=/bin/ls -laR /root/",
+    "facts_only": true,
+    "system_projection": {
+      "event_id": "SHORT-0010",
+      "timestamp": "2022-02-08T08:36:59Z",
+      "threat_level": "high",
+      "alert_level": "high",
+      "final_score": 0.91,
+      "raw_event_score": 0.91,
+      "micro_window_score": 0.94,
+      "macro_window_score": 0.96,
+      "long_horizon_score": 0.95,
+      "reasons": [
+        "root ????",
+        "root ???????"
+      ],
+      "module_projection": {
+        "M1": "semantic_embedding_available",
+        "M2": "entity_roles_resolved_from_event_facts",
+        "M3": "causal_history_context_available",
+        "M4": "current_event_multiscale_context_scored",
+        "M5": "long_horizon_link_candidate",
+        "M6": "fused_demo_alert_level"
+      },
+      "provenance": {
+        "kind": "analyst_curated_demo_projection",
+        "model_execution": false,
+        "synthetic_scores": true,
+        "formal_evaluation": false
+      }
+    },
+    "related_entities": [
+      {
+        "event_id": "SHORT-0010",
+        "entity_type": "host",
+        "canonical_value": "intranet-server",
+        "role": "host",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0010",
+        "entity_type": "user",
+        "canonical_value": "root",
+        "role": "target_user",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0010",
+        "entity_type": "user",
+        "canonical_value": "jward",
+        "role": "target_user",
+        "confidence": 0.98
+      }
+    ],
+    "outgoing_relations": [
+      {
+        "source_event_id": "SHORT-0010",
+        "target_event_id": "SHORT-0011",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.945,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ],
+    "incoming_relations": [
+      {
+        "source_event_id": "SHORT-0009",
+        "target_event_id": "SHORT-0010",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.945,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ]
+  },
+  {
+    "event_id": "SHORT-0011",
+    "timestamp": "2022-02-08T08:36:59Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 323,
+    "raw": "Feb  8 08:36:59 intranet-server sudo: pam_unix(sudo:session): session opened for user root by (uid=0)",
+    "facts_only": true,
+    "system_projection": {
+      "event_id": "SHORT-0011",
+      "timestamp": "2022-02-08T08:36:59Z",
+      "threat_level": "high",
+      "alert_level": "high",
+      "final_score": 0.78,
+      "raw_event_score": 0.78,
+      "micro_window_score": 0.81,
+      "macro_window_score": 0.83,
+      "long_horizon_score": 0.82,
+      "reasons": [
+        "??????"
+      ],
+      "module_projection": {
+        "M1": "semantic_embedding_available",
+        "M2": "entity_roles_resolved_from_event_facts",
+        "M3": "causal_history_context_available",
+        "M4": "current_event_multiscale_context_scored",
+        "M5": "long_horizon_link_candidate",
+        "M6": "fused_demo_alert_level"
+      },
+      "provenance": {
+        "kind": "analyst_curated_demo_projection",
+        "model_execution": false,
+        "synthetic_scores": true,
+        "formal_evaluation": false
+      }
+    },
+    "related_entities": [
+      {
+        "event_id": "SHORT-0011",
+        "entity_type": "host",
+        "canonical_value": "intranet-server",
+        "role": "host",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0011",
+        "entity_type": "user",
+        "canonical_value": "root",
+        "role": "target_user",
+        "confidence": 0.98
+      }
+    ],
+    "outgoing_relations": [
+      {
+        "source_event_id": "SHORT-0011",
+        "target_event_id": "SHORT-0012",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.88,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ],
+    "incoming_relations": [
+      {
+        "source_event_id": "SHORT-0010",
+        "target_event_id": "SHORT-0011",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.945,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ]
+  },
+  {
+    "event_id": "SHORT-0012",
+    "timestamp": "2022-02-08T08:36:59Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 324,
+    "raw": "Feb  8 08:36:59 intranet-server sudo: pam_unix(sudo:session): session closed for user root",
+    "facts_only": true,
+    "system_projection": {
+      "event_id": "SHORT-0012",
+      "timestamp": "2022-02-08T08:36:59Z",
+      "threat_level": "high",
+      "alert_level": "high",
+      "final_score": 0.78,
+      "raw_event_score": 0.78,
+      "micro_window_score": 0.81,
+      "macro_window_score": 0.83,
+      "long_horizon_score": 0.82,
+      "reasons": [
+        "??????"
+      ],
+      "module_projection": {
+        "M1": "semantic_embedding_available",
+        "M2": "entity_roles_resolved_from_event_facts",
+        "M3": "causal_history_context_available",
+        "M4": "current_event_multiscale_context_scored",
+        "M5": "long_horizon_link_candidate",
+        "M6": "fused_demo_alert_level"
+      },
+      "provenance": {
+        "kind": "analyst_curated_demo_projection",
+        "model_execution": false,
+        "synthetic_scores": true,
+        "formal_evaluation": false
+      }
+    },
+    "related_entities": [
+      {
+        "event_id": "SHORT-0012",
+        "entity_type": "host",
+        "canonical_value": "intranet-server",
+        "role": "host",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0012",
+        "entity_type": "user",
+        "canonical_value": "root",
+        "role": "target_user",
+        "confidence": 0.98
+      }
+    ],
+    "outgoing_relations": [
+      {
+        "source_event_id": "SHORT-0012",
+        "target_event_id": "SHORT-0013",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.88,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ],
+    "incoming_relations": [
+      {
+        "source_event_id": "SHORT-0011",
+        "target_event_id": "SHORT-0012",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.88,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ]
+  },
+  {
+    "event_id": "SHORT-0013",
+    "timestamp": "2022-02-08T08:37:08Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 325,
+    "raw": "Feb  8 08:37:08 intranet-server sudo:    jward : TTY=pts/0 ; PWD=/var/www/intranet.mannsmith.harrison.com/wp-content/uploads/2022/02 ; USER=root ; COMMAND=/bin/ls -l /home",
+    "facts_only": true,
+    "system_projection": {
+      "event_id": "SHORT-0013",
+      "timestamp": "2022-02-08T08:37:08Z",
+      "threat_level": "high",
+      "alert_level": "high",
+      "final_score": 0.78,
+      "raw_event_score": 0.78,
+      "micro_window_score": 0.81,
+      "macro_window_score": 0.83,
+      "long_horizon_score": 0.82,
+      "reasons": [
+        "??????"
+      ],
+      "module_projection": {
+        "M1": "semantic_embedding_available",
+        "M2": "entity_roles_resolved_from_event_facts",
+        "M3": "causal_history_context_available",
+        "M4": "current_event_multiscale_context_scored",
+        "M5": "long_horizon_link_candidate",
+        "M6": "fused_demo_alert_level"
+      },
+      "provenance": {
+        "kind": "analyst_curated_demo_projection",
+        "model_execution": false,
+        "synthetic_scores": true,
+        "formal_evaluation": false
+      }
+    },
+    "related_entities": [
+      {
+        "event_id": "SHORT-0013",
+        "entity_type": "host",
+        "canonical_value": "intranet-server",
+        "role": "host",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0013",
+        "entity_type": "user",
+        "canonical_value": "root",
+        "role": "target_user",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0013",
+        "entity_type": "user",
+        "canonical_value": "jward",
+        "role": "target_user",
+        "confidence": 0.98
+      }
+    ],
+    "outgoing_relations": [
+      {
+        "source_event_id": "SHORT-0013",
+        "target_event_id": "SHORT-0014",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.88,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ],
+    "incoming_relations": [
+      {
+        "source_event_id": "SHORT-0012",
+        "target_event_id": "SHORT-0013",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.88,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ]
+  },
+  {
+    "event_id": "SHORT-0014",
+    "timestamp": "2022-02-08T08:37:08Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 326,
+    "raw": "Feb  8 08:37:08 intranet-server sudo: pam_unix(sudo:session): session opened for user root by (uid=0)",
+    "facts_only": true,
+    "system_projection": {
+      "event_id": "SHORT-0014",
+      "timestamp": "2022-02-08T08:37:08Z",
+      "threat_level": "high",
+      "alert_level": "high",
+      "final_score": 0.78,
+      "raw_event_score": 0.78,
+      "micro_window_score": 0.81,
+      "macro_window_score": 0.83,
+      "long_horizon_score": 0.82,
+      "reasons": [
+        "??????"
+      ],
+      "module_projection": {
+        "M1": "semantic_embedding_available",
+        "M2": "entity_roles_resolved_from_event_facts",
+        "M3": "causal_history_context_available",
+        "M4": "current_event_multiscale_context_scored",
+        "M5": "long_horizon_link_candidate",
+        "M6": "fused_demo_alert_level"
+      },
+      "provenance": {
+        "kind": "analyst_curated_demo_projection",
+        "model_execution": false,
+        "synthetic_scores": true,
+        "formal_evaluation": false
+      }
+    },
+    "related_entities": [
+      {
+        "event_id": "SHORT-0014",
+        "entity_type": "host",
+        "canonical_value": "intranet-server",
+        "role": "host",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0014",
+        "entity_type": "user",
+        "canonical_value": "root",
+        "role": "target_user",
+        "confidence": 0.98
+      }
+    ],
+    "outgoing_relations": [
+      {
+        "source_event_id": "SHORT-0014",
+        "target_event_id": "SHORT-0015",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.88,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ],
+    "incoming_relations": [
+      {
+        "source_event_id": "SHORT-0013",
+        "target_event_id": "SHORT-0014",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.88,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ]
+  },
+  {
+    "event_id": "SHORT-0015",
+    "timestamp": "2022-02-08T08:37:08Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 327,
+    "raw": "Feb  8 08:37:08 intranet-server sudo: pam_unix(sudo:session): session closed for user root",
+    "facts_only": true,
+    "system_projection": {
+      "event_id": "SHORT-0015",
+      "timestamp": "2022-02-08T08:37:08Z",
+      "threat_level": "high",
+      "alert_level": "high",
+      "final_score": 0.78,
+      "raw_event_score": 0.78,
+      "micro_window_score": 0.81,
+      "macro_window_score": 0.83,
+      "long_horizon_score": 0.82,
+      "reasons": [
+        "??????"
+      ],
+      "module_projection": {
+        "M1": "semantic_embedding_available",
+        "M2": "entity_roles_resolved_from_event_facts",
+        "M3": "causal_history_context_available",
+        "M4": "current_event_multiscale_context_scored",
+        "M5": "long_horizon_link_candidate",
+        "M6": "fused_demo_alert_level"
+      },
+      "provenance": {
+        "kind": "analyst_curated_demo_projection",
+        "model_execution": false,
+        "synthetic_scores": true,
+        "formal_evaluation": false
+      }
+    },
+    "related_entities": [
+      {
+        "event_id": "SHORT-0015",
+        "entity_type": "host",
+        "canonical_value": "intranet-server",
+        "role": "host",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0015",
+        "entity_type": "user",
+        "canonical_value": "root",
+        "role": "target_user",
+        "confidence": 0.98
+      }
+    ],
+    "outgoing_relations": [],
+    "incoming_relations": [
+      {
+        "source_event_id": "SHORT-0014",
+        "target_event_id": "SHORT-0015",
+        "relation_type": "temporal_causal_candidate",
+        "confidence": 0.88,
+        "evidence": {
+          "reason": "ordered privileged/authentication context",
+          "formal_model_relation": false
+        }
+      }
+    ]
+  },
+  {
+    "event_id": "SHORT-0016",
+    "timestamp": "2022-02-08T08:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 328,
+    "raw": "Feb  8 08:39:01 intranet-server CRON[28361]: pam_unix(cron:session): session opened for user root by (uid=0)",
+    "facts_only": true,
+    "system_projection": {
+      "event_id": "SHORT-0016",
+      "timestamp": "2022-02-08T08:39:01Z",
+      "threat_level": "low",
+      "alert_level": "low",
+      "final_score": 0.32,
+      "raw_event_score": 0.32,
+      "micro_window_score": 0.32,
+      "macro_window_score": 0.32,
+      "long_horizon_score": 0.32,
+      "reasons": [
+        "root ???????????"
+      ],
+      "module_projection": {
+        "M1": "semantic_embedding_available",
+        "M2": "entity_roles_resolved_from_event_facts",
+        "M3": "causal_history_context_available",
+        "M4": "current_event_multiscale_context_scored",
+        "M5": "no_strong_long_horizon_link",
+        "M6": "fused_demo_alert_level"
+      },
+      "provenance": {
+        "kind": "analyst_curated_demo_projection",
+        "model_execution": false,
+        "synthetic_scores": true,
+        "formal_evaluation": false
+      }
+    },
+    "related_entities": [
+      {
+        "event_id": "SHORT-0016",
+        "entity_type": "host",
+        "canonical_value": "intranet-server",
+        "role": "host",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0016",
+        "entity_type": "user",
+        "canonical_value": "root",
+        "role": "target_user",
+        "confidence": 0.98
+      }
+    ],
+    "outgoing_relations": [],
+    "incoming_relations": []
+  },
+  {
+    "event_id": "SHORT-0017",
+    "timestamp": "2022-02-08T08:39:01Z",
+    "source_file": "gather/intranet_server/logs/auth.log",
+    "source_line": 329,
+    "raw": "Feb  8 08:39:01 intranet-server CRON[28361]: pam_unix(cron:session): session closed for user root",
+    "facts_only": true,
+    "system_projection": {
+      "event_id": "SHORT-0017",
+      "timestamp": "2022-02-08T08:39:01Z",
+      "threat_level": "info",
+      "alert_level": "info",
+      "final_score": 0.08,
+      "raw_event_score": 0.08,
+      "micro_window_score": 0.08,
+      "macro_window_score": 0.08,
+      "long_horizon_score": 0.08,
+      "reasons": [
+        "??????"
+      ],
+      "module_projection": {
+        "M1": "semantic_embedding_available",
+        "M2": "entity_roles_resolved_from_event_facts",
+        "M3": "causal_history_context_available",
+        "M4": "current_event_multiscale_context_scored",
+        "M5": "no_strong_long_horizon_link",
+        "M6": "fused_demo_alert_level"
+      },
+      "provenance": {
+        "kind": "analyst_curated_demo_projection",
+        "model_execution": false,
+        "synthetic_scores": true,
+        "formal_evaluation": false
+      }
+    },
+    "related_entities": [
+      {
+        "event_id": "SHORT-0017",
+        "entity_type": "host",
+        "canonical_value": "intranet-server",
+        "role": "host",
+        "confidence": 0.98
+      },
+      {
+        "event_id": "SHORT-0017",
+        "entity_type": "user",
+        "canonical_value": "root",
+        "role": "target_user",
+        "confidence": 0.98
+      }
+    ],
+    "outgoing_relations": [],
+    "incoming_relations": []
+  }
+]

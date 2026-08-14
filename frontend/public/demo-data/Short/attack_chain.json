@@ -1,0 +1,34 @@
+{
+  "chain_id": "SHORT-CANDIDATE-001",
+  "status": "candidate",
+  "claim_type": "analyst_curated_replay",
+  "steps": [
+    {
+      "sequence": 1,
+      "label": "session transition",
+      "evidence_event_ids": [
+        "SHORT-0001"
+      ]
+    },
+    {
+      "sequence": 2,
+      "label": "privileged command context",
+      "evidence_event_ids": [
+        "SHORT-0006",
+        "SHORT-0007"
+      ]
+    },
+    {
+      "sequence": 3,
+      "label": "host and account discovery",
+      "evidence_event_ids": [
+        "SHORT-0010"
+      ]
+    }
+  ],
+  "limitations": [
+    "This is a manually curated replay package, not a model prediction.",
+    "The chain is a candidate interpretation of source log facts.",
+    "AIT ground-truth labels and source labels are excluded from this package."
+  ]
+}

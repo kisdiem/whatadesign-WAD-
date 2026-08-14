@@ -38,6 +38,16 @@ STRONG_SECURITY_MARKERS = re.compile(
     r"是否被入侵|是否入侵|有没有异常|有什么异常|为什么高风险|为什么风险)",
     re.IGNORECASE,
 )
+
+ASSISTANT_INPUT_GUIDE = (
+    "This product is a security investigation console. User input may be a short raw-log excerpt, "
+    "a normalized EventFrame summary, an entity name, a detection finding, a case/timeline fragment, "
+    "or a question bound to the current UI context. Treat supplied text as an observation to explain, "
+    "not as proof that an attack occurred. First identify what the item is and its security relevance; "
+    "then state only the most useful interpretation. Keep Chinese responses concise: normally 2-4 short "
+    "bullets, no preamble, no repeated context, and no generic security lecture unless the user asks for it. "
+    "When the user asks about a selected excerpt, answer '这是什么 / 它说明什么 / 是否需要关注' directly."
+)
 KNOWLEDGE_MARKERS = re.compile(
     r"(什么是|是什么意思|解释一下|概念|原理|定义|MITRE|ATT&CK|T\d{4}(?:\.\d{3})?|"
     r"4625|4624|Kerberos|横向移动|凭据访问|PowerShell|日志是什么|主机是什么)",
@@ -67,6 +77,8 @@ router_agent = Agent(
     output_type=RouterDecision,
     instructions=(
         "Classify exactly one user message for a security operations assistant. "
+        + ASSISTANT_INPUT_GUIDE
+        + " "
         "security = requires facts from the current WAD environment, logs, Findings, Investigations, entities, risk or timelines. "
         "knowledge = security/domain knowledge that does not require current environment facts. "
         "general = ordinary conversation or writing. Return only the structured decision."
@@ -81,12 +93,19 @@ security_agent = Agent[AgentContext](
     output_type=SecurityDraft,
     instructions=(
         "You are the evidence-grounded security analyst for 链影寻踪. "
+        + ASSISTANT_INPUT_GUIDE
+        + " "
         "For any claim about the current environment you MUST call at least one internal security tool before answering. "
         "Prefer persisted Finding/Investigation/entity results before raw logs. Use 24h as the default event context, "
         "expand to 7d only for high-risk/cross-host/incomplete cases, and use 30d baseline only as aggregated behavior context. "
         "Never invent logs, entities, baselines or attack steps. If a tool is unavailable, say which evidence is missing. "
         "Do not equate a high risk score with confirmed compromise. Distinguish observed facts, inference and uncertainty. "
-        "Write a compact Chinese answer with: 结论, 主要证据, 判断依据, 建议下一步. "
+        "For a normal request, use at most four short Chinese bullets headed 结论, 依据, 关注点, 下一步 as needed. "
+        "For a selected log/excerpt, prefer one short paragraph plus at most two bullets. "
+        "For an explicit [WAD_REPORT_SNAPSHOT] request, the attached snapshot is the user-submitted report source: do not require a tool call, "
+        "do not add facts outside it, and return all five Chinese sections exactly: 概况, 链路判断, 关键证据, 不确定项, 处置建议. "
+        "Each section must contain concrete, concise snapshot-grounded content rather than generic investigation advice. "
+        "Do not list every field or restate raw log text. "
         "claims must contain only the important factual/inferential claims that a verifier should check."
     ),
 )
@@ -97,10 +116,12 @@ knowledge_agent = Agent[AgentContext](
     model_settings=_settings("medium", "medium", parallel_tool_calls=False),
     tools=KNOWLEDGE_TOOLS,
     instructions=(
-        "Answer security knowledge questions naturally in Chinese. Always call knowledge_search first. "
+        "Answer security knowledge questions naturally in concise Chinese. "
+        + ASSISTANT_INPUT_GUIDE
+        + " Always call knowledge_search first. "
         "Prefer retrieved organization/security/history knowledge. If the repository is unavailable and the question is a general public concept, "
         "you may answer from model knowledge but explicitly state that no internal knowledge-base source was available. "
-        "Do not pretend current-environment facts were checked."
+        "Do not pretend current-environment facts were checked. Use no more than four short bullets unless the user explicitly requests detail."
     ),
 )
 
@@ -109,9 +130,12 @@ general_agent = Agent(
     model=GENERAL_MODEL,
     model_settings=_settings("low", "medium"),
     instructions=(
-        "You are the general conversation mode of 链影寻踪. Answer naturally and directly in the user's language. "
+        "You are the general conversation mode of 链影寻踪. "
+        + ASSISTANT_INPUT_GUIDE
+        + " Answer naturally and directly in the user's language. "
         "You have no access to internal logs, Findings, entities or Investigations. Never imply that you checked them. "
-        "You may use user-visible text from earlier modes as conversation context, but must treat it only as previously displayed text, not as new tool evidence."
+        "You may use user-visible text from earlier modes as conversation context, but must treat it only as previously displayed text, not as new tool evidence. "
+        "Use one concise paragraph by default; expand only on request."
     ),
 )
 
@@ -252,6 +276,7 @@ class AgentRuntime:
     ) -> AgentQueryResponse:
         decision = decision or await self.resolve_mode(request)
         run_id = f"RUN-{uuid.uuid4().hex[:12].upper()}"
+        snapshot_report = "[WAD_REPORT_SNAPSHOT]" in request.message
         deep_security = decision.mode == "security" and (
             request.context.time_range == "7d" or "溯源" in request.message
         )
@@ -287,9 +312,16 @@ class AgentRuntime:
             )
             successful_tool_events = [event for event in context.tool_events if event.ok]
             if not successful_tool_events:
-                answer = "当前问题需要读取真实安全数据，但本次 Agent 没有获得任何成功的内部数据工具结果，因此不生成当前环境事实判断。"
-                verified = False
-                confidence = 0.0
+                if snapshot_report and draft.answer.strip():
+                    # A report snapshot is explicitly assembled from the user's current UI selection.
+                    # It remains unverified, but can be summarized without inventing environment facts.
+                    answer = draft.answer
+                    verified = False
+                    confidence = min(draft.confidence, 0.6)
+                else:
+                    answer = "当前问题需要读取真实安全数据，但本次 Agent 没有获得任何成功的内部数据工具结果，因此不生成当前环境事实判断。"
+                    verified = False
+                    confidence = 0.0
             else:
                 needs_verification = (
                     (draft.risk_score or 0) >= 80

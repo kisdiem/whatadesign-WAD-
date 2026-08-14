@@ -74,6 +74,7 @@ type ChatItem = {
 type InvestigationStatus = Investigation['status']
 
 const severityMeta: Record<Severity, { label: string; color: string }> = {
+  info: { label: '正常', color: 'blue' },
   critical: { label: '严重', color: 'red' },
   high: { label: '高危', color: 'orange' },
   medium: { label: '中危', color: 'gold' },
