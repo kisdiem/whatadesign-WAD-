@@ -1,0 +1,52 @@
+[
+  {
+    "source_event_id": "SHORT-000003",
+    "target_event_id": "SHORT-000004",
+    "relation_type": "temporal_review_candidate",
+    "confidence": 0.55,
+    "evidence": {
+      "reason": "按时间排序的高风险人工复核候选",
+      "formal_model_relation": false
+    }
+  },
+  {
+    "source_event_id": "SHORT-000004",
+    "target_event_id": "SHORT-000005",
+    "relation_type": "temporal_review_candidate",
+    "confidence": 0.55,
+    "evidence": {
+      "reason": "按时间排序的高风险人工复核候选",
+      "formal_model_relation": false
+    }
+  },
+  {
+    "source_event_id": "SHORT-000005",
+    "target_event_id": "SHORT-000006",
+    "relation_type": "temporal_review_candidate",
+    "confidence": 0.55,
+    "evidence": {
+      "reason": "按时间排序的高风险人工复核候选",
+      "formal_model_relation": false
+    }
+  },
+  {
+    "source_event_id": "SHORT-000006",
+    "target_event_id": "SHORT-000011",
+    "relation_type": "temporal_review_candidate",
+    "confidence": 0.55,
+    "evidence": {
+      "reason": "按时间排序的高风险人工复核候选",
+      "formal_model_relation": false
+    }
+  },
+  {
+    "source_event_id": "SHORT-000011",
+    "target_event_id": "SHORT-000012",
+    "relation_type": "temporal_review_candidate",
+    "confidence": 0.55,
+    "evidence": {
+      "reason": "按时间排序的高风险人工复核候选",
+      "formal_model_relation": false
+    }
+  }
+]

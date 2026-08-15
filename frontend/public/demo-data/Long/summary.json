@@ -1,0 +1,17 @@
+{
+  "dataset_id": "Long",
+  "kind": "demo_system_projection",
+  "model_execution": false,
+  "synthetic_scores": true,
+  "formal_evaluation": false,
+  "event_count": 44175,
+  "threat_level_counts": {
+    "info": 42927,
+    "high": 94,
+    "medium": 426,
+    "low": 728
+  },
+  "time_range": "2022-01-24T13:30:00Z/2022-01-31T13:30:00Z",
+  "candidate_chain_id": "LONG-CANDIDATE-001",
+  "candidate_chain_status": "candidate"
+}

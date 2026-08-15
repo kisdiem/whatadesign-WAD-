@@ -1,0 +1,54 @@
+{
+  "chain_id": "SHORT-CANDIDATE-001",
+  "status": "candidate",
+  "claim_type": "analyst_curated_replay",
+  "steps": [
+    {
+      "sequence": 1,
+      "label": "需要人工复核的高风险事件",
+      "evidence_event_ids": [
+        "SHORT-000003"
+      ]
+    },
+    {
+      "sequence": 2,
+      "label": "需要人工复核的高风险事件",
+      "evidence_event_ids": [
+        "SHORT-000004"
+      ]
+    },
+    {
+      "sequence": 3,
+      "label": "需要人工复核的高风险事件",
+      "evidence_event_ids": [
+        "SHORT-000005"
+      ]
+    },
+    {
+      "sequence": 4,
+      "label": "需要人工复核的高风险事件",
+      "evidence_event_ids": [
+        "SHORT-000006"
+      ]
+    },
+    {
+      "sequence": 5,
+      "label": "需要人工复核的高风险事件",
+      "evidence_event_ids": [
+        "SHORT-000011"
+      ]
+    },
+    {
+      "sequence": 6,
+      "label": "需要人工复核的高风险事件",
+      "evidence_event_ids": [
+        "SHORT-000012"
+      ]
+    }
+  ],
+  "limitations": [
+    "这是基于原始日志的演示回放，不是模型预测。",
+    "候选关联只供人工调查，不是攻击事实。",
+    "未读取 AIT 标签或场景真值。"
+  ]
+}

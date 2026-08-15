@@ -1,0 +1,17 @@
+{
+  "dataset_id": "Short",
+  "kind": "demo_system_projection",
+  "model_execution": false,
+  "synthetic_scores": true,
+  "formal_evaluation": false,
+  "event_count": 2570,
+  "threat_level_counts": {
+    "info": 1849,
+    "high": 93,
+    "medium": 410,
+    "low": 218
+  },
+  "time_range": "2022-01-24T13:30:00Z/2022-01-24T14:00:00Z",
+  "candidate_chain_id": "SHORT-CANDIDATE-001",
+  "candidate_chain_status": "candidate"
+}
