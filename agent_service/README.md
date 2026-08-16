@@ -33,6 +33,24 @@ uvicorn agent_service.app:app --host 127.0.0.1 --port 8000 --reload
 
 前端 Vite 已将 `/api` 代理到 `127.0.0.1:8000`。
 
+## 小文件实时导入
+
+数据源页支持将 LOG、TXT、JSON、JSONL、CSV 小文件真实上传到后端。默认上限 8 MiB：
+
+```text
+POST /api/ingest/files
+GET  /api/ingest/snapshot
+GET  /api/ingest/jobs
+GET  /api/detection/manifest
+GET  /api/log-index/overview
+GET  /api/scale/report
+GET  /api/evaluation/report
+```
+
+上传文件经过可解释的 `m0-m6-prototype-v1` 链路并写入 `run_state/wad_ingestion.db`。检测链路不读取真实标签。EVTX 二进制文件需要先导出为 XML/JSON/CSV，或后续安装 `python-evtx` 适配器。
+
+这条链路用于竞赛原型和小数据演示；`/api/scale/report` 会明确标注为小文件功能实测，不代表 TB 实测结果。
+
 ## 数据仓库
 
 生产模式不允许隐式 mock 回退。

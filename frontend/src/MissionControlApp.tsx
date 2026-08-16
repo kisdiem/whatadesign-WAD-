@@ -54,6 +54,7 @@ import {
   type Severity,
 } from './mocks/data'
 import { loadDemoDataset, type DemoDatasetId } from './services/demoData'
+import { getIngestionSnapshot, uploadLogFile, type IngestResult, type ModuleScores } from './services/ingestion'
 import { downloadAttackChainReport } from './services/attackChainReport'
 import {
   askAssistant,
@@ -98,7 +99,12 @@ const preparedDemoSources: LogSource[] = [
   { id: 'DEMO-LONG', name: 'Long', path: '/demo-data/Long', kind: '可追溯回放', status: 'online', size: '44,175 条事件 / 7 天', lastRead: '2022-01-24 13:30 - 2022-01-31 13:30（UTC）' },
 ]
 
-type DemoReplayEvent = SecurityEvent & { dataset: DemoDatasetId }
+type DemoReplayEvent = SecurityEvent & {
+  dataset: string
+  module_scores?: ModuleScores
+  raw_log_ref?: string
+  score?: number
+}
 
 type EventRow = {
   id: string
@@ -115,6 +121,7 @@ type EventRow = {
   findingId?: string
   findingTitle: string
   risk?: number
+  moduleScores?: ModuleScores
   evidenceIds: string[]
 }
 
@@ -122,6 +129,7 @@ type UploadSourceEntry = {
   uid: string
   name: string
   size: number
+  file?: File
 }
 
 type ImportTask = {
@@ -130,8 +138,11 @@ type ImportTask = {
   kind: string
   size: number
   progress: number
-  status: 'queued' | 'parsing' | 'indexed' | 'ready'
+  status: 'queued' | 'parsing' | 'indexed' | 'ready' | 'failed'
   result: string
+  event_count?: number
+  finding_count?: number
+  events_per_second?: number
 }
 
 type ChatItem = {
@@ -325,6 +336,32 @@ function inferLogParticipants(entities: string[] = []) {
   const process = entities.find((item) => inferEntityType(item) === 'Process')
   const ip = entities.find((item) => inferEntityType(item) === 'IP')
   return { actor, host, process, ip }
+}
+
+function filterRowsBySourceTimeRange<T extends { time: string; source?: string }>(rows: T[], timeRange: string) {
+  const grouped = new Map<string, T[]>()
+  rows.forEach((row) => {
+    const key = row.source || 'unknown'
+    grouped.set(key, [...(grouped.get(key) || []), row])
+  })
+  return Array.from(grouped.values()).flatMap((items) => filterRowsByTimeRange(items, timeRange))
+}
+
+function uploadedOverviewSeries(events: DemoReplayEvent[]) {
+  const buckets = new Map<string, { time: string; logs: number; anomalies: number; source: string }>()
+  events.forEach((event) => {
+    const timestamp = new Date(event.time)
+    if (Number.isNaN(timestamp.getTime())) return
+    timestamp.setUTCSeconds(0, 0)
+    timestamp.setUTCMinutes(Math.floor(timestamp.getUTCMinutes() / 5) * 5)
+    const time = timestamp.toISOString().slice(0, 16).replace('T', ' ')
+    const key = `${event.dataset}|${time}`
+    const current = buckets.get(key) || { time, logs: 0, anomalies: 0, source: event.dataset }
+    current.logs += 1
+    if ((event as SecurityEvent & { score?: number }).score! >= 0.55) current.anomalies += 1
+    buckets.set(key, current)
+  })
+  return Array.from(buckets.values())
 }
 
 function readableAction(value?: string) {
@@ -595,6 +632,7 @@ export default function MissionControlApp() {
   const [caseItems, setCaseItems] = useState<Investigation[]>([])
   const [caseBoards, setCaseBoards] = useState<Record<string, CaseBoard>>({})
   const [sourceItems, setSourceItems] = useState(preparedDemoSources)
+  const [ingestionRevision, setIngestionRevision] = useState(0)
   const [dashboardLoading, setDashboardLoading] = useState(true)
   const [dashboardError, setDashboardError] = useState('')
 
@@ -663,22 +701,38 @@ export default function MissionControlApp() {
       setDashboardLoading(true)
       setDashboardError('')
       try {
-        const datasets: DemoDatasetId[] = sourceItems
-          .filter((source) => source.id === 'DEMO-SHORT' || source.id === 'DEMO-LONG')
-          .map((source) => (source.id === 'DEMO-LONG' ? 'Long' : 'Short') as DemoDatasetId)
+        const datasets: DemoDatasetId[] = ['Short', 'Long']
         const loaded = await Promise.all(datasets.map((dataset) => loadDemoDataset(dataset).then((data) => ({
           ...data,
           dataset,
           // Dataset names are the only selectable log sources. Raw file names remain on events as evidence.
           anomalyWindows: data.anomalyWindows.map((window) => ({ ...window, sourceTypes: [dataset] })),
         }))))
-        const windows = loaded.flatMap((data) => data.anomalyWindows)
-        const cases = loaded.flatMap((data) => data.investigations)
+        let realtime: Awaited<ReturnType<typeof getIngestionSnapshot>> | null = null
+        try {
+          realtime = await getIngestionSnapshot()
+        } catch {
+          // The historical replay stays available when the live ingestion service is offline.
+        }
+        const realtimeEvents: DemoReplayEvent[] = (realtime?.events || []).map((event) => ({
+          ...event,
+          dataset: event.source_type || event.source || '实时上传',
+          source: event.source || event.source_type || '实时上传',
+        }))
+        const windows = [...loaded.flatMap((data) => data.anomalyWindows), ...(realtime?.windows || [])]
+        const cases = [...loaded.flatMap((data) => data.investigations), ...(realtime?.investigations || [])]
         if (!active) return
         setWindowItems(windows)
         setCaseItems(cases)
-        setDemoEvents(loaded.flatMap((data) => data.events.map((event) => ({ ...event, dataset: data.dataset }))))
-        setDemoOverviewSeries(loaded.flatMap((data) => data.overviewSeries.map((item) => ({ ...item, source: data.dataset }))))
+        setDemoEvents([
+          ...loaded.flatMap((data) => data.events.map((event) => ({ ...event, dataset: data.dataset }))),
+          ...realtimeEvents,
+        ])
+        setDemoOverviewSeries([
+          ...loaded.flatMap((data) => data.overviewSeries.map((item) => ({ ...item, source: data.dataset }))),
+          ...uploadedOverviewSeries(realtimeEvents),
+        ])
+        setSourceItems([...(realtime?.sources || []), ...preparedDemoSources])
       } catch (demoError) {
         if (!active) return
         try {
@@ -704,7 +758,7 @@ export default function MissionControlApp() {
     return () => {
       active = false
     }
-  }, [sourceItems])
+  }, [ingestionRevision])
 
   useEffect(() => {
     setCaseBoards((current) => {
@@ -932,21 +986,12 @@ export default function MissionControlApp() {
     setAssistantChat([{ role: 'assistant', content: assistantGreeting }])
   }, [assistantChat.length, assistantContext, assistantSending, location.pathname])
 
-  const registerImportedSources = (files: UploadSourceEntry[]) => {
-    if (!files.length) return
-    const now = new Date().toLocaleString('zh-CN', { hour12: false })
-    setSourceItems((current) => [
-      ...files.map((file) => ({
-        id: `SRC-UP-${Date.now()}-${file.uid}`,
-        name: file.name,
-        path: `local://${file.name}`,
-        kind: inferSourceKind(file.name),
-        status: 'warning' as const,
-        size: formatBytes(file.size),
-        lastRead: `${now} · 待导入`,
-      })),
-      ...current,
-    ])
+  const importLogFile = async (entry: UploadSourceEntry): Promise<IngestResult> => {
+    if (!entry.file) throw new Error(`无法读取 ${entry.name} 的浏览器文件对象。`)
+    const result = await uploadLogFile(entry.file)
+    setSourceItems((current) => [result.source, ...current.filter((source) => source.id !== result.source.id)])
+    setIngestionRevision((current) => current + 1)
+    return result
   }
 
   const setFindingStage = (caseId: string, findingId: string, stage: FindingStage) => {
@@ -988,7 +1033,7 @@ export default function MissionControlApp() {
         />
 
         <div className="mc-sidebar-health">
-          <div><Badge status="processing" /> {PREFER_DEMO_DATA ? '可追溯回放运行中' : '检测服务运行中'}</div>
+          <div><Badge status="processing" /> {PREFER_DEMO_DATA ? '历史回放 + 实时 M0-M6' : '检测服务运行中'}</div>
           <div><Badge status={onlineSources === sourceItems.length ? 'success' : 'warning'} /> {onlineSources}/{sourceItems.length} 日志源在线</div>
           <div><Badge status="success" /> 证据状态库已启用</div>
         </div>
@@ -1015,7 +1060,7 @@ export default function MissionControlApp() {
         </Header>
 
         <Content className="mc-content">
-          {dashboardLoading && <Card style={{ marginBottom: 12 }}><Badge status="processing" /> 正在加载 Short / Long 可追溯回放数据…</Card>}
+          {dashboardLoading && <Card style={{ marginBottom: 12 }}><Badge status="processing" /> 正在加载 Short / Long 回放与后端实时导入数据…</Card>}
           {dashboardError && <Card style={{ marginBottom: 12, borderColor: '#ff4d4f' }}><Text type="danger">数据加载失败：{dashboardError}。系统未回退到静态 Mock。</Text></Card>}
           <Routes>
             <Route path="/overview" element={<OverviewPage findings={findings} cases={filteredCaseItems} caseBoards={caseBoards} timeRange={timeRange} inputOverviewSeries={demoOverviewSeries} />} />
@@ -1023,7 +1068,7 @@ export default function MissionControlApp() {
             <Route path="/entities" element={<EntityInvestigationPage profiles={entityProfiles} findings={findings} timeRange={timeRange} onOpenAssistant={openEntityAssistant} onSubmitBatch={submitBatchToAssistant} onExplain={explainWithAssistant} onOpenFinding={() => navigate('/findings')} />} />
             <Route path="/investigations" element={<InvestigationsPage cases={filteredCaseItems} findings={findings} evidenceByFinding={evidenceByFinding} caseBoards={caseBoards} onSetFindingStage={setFindingStage} onOpenAssistant={openCaseAssistant} onSubmitBatch={submitBatchToAssistant} onGenerateReport={generateAttackChainReport} onExplain={explainWithAssistant} onOpenEntity={(entityId) => navigate(`/entities?entity=${encodeURIComponent(entityId)}`)} />} />
             <Route path="/logs" element={<LogsPage findings={findings} evidenceByFinding={evidenceByFinding} demoEvents={demoEvents} timeRange={timeRange} onSubmitBatch={submitBatchToAssistant} onExplain={explainWithAssistant} />} />
-            <Route path="/sources" element={<SourcesPage sources={sourceItems} onDeleteSource={(sourceId) => setSourceItems((current) => current.filter((source) => source.id !== sourceId))} onRefresh={async () => {}} onRegisterImportedSources={registerImportedSources} />} />
+            <Route path="/sources" element={<SourcesPage sources={sourceItems} onDeleteSource={(sourceId) => setSourceItems((current) => current.filter((source) => source.id !== sourceId))} onRefresh={async () => setIngestionRevision((current) => current + 1)} onImportFile={importLogFile} />} />
             <Route
               path="/assistant"
               element={(
@@ -1090,12 +1135,16 @@ function OverviewPage({
     [findingIds, inputCases],
   )
   const visibleSeries = useMemo(() => {
+    const sourceRows = source === 'all'
+      ? inputOverviewSeries
+      : inputOverviewSeries.filter((item) => item.source === source)
+    const rangedRows = timeRange === '30d' ? sourceRows : filterRowsBySourceTimeRange(sourceRows, timeRange)
     const selected = source === 'all'
       ? (() => {
           // Short uses five-minute buckets while Long uses hourly buckets.
           // Combine only after normalising the all-source view to hours.
           const byHour = new Map<string, { logs: number; anomalies: number }>()
-          inputOverviewSeries.forEach((item) => {
+          rangedRows.forEach((item) => {
             const hour = `${item.time.slice(0, 14)}:00`
             const current = byHour.get(hour) || { logs: 0, anomalies: 0 }
             current.logs += item.logs
@@ -1104,11 +1153,9 @@ function OverviewPage({
           })
           return Array.from(byHour.entries()).map(([time, values]) => ({ time, ...values }))
         })()
-      : inputOverviewSeries
-          .filter((item) => item.source === source)
-          .map(({ time, logs, anomalies }) => ({ time, logs, anomalies }))
+      : rangedRows.map(({ time, logs, anomalies }) => ({ time, logs, anomalies }))
     const ordered = selected.sort((left, right) => left.time.localeCompare(right.time))
-    return timeRange === '30d' ? ordered : filterRowsByTimeRange(ordered, timeRange)
+    return ordered
   }, [inputOverviewSeries, source, timeRange])
 
   const rawEvents = visibleSeries.reduce((sum, item) => sum + item.logs, 0)
@@ -1944,11 +1991,12 @@ function LogsPage({
           ...event,
           source: event.dataset,
           action: readableAction(event.action),
-          rawLogRef: `${event.source}:${event.id}`,
+          rawLogRef: event.raw_log_ref || `${event.source}:${event.id}`,
           entities: [event.actor, event.host, event.process, event.ip].filter((value): value is string => Boolean(value)),
           findingId: finding?.id,
           findingTitle: finding?.title || '未形成异常发现',
           risk: finding?.risk,
+          moduleScores: event.module_scores,
           evidenceIds: finding
             ? (evidenceByFinding[finding.id] || []).filter((item) => item.eventId === event.id).map((item) => item.id)
             : [],
@@ -1999,9 +2047,13 @@ function LogsPage({
 
   const filtered = useMemo(() => {
     if (useRepositoryData) return remoteEvents
-    return filterRowsByTimeRange(events, timeRange).filter((event) => {
+    const sourceMatched = source === 'all' ? events : events.filter((event) => event.source === source)
+    const ranged = source === 'all'
+      ? filterRowsBySourceTimeRange(sourceMatched, timeRange)
+      : filterRowsByTimeRange(sourceMatched, timeRange)
+    return ranged.filter((event) => {
       const haystack = [event.id, event.action, event.actor, event.host, event.process, event.ip, event.source, event.raw, event.findingTitle].join(' ').toLowerCase()
-      return haystack.includes(query.toLowerCase()) && (source === 'all' || event.source === source)
+      return haystack.includes(query.toLowerCase())
     })
   }, [events, query, remoteEvents, source, timeRange, useRepositoryData])
 
@@ -2098,6 +2150,24 @@ function LogsPage({
                   </>
                 ),
               },
+              ...(selected.moduleScores ? [{
+                key: 'pipeline',
+                label: 'M0-M6 链路',
+                children: (
+                  <>
+                    <Card size="small" title="真实上传处理结果">
+                      <Text type="secondary">真实标签未参与检测；分数来自可解释原型链路。</Text>
+                      <Row gutter={[8, 8]} style={{ marginTop: 12 }}>
+                        {Object.entries(selected.moduleScores).map(([stage, score]) => (
+                          <Col span={8} key={stage}>
+                            <Statistic title={stage} value={Math.round(score * 100)} suffix="%" />
+                          </Col>
+                        ))}
+                      </Row>
+                    </Card>
+                  </>
+                ),
+              }] : []),
             ]}
           />
         )}
@@ -2110,59 +2180,16 @@ function SourcesPage({
   sources,
   onDeleteSource,
   onRefresh,
-  onRegisterImportedSources,
+  onImportFile,
 }: {
   sources: LogSource[]
   onDeleteSource: (sourceId: string) => void
   onRefresh: () => Promise<void>
-  onRegisterImportedSources: (files: UploadSourceEntry[]) => void
+  onImportFile: (file: UploadSourceEntry) => Promise<IngestResult>
 }) {
   const [refreshing, setRefreshing] = useState(false)
   const [queue, setQueue] = useState<UploadSourceEntry[]>([])
   const [tasks, setTasks] = useState<ImportTask[]>([])
-
-  useEffect(() => {
-    if (!tasks.some((task) => task.status !== 'ready')) return
-
-    const timer = window.setInterval(() => {
-      setTasks((current) => current.map((task) => {
-        if (task.status === 'ready') return task
-        const nextProgress = Math.min(task.progress + (task.status === 'queued' ? 18 : task.status === 'parsing' ? 14 : 10), 100)
-        if (nextProgress >= 100) {
-          return {
-            ...task,
-            progress: 100,
-            status: 'ready',
-            result: '已完成事件提取与索引登记',
-          }
-        }
-        if (nextProgress >= 78) {
-          return {
-            ...task,
-            progress: nextProgress,
-            status: 'indexed',
-            result: '正在建立事件索引与调查映射',
-          }
-        }
-        if (nextProgress >= 28) {
-          return {
-            ...task,
-            progress: nextProgress,
-            status: 'parsing',
-            result: '正在解析事件、实体和时间字段',
-          }
-        }
-        return {
-          ...task,
-          progress: nextProgress,
-          status: 'queued',
-          result: '已加入导入队列',
-        }
-      }))
-    }, 800)
-
-    return () => window.clearInterval(timer)
-  }, [tasks])
 
   const refresh = async () => {
     setRefreshing(true)
@@ -2202,7 +2229,7 @@ function SourcesPage({
         <Progress
           percent={value}
           size="small"
-          status={record.status === 'ready' ? 'success' : record.status === 'indexed' ? 'active' : 'normal'}
+          status={record.status === 'failed' ? 'exception' : record.status === 'ready' ? 'success' : record.status === 'indexed' ? 'active' : 'normal'}
         />
       ),
     },
@@ -2213,34 +2240,56 @@ function SourcesPage({
       width: 120,
       render: (value: ImportTask['status']) => (
         <Badge
-          status={value === 'ready' ? 'success' : value === 'indexed' ? 'processing' : value === 'parsing' ? 'warning' : 'default'}
-          text={value === 'ready' ? '已就绪' : value === 'indexed' ? '索引中' : value === 'parsing' ? '解析中' : '排队中'}
+          status={value === 'failed' ? 'error' : value === 'ready' ? 'success' : value === 'indexed' ? 'processing' : value === 'parsing' ? 'warning' : 'default'}
+          text={value === 'failed' ? '失败' : value === 'ready' ? '已就绪' : value === 'indexed' ? '索引中' : value === 'parsing' ? '解析中' : '排队中'}
         />
       ),
     },
     { title: '结果', dataIndex: 'result', key: 'result' },
   ]
 
-  const importFiles = () => {
+  const importFiles = async () => {
     if (!queue.length) {
-      message.info('请先选择要登记的日志文件。')
+      message.info('请先选择要上传的日志文件。')
       return
     }
-    setTasks((current) => [
-      ...queue.map((file, index) => ({
+    const selectedFiles = [...queue]
+    const queuedTasks = selectedFiles.map((file) => ({
         id: `TASK-${Date.now()}-${file.uid}`,
         name: file.name,
         kind: inferSourceKind(file.name),
         size: file.size,
-        progress: 6 + index * 4,
+        progress: 5,
         status: 'queued' as const,
-        result: '已加入导入队列',
-      })),
-      ...current,
-    ])
-    onRegisterImportedSources(queue)
+        result: '等待上传到后端',
+      }))
+    setTasks((current) => [...queuedTasks, ...current])
     setQueue([])
-    message.success(`已登记 ${queue.length} 个日志文件。`)
+    for (let index = 0; index < selectedFiles.length; index += 1) {
+      const file = selectedFiles[index]
+      const taskId = queuedTasks[index].id
+      setTasks((current) => current.map((task) => task.id === taskId
+        ? { ...task, progress: 35, status: 'parsing', result: '后端正在执行 M0-M6 处理链路' }
+        : task))
+      try {
+        const result = await onImportFile(file)
+        setTasks((current) => current.map((task) => task.id === taskId
+          ? {
+              ...task,
+              ...result.job,
+              id: taskId,
+              progress: 100,
+              status: 'ready',
+              result: `${result.job.result} · 小样本仅作功能验证，不作为吞吐结论`,
+            }
+          : task))
+      } catch (error) {
+        setTasks((current) => current.map((task) => task.id === taskId
+          ? { ...task, progress: 100, status: 'failed', result: error instanceof Error ? error.message : '上传处理失败' }
+          : task))
+      }
+    }
+    message.success(`已完成 ${selectedFiles.length} 个文件的后端导入请求。`)
   }
 
   const queuedCount = tasks.filter((task) => task.status === 'queued').length
@@ -2262,10 +2311,11 @@ function SourcesPage({
             status: 'done' as const,
           }))}
           onChange={({ fileList }) => {
-            setQueue(fileList.map((file) => ({
+            setQueue((current) => fileList.map((file) => ({
               uid: file.uid,
               name: file.name,
               size: file.size || 0,
+              file: file.originFileObj || current.find((item) => item.uid === file.uid)?.file,
             })))
           }}
           onRemove={(file) => {
@@ -2277,8 +2327,8 @@ function SourcesPage({
           <p className="ant-upload-hint">支持 EVTX / LOG / JSON / JSONL / CSV</p>
         </Dragger>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginTop: 12, flexWrap: 'wrap' }}>
-          <Text type="secondary">建议导入样本集或分片日志</Text>
-          <Button type="primary" onClick={importFiles}>加入数据源</Button>
+          <Text type="secondary">小文件将真实上传至后端并执行 M0-M6；单文件上限由后端配置（默认 8 MiB）</Text>
+          <Button type="primary" onClick={() => { void importFiles() }}>上传并执行 M0-M6</Button>
         </div>
       </Card>
       <Row gutter={[12, 12]} className="mc-summary-row">
