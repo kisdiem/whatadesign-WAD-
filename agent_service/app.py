@@ -6,7 +6,7 @@ import logging
 import os
 import urllib.error
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -17,12 +17,14 @@ from fastapi.responses import StreamingResponse
 from openai import AsyncOpenAI
 from pydantic import BaseModel, Field
 
+from .ingestion import ingestion_store
 from .models import AgentQueryRequest, AgentRequestContext
+from .project_knowledge import knowledge_document_catalog, knowledge_manifest
 from .runtime import AgentRuntime, configure_model
 
 logger = logging.getLogger("wad.agent")
 
-app = FastAPI(title="链影寻踪 Agent Service", version="1.0")
+app = FastAPI(title="链影寻踪 Agent Service", version="1.1")
 
 allowed_origins = [
     origin.strip()
@@ -73,6 +75,18 @@ class SecurityLogSearchRequest(BaseModel):
     start_time: str | None = None
     end_time: str | None = None
     limit: int = Field(default=50, ge=1, le=200)
+
+
+class KnowledgeSearchRequest(BaseModel):
+    query: str = Field(min_length=1, max_length=4000)
+    top_k: int = Field(default=5, ge=1, le=10)
+    scope: list[str] = Field(default_factory=lambda: ["project", "security", "organization", "historical_cases"])
+
+
+class IngestFileRequest(BaseModel):
+    filename: str = Field(min_length=1, max_length=255)
+    content_base64: str = Field(min_length=1)
+    content_type: str = Field(default="", max_length=200)
 
 
 _api_log_sources: list[dict[str, Any]] = []
@@ -299,6 +313,7 @@ def _load_dashboard_collection(filename: str, fallback: list[dict[str, Any]]) ->
 
 @app.get("/api/agent/health")
 async def health() -> dict[str, Any]:
+    ingestion = ingestion_store.manifest()
     return {
         "ok": True,
         "openai_configured": _provider_configured(),
@@ -308,22 +323,61 @@ async def health() -> dict[str, Any]:
         "base_url": _runtime_base_url,
         "modes": ["auto", "security", "knowledge", "general"],
         "production_mock_fallback": False,
+        "ingestion_pipeline": ingestion["pipeline"],
+        "ingestion_counts": ingestion["counts"],
+        "labels_used_for_detection": ingestion["labels_used_for_detection"],
+        "knowledge_base": knowledge_manifest(),
     }
 
 
 @app.get("/api/windows")
 async def list_windows() -> list[dict[str, Any]]:
-    return _load_dashboard_collection("windows.json", _demo_windows)
+    try:
+        persisted = _load_dashboard_collection("windows.json", _demo_windows)
+    except HTTPException as error:
+        if error.status_code != 503:
+            raise
+        persisted = []
+    return [*persisted, *ingestion_store.snapshot(event_limit=1)["windows"]]
 
 
 @app.get("/api/investigations")
 async def list_investigations() -> list[dict[str, Any]]:
-    return _load_dashboard_collection("investigations.json", _demo_investigations)
+    try:
+        persisted = _load_dashboard_collection("investigations.json", _demo_investigations)
+    except HTTPException as error:
+        if error.status_code != 503:
+            raise
+        persisted = []
+    return [*persisted, *ingestion_store.snapshot(event_limit=1)["investigations"]]
 
 
 @app.get("/api/knowledge/documents")
 async def list_knowledge_documents() -> list[dict[str, Any]]:
-    return _load_dashboard_collection("knowledge_documents.json", _demo_knowledge_docs)
+    try:
+        external = _load_dashboard_collection("knowledge_documents.json", _demo_knowledge_docs)
+    except HTTPException as error:
+        if error.status_code != 503:
+            raise
+        external = []
+    project = knowledge_document_catalog()
+    project_ids = {entry["id"] for entry in project}
+    return [*project, *(item for item in external if str(item.get("id", "")) not in project_ids)]
+
+
+@app.post("/api/knowledge/search")
+async def search_knowledge(request: KnowledgeSearchRequest) -> dict[str, Any]:
+    result = await runtime.repository.search_knowledge(request.query, request.top_k, request.scope)
+    if not result.ok:
+        return {"documents": [], "count": 0, "retrieval": "hybrid_lexical_cjk_v1", "message": result.message}
+    data = result.data if isinstance(result.data, dict) else {"documents": []}
+    documents = data.get("documents", [])
+    return {
+        "documents": documents,
+        "count": len(documents),
+        "retrieval": data.get("retrieval", "hybrid_lexical_cjk_v1"),
+        "evidence_refs": result.evidence_refs,
+    }
 
 
 @app.post("/api/settings/log-sources/test")
@@ -333,8 +387,13 @@ async def test_log_source(request: ApiLogSourceRequest) -> dict[str, Any]:
 
 @app.get("/api/settings/log-sources")
 async def list_log_sources() -> list[dict[str, Any]]:
-    base_sources = _load_dashboard_collection("log_sources.json", _demo_log_sources)
-    return [*base_sources, *_api_log_sources]
+    try:
+        base_sources = _load_dashboard_collection("log_sources.json", _demo_log_sources)
+    except HTTPException as error:
+        if error.status_code != 503:
+            raise
+        base_sources = []
+    return [*base_sources, *ingestion_store.snapshot(event_limit=1)["sources"], *_api_log_sources]
 
 
 @app.post("/api/settings/log-sources")
@@ -355,6 +414,15 @@ async def create_log_source(request: ApiLogSourceRequest) -> dict[str, Any]:
 
 @app.post("/api/security/logs/search")
 async def search_security_logs(request: SecurityLogSearchRequest) -> dict[str, Any]:
+    uploaded = await asyncio.to_thread(
+        ingestion_store.search,
+        entities=request.entities,
+        source_types=request.source_types,
+        keywords=request.keywords,
+        start_time=request.start_time,
+        end_time=request.end_time,
+        limit=request.limit,
+    )
     result = await runtime.repository.search_logs(
         entities=request.entities,
         source_types=request.source_types,
@@ -363,9 +431,115 @@ async def search_security_logs(request: SecurityLogSearchRequest) -> dict[str, A
         end_time=request.end_time,
         limit=request.limit,
     )
-    if not result.ok:
+    repository_events = result.data.get("events", []) if result.ok and isinstance(result.data, dict) else []
+    events = [*uploaded["events"], *repository_events]
+    events.sort(key=lambda item: str(item.get("timestamp", item.get("time", ""))), reverse=True)
+    deduplicated = list({str(item.get("event_id", item.get("id", index))): item for index, item in enumerate(events)}.values())[:request.limit]
+    if not deduplicated and not result.ok:
         raise HTTPException(status_code=404, detail=result.message or "日志查询失败。")
-    return result.data if isinstance(result.data, dict) else {"events": [], "count": 0}
+    return {"events": deduplicated, "count": len(deduplicated)}
+
+
+@app.post("/api/ingest/files")
+async def ingest_file(request: IngestFileRequest) -> dict[str, Any]:
+    try:
+        return await asyncio.to_thread(
+            ingestion_store.ingest_base64,
+            request.filename,
+            request.content_base64,
+            request.content_type,
+        )
+    except (ValueError, json.JSONDecodeError) as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+@app.get("/api/ingest/snapshot")
+async def ingestion_snapshot(event_limit: int = 5000) -> dict[str, Any]:
+    return await asyncio.to_thread(ingestion_store.snapshot, event_limit)
+
+
+@app.get("/api/ingest/jobs")
+async def ingestion_jobs() -> list[dict[str, Any]]:
+    return (await asyncio.to_thread(ingestion_store.snapshot, 1))["jobs"]
+
+
+@app.delete("/api/ingest/sources/{source_id}")
+async def delete_ingested_source(source_id: str) -> dict[str, Any]:
+    result = await asyncio.to_thread(ingestion_store.delete_source, source_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="上传数据源不存在或已经删除。")
+    return result
+
+
+@app.get("/api/detection/manifest")
+async def detection_manifest() -> dict[str, Any]:
+    return await asyncio.to_thread(ingestion_store.manifest)
+
+
+@app.get("/api/log-index/overview")
+async def log_index_overview(time_range: str = "7d") -> dict[str, Any]:
+    snapshot = await asyncio.to_thread(ingestion_store.snapshot, 20_000)
+    events = snapshot["events"]
+    hours = 24 if time_range == "24h" else 1 if time_range == "1h" else 24 * 7 if time_range == "7d" else 24 * 30
+    parsed_times: list[datetime] = []
+    for event in events:
+        try:
+            parsed_times.append(datetime.fromisoformat(str(event.get("timestamp", "")).replace("Z", "+00:00")))
+        except ValueError:
+            pass
+    cutoff = max(parsed_times) - timedelta(hours=hours) if parsed_times else None
+    buckets: dict[str, dict[str, Any]] = {}
+    visible = []
+    for event in events:
+        try:
+            timestamp = datetime.fromisoformat(str(event.get("timestamp", "")).replace("Z", "+00:00"))
+        except ValueError:
+            timestamp = None
+        if cutoff and timestamp and timestamp < cutoff:
+            continue
+        visible.append(event)
+        key = timestamp.astimezone(timezone.utc).strftime("%Y-%m-%d %H:00") if timestamp else "unknown"
+        bucket = buckets.setdefault(key, {"time": key, "logs": 0, "anomalies": 0})
+        bucket["logs"] += 1
+        if float(event.get("score", 0)) >= 0.55:
+            bucket["anomalies"] += 1
+    return {
+        "time_range": time_range,
+        "event_count": snapshot["event_count"],
+        "visible_count": len(visible),
+        "series": sorted(buckets.values(), key=lambda item: item["time"]),
+        "scope": "realtime_upload_store_only",
+    }
+
+
+@app.get("/api/scale/report")
+async def scale_report() -> dict[str, Any]:
+    jobs = (await asyncio.to_thread(ingestion_store.snapshot, 1))["jobs"]
+    total_events = sum(int(job.get("event_count", 0)) for job in jobs)
+    total_bytes = sum(int(job.get("size", 0)) for job in jobs)
+    total_duration = sum(float(job.get("duration_seconds", 0)) for job in jobs)
+    return {
+        "scope": "small_file_functional_measurement",
+        "jobs": len(jobs),
+        "bytes_processed": total_bytes,
+        "events_processed": total_events,
+        "duration_seconds": round(total_duration, 4),
+        "observed_events_per_second": round(total_events / total_duration, 2) if total_duration else 0,
+        "tb_processed": False,
+        "tb_claim": "未进行 TB 实测；不得将小文件吞吐直接宣称为 TB 处理结果。",
+    }
+
+
+@app.get("/api/evaluation/report")
+async def evaluation_report() -> dict[str, Any]:
+    manifest = await asyncio.to_thread(ingestion_store.manifest)
+    return {
+        "formal_evaluation": False,
+        "labels_used_for_detection": False,
+        "prediction_count": manifest["counts"]["events"],
+        "reason": "文件接入事件流不读取真实标签；需在预测冻结后提供独立标签文件才能计算召回率和误报率。",
+        "metrics": None,
+    }
 
 
 @app.get("/api/security/entities/{entity_id}")

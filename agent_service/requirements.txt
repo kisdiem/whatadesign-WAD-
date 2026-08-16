@@ -2,3 +2,4 @@ fastapi
 uvicorn[standard]
 openai-agents
 pydantic>=2
+drain3>=0.9.11

@@ -18,6 +18,7 @@ from .models import (
     RouterDecision,
     SecurityDraft,
     VerificationResult,
+    VerificationSummary,
 )
 from .repository import SecurityRepository, build_repository
 from .tools import AgentContext, KNOWLEDGE_TOOLS, SECURITY_TOOLS
@@ -96,6 +97,9 @@ security_agent = Agent[AgentContext](
         + ASSISTANT_INPUT_GUIDE
         + " "
         "For any claim about the current environment you MUST call at least one internal security tool before answering. "
+        "You are not a generic chatbot: reason explicitly through the WAD M0-M6 pipeline, multi-scale active retrieval, "
+        "cross-source semantic/entity graphs and long-horizon links when they are relevant. "
+        "When explaining a risk score, association, M0-M6 method or investigation playbook, call knowledge_search in addition to the security-data tool. "
         "Prefer persisted Finding/Investigation/entity results before raw logs. Use 24h as the default event context, "
         "expand to 7d only for high-risk/cross-host/incomplete cases, and use 30d baseline only as aggregated behavior context. "
         "Never invent logs, entities, baselines or attack steps. If a tool is unavailable, say which evidence is missing. "
@@ -289,6 +293,8 @@ class AgentRuntime:
         # Tool transcripts are isolated by mode. Only user-visible text is shared across modes.
         session = SQLiteSession(f"{request.conversation_id}:{decision.mode}", SESSION_DB)
         cross_mode_history = self._cross_mode_history(request.conversation_id, decision.mode)
+        structured = None
+        verification_summary = None
 
         if decision.mode == "security":
             await self._notify(status_callback, "正在规划安全分析")
@@ -310,6 +316,7 @@ class AgentRuntime:
                 if isinstance(draft_output, SecurityDraft)
                 else SecurityDraft(answer=str(draft_output), confidence=0.5)
             )
+            structured = draft.structured
             successful_tool_events = [event for event in context.tool_events if event.ok]
             if not successful_tool_events:
                 if snapshot_report and draft.answer.strip():
@@ -341,6 +348,21 @@ class AgentRuntime:
                     verification: VerificationResult = verification_run.final_output
                     verified = not verification.unsupported and not verification.contradictions
                     confidence = min(confidence, verification.confidence)
+                    total_items = sum(
+                        len(items)
+                        for items in (
+                            structured.facts,
+                            structured.assessments,
+                            structured.uncertainties,
+                            structured.recommended_queries,
+                        )
+                    ) if structured else 0
+                    downgraded_items = len(verification.unsupported) + len(verification.contradictions)
+                    verification_summary = VerificationSummary(
+                        totalItems=total_items,
+                        verifiedItems=max(total_items - downgraded_items, 0),
+                        downgradedItems=downgraded_items,
+                    )
                     if not verified:
                         await self._notify(status_callback, "正在收敛不受支持的结论")
                         repair_input = json.dumps(
@@ -383,7 +405,14 @@ class AgentRuntime:
             answer,
         )
 
-        evidence = [EvidenceRef(label=ref, ref=ref) for ref in sorted(context.evidence_refs)]
+        evidence = [
+            EvidenceRef(
+                label=context.evidence_labels.get(ref, ref),
+                ref=ref,
+                source=context.evidence_sources.get(ref),
+            )
+            for ref in sorted(context.evidence_refs)
+        ]
         return AgentQueryResponse(
             run_id=run_id,
             conversation_id=request.conversation_id,
@@ -394,4 +423,6 @@ class AgentRuntime:
             tool_events=context.tool_events,
             verified=verified,
             confidence=confidence,
+            structured=structured,
+            verification_summary=verification_summary,
         )

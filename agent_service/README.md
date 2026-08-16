@@ -9,6 +9,17 @@
 - `knowledge`：优先检索知识库，不读取内部日志工具。
 - `general`：普通对话，不具备内部安全数据权限。
 
+## 项目知识增强
+
+小影将外部模型作为可替换的推理层，项目特性由本仓库提供，而不是写在某个模型名称里：
+
+- `project_knowledge.json` 内置链影寻踪 M0-M6、三项核心创新、`weak_fusion_v2`、评测隔离协议、TB 级架构和调查工作流。
+- `hybrid_lexical_cjk_v1` 同时使用英文词元、中文字符片段、标题和标签权重，支持不带空格的中文检索。
+- 当前环境问题必须先调用 Finding、Investigation、Entity、Timeline 或 Log 工具；方法解释同时检索项目知识库。
+- 返回结果携带知识文档标题、文档 ID、版本和安全证据引用。
+- 安全分析结构化输出 `facts`、`assessments`、`uncertainties`、`recommended_queries`，高风险结论可进入独立证据核验器。
+- 项目知识库在未配置模型 Key 时仍可检索；未配置安全数据仓库时不会伪造当前环境事实。
+
 ## 安装与启动
 
 在仓库根目录：
@@ -32,6 +43,25 @@ uvicorn agent_service.app:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 前端 Vite 已将 `/api` 代理到 `127.0.0.1:8000`。
+
+## 小文件实时导入
+
+数据源页支持将 LOG、TXT、JSON、JSONL、CSV 小文件真实上传到后端。默认上限 8 MiB：
+
+```text
+POST /api/ingest/files
+GET  /api/ingest/snapshot
+GET  /api/ingest/jobs
+DELETE /api/ingest/sources/{source_id}
+GET  /api/detection/manifest
+GET  /api/log-index/overview
+GET  /api/scale/report
+GET  /api/evaluation/report
+```
+
+上传文件经过可解释的 `m0-m6-prototype-v1` 链路并写入 `run_state/wad_ingestion.db`。删除上传数据源时，会在同一事务中级联清理对应任务、事件、发现和案件。检测链路不读取真实标签。EVTX 二进制文件需要先导出为 XML/JSON/CSV，或后续安装 `python-evtx` 适配器。
+
+这条链路用于竞赛原型和小数据演示；`/api/scale/report` 会明确标注为小文件功能实测，不代表 TB 实测结果。
 
 ## 数据仓库
 
@@ -100,6 +130,18 @@ SSE 事件类型：`route`、`status`、`citation`、`final`、`error`。
 ### `GET /api/agent/health`
 
 返回 Agent 服务、OpenAI 配置状态和 Repository 类型，不返回任何密钥。
+
+### `POST /api/knowledge/search`
+
+不依赖模型调用的项目知识检索接口：
+
+```json
+{
+  "query": "为什么综合风险评分要结合多尺度和长周期关联？",
+  "top_k": 3,
+  "scope": ["project"]
+}
+```
 
 ## 安全边界
 

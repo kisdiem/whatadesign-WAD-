@@ -150,6 +150,22 @@ type DemoReplayEvent = SecurityEvent & {
   score?: number
 }
 
+function presentEventStreamSource(source: LogSource): LogSource {
+  if (!source.id.startsWith('UPLOAD-') && !source.path.startsWith('upload://')) return source
+  return {
+    ...source,
+    path: `stream://${source.name}`,
+    kind: '事件流',
+  }
+}
+
+type DemoReplayEvent = SecurityEvent & {
+  dataset: string
+  module_scores?: ModuleScores
+  raw_log_ref?: string
+  score?: number
+}
+
 type EventRow = {
   id: string
   time: string
@@ -778,12 +794,15 @@ function useRepositoryPresentation() {
 
 function PageTitle({ title, subtitle, extra }: { title: string; subtitle?: string; extra?: ReactNode }) {
   return (
-    <div className="mc-page-title">
-      <div>
-        <Title level={2}>{title}</Title>
-        {subtitle && <Text type="secondary">{subtitle}</Text>}
-      </div>
-      {extra}
+    <div className="mc-assistant-answer">
+      {content.split(/\r?\n/).map((rawLine, index) => {
+        const line = rawLine.trim()
+        if (!line) return <div className="mc-assistant-answer-gap" key={`gap-${index}`} />
+        if (/^【.+】$/.test(line)) return <div className="mc-assistant-answer-heading" key={`heading-${index}`}>{line.slice(1, -1)}</div>
+        if (/^\d+\.\s/.test(line)) return <div className="mc-assistant-answer-step" key={`step-${index}`}>{line}</div>
+        if (line.startsWith('- ')) return <div className="mc-assistant-answer-bullet" key={`bullet-${index}`}>{line.slice(2)}</div>
+        return <Paragraph key={`paragraph-${index}`}>{line}</Paragraph>
+      })}
     </div>
   )
 }
@@ -1149,18 +1168,11 @@ export default function MissionControlApp() {
     }
   }
 
-  const openAssistantWithContext = (nextContext: AssistantContext) => {
-    const kickoff = buildAssistantKickoff(nextContext)
-    setAssistantContext(nextContext)
-    setAssistantQuestion('')
-    setAssistantDockCollapsed(false)
-    navigate('/assistant')
-    if (!kickoff) {
-      setAssistantChat([{ role: 'assistant', content: assistantGreeting }])
-      return
-    }
-    setAssistantChat([{ role: 'assistant', content: assistantGreeting }])
-    void runAssistant(kickoff.prompt, nextContext, { appendUserMessage: false })
+  const deleteLogSource = async (sourceId: string) => {
+    const result = await deleteIngestedSource(sourceId)
+    setSourceItems((current) => current.filter((source) => source.id !== sourceId))
+    setIngestionRevision((current) => current + 1)
+    message.success(`已删除 ${result.name} 及其关联事件、发现和案件。`)
   }
 
   const openFindingAssistant = (finding: FindingRecord) => {
@@ -3026,20 +3038,25 @@ function AssistantPage({
                           </>
                         )}
                       </div>
-                    )}
-                    {item.role === 'assistant' && index === chat.length - 1 && actions.length > 0 && (
-                      <Space wrap className="mc-chat-actions">
-                        {actions.map((action) => (
-                          <Button key={action.key} size="small" onClick={action.onClick}>
-                            {action.label}
-                          </Button>
-                        ))}
-                      </Space>
-                    )}
+                      <RiskBadge value={item.risk} />
+                    </div>
+                    <Paragraph className="mc-stage-item-summary">
+                      <ExplainableText fallback={item.summary} context={{ caseId: selected.id, windowIds: [item.id], entityIds: [item.entity] }} onExplain={onExplain}>{item.summary}</ExplainableText>
+                    </Paragraph>
+                    <Space size={[6, 6]} wrap className="mc-stage-item-meta">
+                      <Tag>{readableEntityType(item.entityType)} · {item.entity}</Tag>
+                      <Tag color={activeFindingIds.has(item.id) ? 'green' : 'default'}>{activeFindingIds.has(item.id) ? `${timeRange} 当前窗口` : '历史锚点'}</Tag>
+                      <Text type="secondary">{item.events.length} 条事件</Text>
+                      <Text type="secondary">{item.host || '主机未解析'}</Text>
+                    </Space>
+                    <Space size={4} wrap className="mc-stage-item-actions">
+                      {stage !== 'main' && <Button type="link" size="small" onClick={() => onSetFindingStage(selected.id, item.id, 'main')}>加入主链</Button>}
+                      {stage !== 'candidate' && <Button type="link" size="small" onClick={() => onSetFindingStage(selected.id, item.id, 'candidate')}>保留候选</Button>}
+                      {stage !== 'excluded' && <Button type="link" size="small" danger onClick={() => onSetFindingStage(selected.id, item.id, 'excluded')}>排除</Button>}
+                    </Space>
                   </div>
                 </div>
               ))}
-              {sending && <div><Badge status="processing" /> 小影处理中…</div>}
             </div>
             <div className="mc-chat-composer">
               <Input.TextArea value={question} onChange={(event) => onQuestionChange(event.target.value)} onPressEnter={(event) => { if (!event.shiftKey) { event.preventDefault(); onSubmit(question) } }} autoSize={{ minRows: 2, maxRows: 5 }} placeholder="输入调查问题" />
@@ -3153,6 +3170,229 @@ function AssistantDock({
   }
 
   return (
+    <>
+      <PageTitle title="案件调查" extra={<Space><Button onClick={() => onOpenAssistant(selected)}>分析当前案件</Button><Button icon={<RobotOutlined />} onClick={() => submitCase(false)}>提交当前攻击链给小影</Button><Button type="primary" icon={<RobotOutlined />} onClick={() => submitCase(true)}>生成攻击链分析报告</Button></Space>} />
+      <Row gutter={[12, 12]}>
+        <Col xs={24} xl={5}>
+          <Card title="案件" className="mc-investigation-list">
+            <List
+              dataSource={cases}
+              renderItem={(item) => (
+                <List.Item className={item.id === selected.id ? 'active' : ''} onClick={() => setSelectedId(item.id)}>
+                  <List.Item.Meta title={<Text strong>{item.title}</Text>} description={`${item.id} · ${item.owner}`} />
+                  <Tag color={item.severity === 'critical' ? 'red' : 'orange'}>{severityLabel[item.severity]}</Tag>
+                </List.Item>
+              )}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} xl={19}>
+          <Card className="mc-case-card">
+            <div className="mc-case-head">
+              <div>
+                <Title level={3}>{selected.title}</Title>
+                <Text type="secondary">{selected.id} · {selected.owner} · {statusLabel[selected.status === 'contained' ? 'closed' : selected.status]}</Text>
+                <Paragraph style={{ margin: '8px 0 0' }}>{selected.summary}</Paragraph>
+                <Space size={[6, 6]} wrap>
+                  <Tag color="blue">多尺度上下文主动检索</Tag>
+                  <Tag color="geekblue">跨时间窗口长周期关联</Tag>
+                  <Tag color="cyan">跨源语义与实体关系建模</Tag>
+                </Space>
+              </div>
+              <Space direction="vertical" align="end" size={4}>
+                <Tag color="processing">锚点 {related[0]?.entity || '—'}</Tag>
+                <Text type="secondary">完整链路 {related.length} 阶段 · {timeRange} 当前窗口 {activeRelatedCount} 阶段</Text>
+              </Space>
+            </div>
+          </Card>
+
+          <Row gutter={[12, 12]}>
+            <Col span={24}>
+              <Card title={<HelpTitle title="攻击链图" description="始终保留完整长周期链路；当前时间窗内节点高亮，窗口外节点作为历史锚点淡化展示。连线表示关联证据，不等同于已确认攻击。" />} className="mc-panel">
+                <Suspense fallback={<ChartFallback height={360} />}>
+                  <EChartsView
+                    option={graphOption}
+                    style={{ height: 360 }}
+                    onEvents={{
+                      dblclick: (params) => {
+                        const finding = related.find((item) => item.id === params.data?.id)
+                        if (finding) {
+                          onExplain(finding.title, { caseId: selected.id, windowIds: [finding.id], entityIds: [finding.entity] })
+                          return
+                        }
+                        const entity = params.data?.id || params.data?.name
+                        if (entity) onExplain(entity, { caseId: selected.id, entityIds: [entity] })
+                      },
+                    }}
+                  />
+                </Suspense>
+              </Card>
+            </Col>
+          </Row>
+
+          <Row gutter={[12, 12]}>
+            {renderStage('main', main)}
+            {renderStage('candidate', candidate)}
+            {renderStage('excluded', excluded)}
+          </Row>
+
+          <Row gutter={[12, 12]}>
+            <Col xs={24} lg={14}>
+              <Card title={<HelpTitle title="证据时间线" description="按发生时间排列案件中的关键事件，便于核对先后关系和调查状态。" />} className="mc-panel">
+                <Table
+                  rowKey="id"
+                  size="small"
+                  pagination={{ pageSize: 6, hideOnSinglePage: true }}
+                  columns={[
+                    { title: '发生时间', dataIndex: 'start', key: 'start', width: 165 },
+                    { title: '发生了什么', dataIndex: 'title', key: 'title', width: 220 },
+                    { title: '涉及实体', dataIndex: 'entity', key: 'entity', width: 145 },
+                    { title: '证据说明', key: 'statement', render: (_: unknown, row: FindingRecord) => evidenceByFinding[row.id]?.[0]?.statement || row.summary },
+                    { title: '窗口归属', key: 'scope', width: 105, render: (_: unknown, row: FindingRecord) => <Tag color={activeFindingIds.has(row.id) ? 'green' : 'default'}>{activeFindingIds.has(row.id) ? timeRange : '历史锚点'}</Tag> },
+                    { title: '调查状态', key: 'stage', width: 105, render: (_: unknown, row: FindingRecord) => <Tag color={board[row.id] === 'main' ? 'blue' : board[row.id] === 'candidate' ? 'orange' : 'default'}>{readableStage(board[row.id] || 'candidate')}</Tag> },
+                  ]}
+                  dataSource={[...related].sort((a, b) => a.start.localeCompare(b.start))}
+                  locale={{ emptyText: '当前案件暂无可展示证据' }}
+                  scroll={{ x: 880 }}
+                />
+                {/*
+                  items={related.map((finding) => {
+                    const stage = board[finding.id]
+                    const dot = stage === 'main'
+                      ? <CheckCircleFilled style={{ color: '#1677ff' }} />
+                      : stage === 'candidate'
+                        ? <ClockCircleOutlined style={{ color: '#f59e0b' }} />
+                        : <span style={{ color: '#94a3b8' }}>×</span>
+                    return {
+                      dot,
+                      children: (
+                        <div>
+                          <strong>{finding.start} · {finding.title}</strong>
+                          <div><Text type="secondary">{finding.id} · {finding.entity} · {stage}</Text></div>
+                          <div><Text>{evidenceByFinding[finding.id]?.[0]?.statement || finding.summary}</Text></div>
+                        </div>
+                      ),
+                    }
+                  })}
+                */}
+              </Card>
+            </Col>
+            <Col xs={24} lg={10}>
+              <Card title={<HelpTitle title="实体枢轴" description="汇总案件中反复出现的用户、主机、进程和地址，用于快速切换调查对象。" />} className="mc-panel">
+                <List
+                  dataSource={entityStats}
+                  renderItem={(item) => (
+                    <List.Item actions={[<a key="open" onClick={() => onOpenEntity(item.entity)}>查看实体</a>]}>
+                      <List.Item.Meta title={<Text strong>{item.entity}</Text>} description={`${item.type} · 参与 ${item.findingCount} 个发现 · ${item.eventCount} 条事件 · ${item.hosts.join('、') || '主机未解析'}`} />
+                    </List.Item>
+                  )}
+                />
+              </Card>
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+    </>
+  )
+}
+
+function LogsPage({
+  findings,
+  evidenceByFinding,
+  demoEvents,
+  timeRange,
+  onSubmitBatch,
+  onExplain,
+}: {
+  findings: FindingRecord[]
+  evidenceByFinding: Record<string, EvidenceRecord[]>
+  demoEvents: DemoReplayEvent[]
+  timeRange: string
+  onSubmitBatch: (prompt: string, context: AssistantContext) => void
+  onExplain: (excerpt: string, context: AssistantContext) => void
+}) {
+  const location = useLocation()
+  const useRepositoryData = useRepositoryPresentation()
+  const [query, setQuery] = useState('')
+  const [source, setSource] = useState('all')
+  const [selected, setSelected] = useState<EventRow | null>(null)
+  const [remoteEvents, setRemoteEvents] = useState<EventRow[]>([])
+  const [loading, setLoading] = useState(false)
+  const [loadError, setLoadError] = useState('')
+  const [page, setPage] = useState(1)
+  const requestedQuery = useMemo(() => new URLSearchParams(location.search).get('q') || '', [location.search])
+  useEffect(() => {
+    if (requestedQuery) {
+      setQuery(requestedQuery)
+    }
+  }, [requestedQuery])
+
+  const events = useMemo<EventRow[]>(() => {
+    if (demoEvents.length) {
+      return buildReplayEventRows(demoEvents, findings, evidenceByFinding)
+    }
+    return findings.flatMap((finding) => finding.events.map((event) => {
+      const source = finding.sourceTypes[0] || 'Short'
+      const normalizedAction = normalizedEventCategory(event.action, event.raw, event.process)
+      return {
+        ...event,
+        source,
+        action: describeLogEvent({ ...event, source, normalizedAction }),
+        normalizedAction,
+        findingId: finding.id,
+        findingTitle: finding.title,
+        risk: finding.risk,
+        evidenceIds: (evidenceByFinding[finding.id] || []).filter((item) => item.eventId === event.id).map((item) => item.id),
+      }
+    }))
+  }, [demoEvents, evidenceByFinding, findings])
+  useEffect(() => {
+    if (!useRepositoryData) {
+      setRemoteEvents([])
+      setLoadError('')
+      return
+    }
+    let active = true
+    const handle = window.setTimeout(async () => {
+      setLoading(true)
+      setLoadError('')
+      try {
+        const result = await searchSecurityLogs({
+          sourceTypes: source === 'all' ? [] : [source],
+          keywords: query.trim() ? query.trim().split(/\s+/).slice(0, 6) : [],
+          limit: 200,
+        })
+        if (!active) return
+        setRemoteEvents(filterRowsByTimeRange(result.events.map(toEventRow), timeRange))
+      } catch (error) {
+        if (!active) return
+        setRemoteEvents([])
+        setLoadError(error instanceof Error ? error.message : '真实日志查询失败。')
+      } finally {
+        if (active) setLoading(false)
+      }
+    }, 220)
+    return () => {
+      active = false
+      window.clearTimeout(handle)
+    }
+  }, [query, source, timeRange, useRepositoryData])
+
+  const filtered = useMemo(() => {
+    if (useRepositoryData) return remoteEvents
+    const sourceMatched = source === 'all' ? events : events.filter((event) => event.source === source)
+    const ranged = source === 'all'
+      ? filterRowsBySourceTimeRange(sourceMatched, timeRange)
+      : filterRowsByTimeRange(sourceMatched, timeRange)
+    const normalizedQuery = query.trim().toLowerCase()
+    if (!normalizedQuery) return ranged
+    return ranged.filter((event) => {
+      const haystack = [event.id, event.action, event.normalizedAction, event.actor, event.host, event.process, event.ip, event.source, event.raw, event.findingTitle].join(' ').toLowerCase()
+      return haystack.includes(normalizedQuery)
+    })
+  }, [events, query, remoteEvents, source, timeRange, useRepositoryData])
+
+  return (
     <Card className="mc-assistant-dock" style={position}>
       <div className={`mc-assistant-dock-head ${dragging ? 'is-dragging' : ''}`} onPointerDown={startDragging}>
         <Space size={8}>
@@ -3180,7 +3420,6 @@ function AssistantDock({
       </div>
     </Card>
   )
-}
 
 function EvaluationPage({ findings, caseBoards, rawEvents }: { findings: FindingRecord[]; caseBoards: Record<string, CaseBoard>; rawEvents: number }) {
   const reviewed = Object.values(caseBoards).reduce((sum, board) => sum + Object.keys(board).length, 0)

@@ -30,6 +30,8 @@ class AgentContext:
     tool_events: list[ToolEvent] = field(default_factory=list)
     evidence_refs: set[str] = field(default_factory=set)
     evidence_payloads: list[dict[str, Any]] = field(default_factory=list)
+    evidence_labels: dict[str, str] = field(default_factory=dict)
+    evidence_sources: dict[str, str] = field(default_factory=dict)
 
     async def notify(self, label: str) -> None:
         if self.status_callback:
@@ -63,6 +65,17 @@ class AgentContext:
         self.evidence_refs.update(refs)
         if result.ok and result.data is not None:
             self.evidence_payloads.append({"tool": tool, "data": result.data, "evidence_refs": refs})
+            if tool == "knowledge.search" and isinstance(result.data, dict):
+                for document in result.data.get("documents", []):
+                    if not isinstance(document, dict):
+                        continue
+                    reference = str(document.get("document_id") or document.get("id") or "")
+                    if not reference:
+                        continue
+                    self.evidence_labels[reference] = str(document.get("title") or document.get("name") or reference)
+                    source = document.get("source") or document.get("path") or document.get("knowledge_version")
+                    if source:
+                        self.evidence_sources[reference] = str(source)
         self.tool_events.append(ToolEvent(tool=tool, ok=result.ok, message=result.message or ("ok" if result.ok else "failed"), evidence_refs=refs))
         payload = {"ok": result.ok, "message": result.message, "data": result.data, "evidence_refs": refs}
         return json.dumps(payload, ensure_ascii=False)
@@ -174,7 +187,7 @@ async def knowledge_search(
     result = await wrapper.context.repository.search_knowledge(
         query=query,
         top_k=max(1, min(top_k, 10)),
-        scope=scope or ["security", "organization", "historical_cases"],
+        scope=scope or ["project", "security", "organization", "historical_cases"],
     )
     return wrapper.context.record("knowledge.search", result)
 

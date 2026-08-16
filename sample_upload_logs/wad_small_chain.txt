@@ -1,0 +1,6 @@
+2026-08-16T10:00:00Z sshd host=demo-web user=alice failed password from 10.0.0.8
+2026-08-16T10:00:12Z sshd host=demo-web user=alice failed password from 10.0.0.8
+2026-08-16T10:01:03Z sudo host=demo-web user=alice session opened for user root
+2026-08-16T10:02:25Z audit host=demo-web user=alice process=powershell.exe command="powershell -enc SQBFAFgA"
+2026-08-16T10:03:10Z account host=demo-web useradd user=backup_admin
+2026-08-16T10:04:40Z dns host=demo-web user=backup_admin connect outbound destination=198.51.100.42
