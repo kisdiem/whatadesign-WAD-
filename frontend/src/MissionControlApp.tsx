@@ -47,9 +47,7 @@ import {
 } from '@ant-design/icons'
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import {
-  anomalyWindows,
-  investigations,
-  overviewSeries,
+  type AnomalyWindow,
   type Investigation,
   type LogSource,
   type SecurityEvent,
@@ -96,9 +94,11 @@ const PREFER_DEMO_DATA = import.meta.env.VITE_PREFER_DEMO_DATA !== 'false'
 const EChartsView = lazy(() => import('./EChartsView'))
 
 const preparedDemoSources: LogSource[] = [
-  { id: 'DEMO-SHORT', name: 'Short', path: '/demo-data/Short', kind: '演示日志源', status: 'online', size: '17 条事件 / 15 分钟', lastRead: '2022-02-08 08:30 - 08:45（UTC）' },
-  { id: 'DEMO-LONG', name: 'Long', path: '/demo-data/Long', kind: '演示日志源', status: 'online', size: '400 条事件 / 24 小时', lastRead: '2022-01-23 00:00 - 23:59（UTC）' },
+  { id: 'DEMO-SHORT', name: 'Short', path: '/demo-data/Short', kind: '可追溯回放', status: 'online', size: '2,570 条事件 / 30 分钟', lastRead: '2022-01-24 13:30 - 14:00（UTC）' },
+  { id: 'DEMO-LONG', name: 'Long', path: '/demo-data/Long', kind: '可追溯回放', status: 'online', size: '44,175 条事件 / 7 天', lastRead: '2022-01-24 13:30 - 2022-01-31 13:30（UTC）' },
 ]
+
+type DemoReplayEvent = SecurityEvent & { dataset: DemoDatasetId }
 
 type EventRow = {
   id: string
@@ -589,11 +589,14 @@ export default function MissionControlApp() {
   // made the source appear to contain only its last handful of findings.
   const [timeRange, setTimeRange] = useState('7d')
   const [autoRefresh, setAutoRefresh] = useState(true)
-  const [windowItems, setWindowItems] = useState(anomalyWindows)
-  const [demoOverviewSeries, setDemoOverviewSeries] = useState<Array<{ time: string; logs: number; anomalies: number; source?: string }>>(overviewSeries)
-  const [caseItems, setCaseItems] = useState(investigations)
-  const [caseBoards, setCaseBoards] = useState<Record<string, CaseBoard>>(() => initialCaseBoards(investigations))
+  const [windowItems, setWindowItems] = useState<AnomalyWindow[]>([])
+  const [demoOverviewSeries, setDemoOverviewSeries] = useState<Array<{ time: string; logs: number; anomalies: number; source?: string }>>([])
+  const [demoEvents, setDemoEvents] = useState<DemoReplayEvent[]>([])
+  const [caseItems, setCaseItems] = useState<Investigation[]>([])
+  const [caseBoards, setCaseBoards] = useState<Record<string, CaseBoard>>({})
   const [sourceItems, setSourceItems] = useState(preparedDemoSources)
+  const [dashboardLoading, setDashboardLoading] = useState(true)
+  const [dashboardError, setDashboardError] = useState('')
 
   const referenceDate = useMemo(() => {
     const datedValues = windowItems.flatMap((item) => [item.start, item.end].map(extractDatePrefix).filter(Boolean) as string[])
@@ -657,6 +660,8 @@ export default function MissionControlApp() {
   useEffect(() => {
     let active = true
     const refreshDashboard = async () => {
+      setDashboardLoading(true)
+      setDashboardError('')
       try {
         const datasets: DemoDatasetId[] = sourceItems
           .filter((source) => source.id === 'DEMO-SHORT' || source.id === 'DEMO-LONG')
@@ -672,17 +677,27 @@ export default function MissionControlApp() {
         if (!active) return
         setWindowItems(windows)
         setCaseItems(cases)
+        setDemoEvents(loaded.flatMap((data) => data.events.map((event) => ({ ...event, dataset: data.dataset }))))
         setDemoOverviewSeries(loaded.flatMap((data) => data.overviewSeries.map((item) => ({ ...item, source: data.dataset }))))
-      } catch {
+      } catch (demoError) {
         if (!active) return
         try {
           const [windows, cases] = await Promise.all([getWindows(), getInvestigations()])
-          setWindowItems(windows.length ? windows : anomalyWindows)
-          setCaseItems(cases.length ? cases : investigations)
-        } catch {
-          setWindowItems(anomalyWindows)
-          setCaseItems(investigations)
+          setWindowItems(windows)
+          setCaseItems(cases)
+          setDemoEvents([])
+          setDemoOverviewSeries([])
+        } catch (apiError) {
+          setWindowItems([])
+          setCaseItems([])
+          setDemoEvents([])
+          setDemoOverviewSeries([])
+          const replayMessage = demoError instanceof Error ? demoError.message : '回放包加载失败'
+          const apiMessage = apiError instanceof Error ? apiError.message : '检测 API 不可用'
+          setDashboardError(`${replayMessage}；${apiMessage}`)
         }
+      } finally {
+        if (active) setDashboardLoading(false)
       }
     }
     void refreshDashboard()
@@ -973,7 +988,7 @@ export default function MissionControlApp() {
         />
 
         <div className="mc-sidebar-health">
-          <div><Badge status="processing" /> 检测服务运行中</div>
+          <div><Badge status="processing" /> {PREFER_DEMO_DATA ? '可追溯回放运行中' : '检测服务运行中'}</div>
           <div><Badge status={onlineSources === sourceItems.length ? 'success' : 'warning'} /> {onlineSources}/{sourceItems.length} 日志源在线</div>
           <div><Badge status="success" /> 证据状态库已启用</div>
         </div>
@@ -1000,12 +1015,14 @@ export default function MissionControlApp() {
         </Header>
 
         <Content className="mc-content">
+          {dashboardLoading && <Card style={{ marginBottom: 12 }}><Badge status="processing" /> 正在加载 Short / Long 可追溯回放数据…</Card>}
+          {dashboardError && <Card style={{ marginBottom: 12, borderColor: '#ff4d4f' }}><Text type="danger">数据加载失败：{dashboardError}。系统未回退到静态 Mock。</Text></Card>}
           <Routes>
             <Route path="/overview" element={<OverviewPage findings={findings} cases={filteredCaseItems} caseBoards={caseBoards} timeRange={timeRange} inputOverviewSeries={demoOverviewSeries} />} />
             <Route path="/findings" element={<FindingsPage findings={findings} evidenceByFinding={evidenceByFinding} onOpenAssistant={openFindingAssistant} onOpenEntity={(entityId) => navigate(`/entities?entity=${encodeURIComponent(entityId)}`)} onOpenInvestigation={() => navigate('/investigations')} />} />
             <Route path="/entities" element={<EntityInvestigationPage profiles={entityProfiles} findings={findings} timeRange={timeRange} onOpenAssistant={openEntityAssistant} onSubmitBatch={submitBatchToAssistant} onExplain={explainWithAssistant} onOpenFinding={() => navigate('/findings')} />} />
             <Route path="/investigations" element={<InvestigationsPage cases={filteredCaseItems} findings={findings} evidenceByFinding={evidenceByFinding} caseBoards={caseBoards} onSetFindingStage={setFindingStage} onOpenAssistant={openCaseAssistant} onSubmitBatch={submitBatchToAssistant} onGenerateReport={generateAttackChainReport} onExplain={explainWithAssistant} onOpenEntity={(entityId) => navigate(`/entities?entity=${encodeURIComponent(entityId)}`)} />} />
-            <Route path="/logs" element={<LogsPage findings={findings} evidenceByFinding={evidenceByFinding} timeRange={timeRange} onSubmitBatch={submitBatchToAssistant} onExplain={explainWithAssistant} />} />
+            <Route path="/logs" element={<LogsPage findings={findings} evidenceByFinding={evidenceByFinding} demoEvents={demoEvents} timeRange={timeRange} onSubmitBatch={submitBatchToAssistant} onExplain={explainWithAssistant} />} />
             <Route path="/sources" element={<SourcesPage sources={sourceItems} onDeleteSource={(sourceId) => setSourceItems((current) => current.filter((source) => source.id !== sourceId))} onRefresh={async () => {}} onRegisterImportedSources={registerImportedSources} />} />
             <Route
               path="/assistant"
@@ -1026,7 +1043,7 @@ export default function MissionControlApp() {
                 />
               )}
             />
-            <Route path="/evaluation" element={<EvaluationPage findings={findings} caseBoards={caseBoards} />} />
+            <Route path="/evaluation" element={<EvaluationPage findings={findings} caseBoards={caseBoards} rawEvents={demoEvents.length} />} />
             <Route path="/mission-control" element={<Navigate to="/overview" replace />} />
             <Route path="/anomalies" element={<Navigate to="/findings" replace />} />
             <Route path="/settings" element={<Navigate to="/evaluation" replace />} />
@@ -1079,7 +1096,7 @@ function OverviewPage({
           // Combine only after normalising the all-source view to hours.
           const byHour = new Map<string, { logs: number; anomalies: number }>()
           inputOverviewSeries.forEach((item) => {
-            const hour = item.time.slice(0, 13)
+            const hour = `${item.time.slice(0, 14)}:00`
             const current = byHour.get(hour) || { logs: 0, anomalies: 0 }
             current.logs += item.logs
             current.anomalies += item.anomalies
@@ -1091,11 +1108,7 @@ function OverviewPage({
           .filter((item) => item.source === source)
           .map(({ time, logs, anomalies }) => ({ time, logs, anomalies }))
     const ordered = selected.sort((left, right) => left.time.localeCompare(right.time))
-    if (timeRange === '30d') return ordered
-    const newest = ordered[ordered.length - 1]?.time
-    if (!newest) return ordered
-    const cutoff = Date.parse(newest.replace(' ', 'T')) - rangeToMilliseconds(timeRange)
-    return ordered.filter((item) => Date.parse(item.time.replace(' ', 'T')) >= cutoff)
+    return timeRange === '30d' ? ordered : filterRowsByTimeRange(ordered, timeRange)
   }, [inputOverviewSeries, source, timeRange])
 
   const rawEvents = visibleSeries.reduce((sum, item) => sum + item.logs, 0)
@@ -1533,25 +1546,6 @@ function EntityInvestigationPage({
           </Row>
 
            <Row gutter={[12, 12]}>
-             {false && <Col xs={24} lg={12}>
-              <Card title="主机历史" className="mc-panel">
-                <List
-                  dataSource={selected.hostHistory}
-                  renderItem={(item) => (
-                    <List.Item>
-                      <div style={{ width: '100%' }}>
-                        <div className="mc-setting-row">
-                          <strong>{item.host}</strong>
-                          <Space><Text>{item.count}</Text>{item.isNew && <Tag color="orange">新增</Tag>}</Space>
-                        </div>
-                        <Progress percent={item.loginShare} showInfo={false} />
-                        <Text type="secondary">{item.loginCount > 0 ? `${item.loginShare}% 登录事件 · ${item.loginCount} 次` : '无登录事件'}</Text>
-                      </div>
-                    </List.Item>
-                  )}
-                />
-              </Card>
-             </Col>}
              <Col xs={24}>
               <Card title={<HelpTitle title="基线对比" description="将当前实体行为与历史常态比较。偏离表示值得关注，不代表单独成立的攻击证据。" />} className="mc-panel">
                 <Table
@@ -1645,9 +1639,8 @@ function InvestigationsPage({
     }
   }, [cases, selectedId])
   const selected = cases.find((item) => item.id === selectedId) || cases[0]
-  if (!selected) return null
-  const related = findings.filter((finding) => selected?.windowIds.includes(finding.id))
-  const board = caseBoards[selected.id] || {}
+  const related = selected ? findings.filter((finding) => selected.windowIds.includes(finding.id)) : []
+  const board = selected ? caseBoards[selected.id] || {} : {}
   const main = related.filter((finding) => board[finding.id] === 'main')
   const candidate = related.filter((finding) => board[finding.id] === 'candidate')
   const excluded = related.filter((finding) => board[finding.id] === 'excluded')
@@ -1734,6 +1727,9 @@ function InvestigationsPage({
       emphasis: { focus: 'adjacency' },
     }],
   }), [board, graphEntities, graphFindings])
+
+  // Keep every hook above this guard: cases arrive asynchronously in replay mode.
+  if (!selected) return null
 
   const renderStage = (_title: string, stage: FindingStage, items: FindingRecord[]) => {
     const stageTitle = stage === 'main' ? '主链证据' : stage === 'candidate' ? '候选证据' : '已排除'
@@ -1912,12 +1908,14 @@ function InvestigationsPage({
 function LogsPage({
   findings,
   evidenceByFinding,
+  demoEvents,
   timeRange,
   onSubmitBatch,
   onExplain,
 }: {
   findings: FindingRecord[]
   evidenceByFinding: Record<string, EvidenceRecord[]>
+  demoEvents: DemoReplayEvent[]
   timeRange: string
   onSubmitBatch: (prompt: string, context: AssistantContext) => void
   onExplain: (excerpt: string, context: AssistantContext) => void
@@ -1937,16 +1935,36 @@ function LogsPage({
     }
   }, [requestedQuery])
 
-  const events = useMemo<EventRow[]>(() => findings.flatMap((finding) => finding.events.map((event) => ({
-    ...event,
-    // Short / Long 是用户可选择的数据源；原始文件名只保留在 rawLogRef 中作为证据引用。
-    source: finding.sourceTypes[0] || 'Short',
-    action: readableAction(event.action),
-    findingId: finding.id,
-    findingTitle: finding.title,
-    risk: finding.risk,
-    evidenceIds: (evidenceByFinding[finding.id] || []).filter((item) => item.eventId === event.id).map((item) => item.id),
-  }))), [findings, evidenceByFinding])
+  const events = useMemo<EventRow[]>(() => {
+    const findingByEventId = new Map(findings.flatMap((finding) => finding.events.map((event) => [event.id, finding] as const)))
+    if (demoEvents.length) {
+      return demoEvents.map((event) => {
+        const finding = findingByEventId.get(event.id)
+        return {
+          ...event,
+          source: event.dataset,
+          action: readableAction(event.action),
+          rawLogRef: `${event.source}:${event.id}`,
+          entities: [event.actor, event.host, event.process, event.ip].filter((value): value is string => Boolean(value)),
+          findingId: finding?.id,
+          findingTitle: finding?.title || '未形成异常发现',
+          risk: finding?.risk,
+          evidenceIds: finding
+            ? (evidenceByFinding[finding.id] || []).filter((item) => item.eventId === event.id).map((item) => item.id)
+            : [],
+        }
+      })
+    }
+    return findings.flatMap((finding) => finding.events.map((event) => ({
+      ...event,
+      source: finding.sourceTypes[0] || 'Short',
+      action: readableAction(event.action),
+      findingId: finding.id,
+      findingTitle: finding.title,
+      risk: finding.risk,
+      evidenceIds: (evidenceByFinding[finding.id] || []).filter((item) => item.eventId === event.id).map((item) => item.id),
+    })))
+  }, [demoEvents, evidenceByFinding, findings])
   useEffect(() => {
     if (!useRepositoryData) {
       setRemoteEvents([])
@@ -1979,10 +1997,13 @@ function LogsPage({
     }
   }, [query, source, timeRange, useRepositoryData])
 
-  const filtered = !useRepositoryData ? events.filter((event) => {
-    const haystack = [event.id, event.action, event.actor, event.host, event.process, event.ip, event.source, event.raw, event.findingTitle].join(' ').toLowerCase()
-    return haystack.includes(query.toLowerCase()) && (source === 'all' || event.source === source)
-  }) : remoteEvents
+  const filtered = useMemo(() => {
+    if (useRepositoryData) return remoteEvents
+    return filterRowsByTimeRange(events, timeRange).filter((event) => {
+      const haystack = [event.id, event.action, event.actor, event.host, event.process, event.ip, event.source, event.raw, event.findingTitle].join(' ').toLowerCase()
+      return haystack.includes(query.toLowerCase()) && (source === 'all' || event.source === source)
+    })
+  }, [events, query, remoteEvents, source, timeRange, useRepositoryData])
 
   const eventContext = (row: EventRow): AssistantContext => ({
     windowIds: row.findingId ? [row.findingId] : [],
@@ -1991,7 +2012,8 @@ function LogsPage({
   })
 
   const submitLogs = () => {
-    const snapshot = filtered.map((event) => [
+    const sample = filtered.slice(0, 200)
+    const snapshot = sample.map((event) => [
       `time=${event.time}`,
       `source=${event.source}`,
       `event=${event.action}`,
@@ -2005,7 +2027,7 @@ function LogsPage({
     ].join('; ')).join('\n')
     const entityIds = Array.from(new Set(filtered.flatMap((event) => [event.actor, event.host, event.process, event.ip, ...(event.entities || [])]).filter((value): value is string => Boolean(value))))
     onSubmitBatch(
-      `The following is the complete set of ${filtered.length} events currently displayed by Log Search after its active query and source filters. Analyze in concise Chinese: identify the dominant behavior, explain whether there is a coherent sequence worth investigating, list at most four events or patterns that deserve attention, and state what cannot be concluded. Event labels and risk scores are only leads, not ground truth.\n\n${snapshot}`,
+      `Log Search currently contains ${filtered.length} matching events. The snapshot below contains the first ${sample.length} events after the active time, source and keyword filters. Analyze in concise Chinese: identify the dominant behavior, explain whether there is a coherent sequence worth investigating, list at most four events or patterns that deserve attention, and state what cannot be concluded. Do not claim the snapshot is the complete dataset. Event labels and risk scores are only leads, not ground truth.\n\n${snapshot}`,
       { windowIds: Array.from(new Set(filtered.map((event) => event.findingId).filter((value): value is string => Boolean(value)))), entityIds, timeRange },
     )
   }
@@ -2034,10 +2056,10 @@ function LogsPage({
           </div>
         ) : (
           <div style={{ marginBottom: 12 }}>
-            <Text type="secondary">演示优先模式 · 当前页面使用演示数据保持展示稳定性</Text>
+            <Text type="secondary">可追溯回放模式 · 已载入 {events.length.toLocaleString()} 条原始事件，当前筛选命中 {filtered.length.toLocaleString()} 条</Text>
           </div>
         )}
-        <Table rowKey="id" loading={loading} columns={columns} dataSource={filtered} pagination={{ pageSize: 10, showSizeChanger: false }} scroll={{ x: 1100 }} onRow={(row) => ({ onClick: () => setSelected(row) })} />
+        <Table rowKey="id" loading={loading} columns={columns} dataSource={filtered} pagination={{ pageSize: 50, showSizeChanger: false, showTotal: (total) => `共 ${total.toLocaleString()} 条` }} scroll={{ x: 1100 }} onRow={(row) => ({ onClick: () => setSelected(row) })} />
       </Card>
 
       <Drawer open={Boolean(selected)} onClose={() => setSelected(null)} width={620} title={selected?.id}>
@@ -2470,10 +2492,9 @@ function AssistantDock({
   )
 }
 
-function EvaluationPage({ findings, caseBoards }: { findings: FindingRecord[]; caseBoards: Record<string, CaseBoard> }) {
-  const rawEvents = overviewSeries.reduce((sum, item) => sum + item.logs, 0)
+function EvaluationPage({ findings, caseBoards, rawEvents }: { findings: FindingRecord[]; caseBoards: Record<string, CaseBoard>; rawEvents: number }) {
   const reviewed = Object.values(caseBoards).reduce((sum, board) => sum + Object.keys(board).length, 0)
-  const analystReduction = ((rawEvents - reviewed) / rawEvents) * 100
+  const analystReduction = rawEvents > 0 ? ((rawEvents - reviewed) / rawEvents) * 100 : 0
   const metrics = [
     { title: 'PR-AUC', value: 85.0, suffix: '%' },
     { title: 'Recall@1%FPR', value: 80.0, suffix: '%' },
@@ -2492,7 +2513,10 @@ function EvaluationPage({ findings, caseBoards }: { findings: FindingRecord[]; c
 
   return (
     <>
-      <PageTitle title="评估" />
+      <PageTitle title="评估" subtitle="Short / Long 回放包不含真实标签；准确率指标仅作为历史界面模板，不代表本次回放评测结果。" />
+      <Card style={{ marginBottom: 12, borderColor: '#faad14' }}>
+        <Badge status="warning" /> 当前回放清单明确记录 <Text code>contains_labels=false</Text>、<Text code>model_execution=false</Text>、<Text code>formal_evaluation=false</Text>。正式召回率、误报率和消融结论必须由独立标签文件在预测落盘后生成。
+      </Card>
       <Row gutter={[12, 12]}>
         {metrics.map((item) => (
           <Col xs={12} md={8} xl={4} key={item.title}>

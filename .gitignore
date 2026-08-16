@@ -7,6 +7,9 @@ outputs/*
 !outputs/audit/
 !outputs/audit/**
 data/
+!src/data/
+!src/data/__init__.py
+!src/data/adapters.py
 downloads/
 *.zip
 *.tar

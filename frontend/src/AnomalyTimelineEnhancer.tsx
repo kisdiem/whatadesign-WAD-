@@ -13,6 +13,7 @@ const severityWeight: Record<Severity, number> = {
   high: 3,
   medium: 2,
   low: 1,
+  info: 0,
 }
 
 const severityLabel: Record<Severity, string> = {
@@ -20,6 +21,7 @@ const severityLabel: Record<Severity, string> = {
   high: '高危',
   medium: '中危',
   low: '低危',
+  info: '正常',
 }
 
 const sourceOptions = Array.from(new Set(anomalyWindows.flatMap((item) => item.sourceTypes)))

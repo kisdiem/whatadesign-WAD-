@@ -1,6 +1,6 @@
 import generatedDataset from './generatedDataset.json'
 
-export type Severity = 'critical' | 'high' | 'medium' | 'low'
+export type Severity = 'critical' | 'high' | 'medium' | 'low' | 'info'
 export type WindowStatus = 'new' | 'reviewing' | 'investigating' | 'ignored' | 'closed'
 
 export interface SecurityEvent {

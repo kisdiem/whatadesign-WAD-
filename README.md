@@ -12,9 +12,10 @@
 前端 (React + Vite + TS + Ant Design + ECharts)  http://127.0.0.1:5173
 后端 (Python FastAPI + Uvicorn)                http://127.0.0.1:8000
 数据层
-  ├─ 前端展示层：src/mocks/data.ts + generatedDataset.json（演示主视觉）
-  ├─ 后端真实层：outputs/wad_agent_data/（日志检索、实体回查、证据追溯备用）
-  └─ 原始素材层：十几 GB 数据集（AIT-ADS / AIT-LDSv2 / EVTX）
+  ├─ 可追溯回放：frontend/public/demo-data/{Short,Long}
+  ├─ 前端领域层：Finding / Investigation / Evidence / EntityProfile
+  ├─ 后端服务层：agent_service（小影、日志与实体查询接口）
+  └─ 原始素材层：AIT-ADS / AIT-LDSv2 / EVTX 等数据集
 ```
 
 ## 页面结构（8 页）
@@ -28,7 +29,7 @@
 | 日志检索 | 多源日志统一查询，Normalized / Raw 双视图 |
 | 数据源 | 数据源台账 + 文件导入入口（EVTX/LOG/JSON/JSONL/CSV） |
 | 小影 | 可执行调查副驾（见下文） |
-| 评测 | Recall@1%FPR、跨域、长程关联、消融实验、错误案例、处理效率 |
+| 评测 | 指标与消融报告界面，并显式展示标签和评测边界 |
 
 ## 核心数据对象
 
@@ -37,17 +38,20 @@
 - **Investigation**：人工调查状态，`main / candidates / excluded` 三段
 - **Evidence**：结论与原始日志的桥，`statement + source + raw_log_ref`，保证可追溯
 
-## 数据策略（三层混合）
+## 可追溯回放数据与边界
 
-原则：**展示绝对优先**。
+当前前端默认加载两套保留真实源时间戳和原始日志文本的回放包：
 
-| 层 | 内容 | 用途 |
-|---|---|---|
-| 展示层 | data.ts + generatedDataset.json | 页面主视觉，稳定美观 |
-| 真实数据层 | outputs/wad_agent_data/（20 窗口、2 案件、20 findings、133 实体、3900 条日志） | 检索/回查备用 |
-| 原始素材层 | 十几 GB 数据集 | 仅作拓宽 mock 的素材库 |
+| 数据集 | 事件数 | 时间跨度 | 用途 |
+|---|---:|---|---|
+| Short | 2,570 | 30 分钟 | 快速检查页面和证据追溯 |
+| Long | 44,175 | 7 天 | 长时间范围、攻击链和全量日志检索 |
 
-十几 G 数据通过 `scripts/build_wad_agent_data.py` 提炼、`scripts/export_mock_extension.py` 时间平移后并入前端 mock；前端默认 `VITE_PREFER_DEMO_DATA` 演示模式，真实 API 已接但降级备用。
+- 日志检索页可分页查询全部 **46,745** 条事件，不再只展示 Finding 内的候选事件；
+- 已验证时间过滤存在明显差异：过去 1 小时 501 条、过去 24 小时 6,359 条、过去 7 天 46,745 条；
+- `manifest.json` 明确记录 `contains_labels=false`，回放投影记录 `model_execution=false`、`formal_evaluation=false`；
+- 风险分数和候选链属于可视化调查投影，不等同于本次启动执行了检测模型，也不能作为正式召回率或误报率；
+- 回放或 API 加载失败时显示错误，不再隐式回退到静态 Mock。
 
 ## 小影（智能体）
 
@@ -65,12 +69,16 @@
 
 ```powershell
 # 后端
-cd d:\CODE\whatadesign-WAD--agent-splunk-mission-control-ui
+cd <项目目录>
 python -m uvicorn agent_service.app:app --host 127.0.0.1 --port 8000
 
 # 前端（另一个终端）
 cd frontend
-npm.cmd run dev   # http://127.0.0.1:5173
+npm install
+npm run dev   # http://127.0.0.1:5173
+
+# 严格类型检查 + 生产打包
+npm run build
 ```
 
 ## 关键文件
@@ -88,6 +96,12 @@ npm.cmd run dev   # http://127.0.0.1:5173
 
 ## 已完成的优化
 
+- 修复：补齐缺失的攻击链报告下载模块，前端不再停留在 Vite 错误页
+- 构建：修复 Severity、实体历史和 ECharts 事件类型，严格 TypeScript 构建通过
+- 数据：修复小时桶截断导致的“原始事件 0”，总览正确展示 46,745 条回放事件
+- 日志：接入 Short / Long 全量事件、时间范围过滤、关键词/来源筛选和 50 条分页
+- 边界：取消静态 Mock 隐式兜底，明确无标签回放与正式模型评测的区别
+- 报告：攻击链报告可下载为 UTF-8 Markdown 文件
 - UI：深蓝冷色底、全局提亮、hover 反馈、图表轴标签留白、链图红橙告警色
 - 简洁化：去除解释型副标题，英文标签中文化（研判漏斗、数据源分布、消融实验等）
 - 交互：时间范围联动过滤、发现页不自动展开、案件链图置顶、智能体可执行按钮
@@ -96,8 +110,11 @@ npm.cmd run dev   # http://127.0.0.1:5173
 
 ## 当前状态
 
-- 前端构建通过，后端核心测试 `9 passed`
-- 展示层 demo 优先，真实数据层备用
+- 修复分支：`scx-minimal-fix`
+- `npm run build` 已通过；Vite 生产包可生成
+- `python -m pytest -q` 已通过：104 项测试全部通过
+- 前端和后端可分别在 `5173`、`8000` 端口启动
+- 浏览器已验收总览、发现、案件、全量日志检索和评测边界说明，控制台无报错
 
 ## 后续建议
 

@@ -48,6 +48,7 @@ function eventFields(event: DemoTimelineEvent) {
 }
 
 export async function loadDemoDataset(dataset: DemoDatasetId): Promise<{
+  events: SecurityEvent[]
   anomalyWindows: AnomalyWindow[]
   investigations: Investigation[]
   logSources: LogSource[]
@@ -135,5 +136,5 @@ export async function loadDemoDataset(dataset: DemoDatasetId): Promise<{
     buckets.set(key, current)
   })
   const overviewSeries = Array.from(buckets.entries()).map(([time, count]) => ({ time: time.replace('T', ' '), ...count }))
-  return { anomalyWindows, investigations, logSources, overviewSeries }
+  return { events, anomalyWindows, investigations, logSources, overviewSeries }
 }

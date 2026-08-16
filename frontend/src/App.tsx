@@ -78,6 +78,7 @@ const severityMeta: Record<Severity, { label: string; color: string }> = {
   high: { label: '高危', color: 'orange' },
   medium: { label: '中危', color: 'gold' },
   low: { label: '低危', color: 'blue' },
+  info: { label: '正常', color: 'default' },
 }
 
 const caseStatusLabel: Record<InvestigationStatus, string> = {
