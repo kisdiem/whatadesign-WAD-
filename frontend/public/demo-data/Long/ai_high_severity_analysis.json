@@ -1,0 +1,4027 @@
+{
+  "dataset": "Long",
+  "generated_at": "2026-08-16T20:54:03.083Z",
+  "count": 94,
+  "success": 94,
+  "failures": [],
+  "items": [
+    {
+      "event_id": "LONG-000003",
+      "timestamp": "2022-01-24T13:30:30.356000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: new user: name=ait, UID=1000, GID=1000, home=/home/ait, shell=/bin/bash",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "系统在2022年1月24日08:25:38创建了一个新用户，用户名为ait，UID和GID均为1000，家目录为/home/ait，登录shell为/bin/bash。",
+        "field_breakdown": [
+          "时间戳: Jan 24 08:25:38 - 事件发生的日期和时间",
+          "主机名: intranet-server - 发生事件的主机",
+          "进程: useradd[829] - 执行用户添加命令的进程",
+          "消息: new user: name=ait, UID=1000, GID=1000, home=/home/ait, shell=/bin/bash - 新用户的具体信息"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "新创建的用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能创建新用户以维持持久化访问，或用于隐藏恶意活动。",
+        "limits": [
+          "仅凭此日志无法判断创建用户的行为是否合法，需要结合其他上下文信息。",
+          "日志未记录执行useradd命令的用户身份，无法确定操作者。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000004",
+      "timestamp": "2022-01-24T13:30:30.356000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to group 'dialout'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户 'ait' 被添加到 'dialout' 组，表明用户权限变更。",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 日志时间戳，表示事件发生的日期和时间。",
+          "intranet-server: 主机名，表示事件发生的服务器。",
+          "useradd[829]: 进程名和进程ID，表示执行用户添加操作的程序。",
+          "add 'ait' to group 'dialout': 事件描述，表示将用户 'ait' 添加到 'dialout' 组。"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "dialout",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "如果 'ait' 不是预期用户，或 'dialout' 组权限敏感，可能表示权限提升或未授权访问。",
+        "limits": [
+          "日志未显示操作者身份，无法确定是管理员还是攻击者。",
+          "未提供上下文，无法判断该操作是否正常。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000005",
+      "timestamp": "2022-01-24T13:30:30.356000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: new group: name=ait, GID=1000",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "系统在intranet-server主机上创建了一个名为ait的新用户组，GID为1000。",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 日志时间戳，表示事件发生的日期和时间。",
+          "intranet-server: 主机名，表示事件发生的服务器。",
+          "useradd[829]: 进程名称和PID，表示执行用户添加操作的进程。",
+          "new group: name=ait, GID=1000: 事件描述，表示创建了新组ait，组ID为1000。"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "新创建的用户组"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能创建新组以隐藏恶意活动或为后续提权做准备。",
+        "limits": [
+          "该日志仅显示组创建，未显示创建者或具体操作上下文。",
+          "无法确定该操作是否经过授权或属于正常管理行为。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000006",
+      "timestamp": "2022-01-24T13:30:30.356000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to group 'adm'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户 'ait' 被添加到 'adm' 组，表明权限提升或用户管理操作。",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 日志时间戳，表示事件发生的日期和时间。",
+          "intranet-server: 主机名，表示事件发生的服务器。",
+          "useradd[829]: 进程名和PID，表示执行用户添加操作的进程。",
+          "add 'ait' to group 'adm': 事件描述，表示将用户 'ait' 添加到 'adm' 组。"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "adm",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能通过添加用户到特权组（如adm）来提升权限，从而访问敏感系统文件或执行管理操作。",
+        "limits": [
+          "单条日志无法确定操作是否恶意，需结合上下文（如用户来源、操作频率等）分析。",
+          "日志未记录操作者身份，无法判断是管理员还是攻击者执行。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000011",
+      "timestamp": "2022-01-24T13:30:30.357000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to shadow group 'adm'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户 'ait' 被添加到系统管理组 'adm'，表明该用户获得了管理员权限。",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 日志时间戳，表示事件发生的日期和时间。",
+          "intranet-server: 主机名，表示事件发生的服务器。",
+          "useradd[829]: 进程名称和PID，表示执行用户添加操作的进程。",
+          "add 'ait' to shadow group 'adm': 事件描述，表示将用户 'ait' 添加到 'adm' 组。"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "adm",
+            "role": "目标组，具有管理员权限"
+          }
+        ],
+        "possible_malicious_use": "如果 'ait' 不是预期用户，或者此操作未授权，可能表示攻击者创建了后门账户或提升了权限。",
+        "limits": [
+          "仅凭此日志无法确定操作是否合法，需要结合其他上下文（如用户是否由管理员添加）。",
+          "日志未显示操作来源IP或执行者，无法追踪操作者身份。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000012",
+      "timestamp": "2022-01-24T13:30:30.357000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to shadow group 'dialout'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户ait被添加到shadow组dialout，表明系统管理员或自动化脚本为用户ait授予了拨号设备访问权限。",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 日志时间戳，表示事件发生的日期和时间。",
+          "intranet-server: 主机名，表示事件发生的服务器。",
+          "useradd[829]: 进程名和PID，表示执行用户添加操作的进程。",
+          "add 'ait' to shadow group 'dialout': 事件描述，表示将用户ait添加到shadow组dialout。"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "dialout",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "如果ait不是预期用户，或dialout组权限被滥用，可能用于未授权访问调制解调器或串行设备，进而进行网络渗透或数据窃取。",
+        "limits": [
+          "仅凭此日志无法确定操作是否恶意，需结合用户行为、上下文和策略判断。",
+          "日志未记录执行者身份，无法区分管理员操作或攻击者利用漏洞。",
+          "dialout组权限范围可能因系统配置而异，需进一步审计。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000013",
+      "timestamp": "2022-01-24T13:30:30.357000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to shadow group 'cdrom'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户 'ait' 被添加到系统组 'cdrom'，表明该用户获得了访问光驱设备的权限。",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 日志时间戳，表示事件发生的日期和时间。",
+          "intranet-server: 主机名，表示事件发生的服务器。",
+          "useradd[829]: 进程名称和进程ID，表示执行用户添加操作的程序。",
+          "add 'ait' to shadow group 'cdrom': 事件描述，表示将用户 'ait' 添加到 'cdrom' 组。"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "cdrom",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "如果 'ait' 不是预期用户，或该操作未经授权，可能表示攻击者创建了后门账户或提升了权限。",
+        "limits": [
+          "日志仅显示用户被添加到组，未显示操作者身份。",
+          "无法确定该操作是否经过授权。",
+          "日志时间戳与提供的ISO时间戳不一致，可能存在时区差异或日志伪造。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000014",
+      "timestamp": "2022-01-24T13:30:30.357000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to shadow group 'floppy'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户ait被添加到shadow组floppy中，表明系统管理员或具有相应权限的用户执行了用户组变更操作。",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 日志时间戳，表示事件发生的具体时间",
+          "intranet-server: 主机名，指明事件发生的服务器",
+          "useradd[829]: 进程名和进程ID，表示执行用户添加操作的程序",
+          "add 'ait' to shadow group 'floppy': 事件描述，说明将用户ait添加到shadow组floppy"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "floppy",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "如果ait用户不应属于floppy组，可能表示权限提升或未授权操作，攻击者可能利用该组权限访问敏感资源。",
+        "limits": [
+          "该日志仅显示用户组变更，不包含操作者身份，无法确定是否为合法操作",
+          "未提供上下文信息，无法判断该操作是否符合安全策略"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000015",
+      "timestamp": "2022-01-24T13:30:30.357000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to shadow group 'sudo'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户 'ait' 被添加到 sudo 组，获得了管理员权限。",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 日志时间戳，表示事件发生的日期和时间。",
+          "intranet-server: 主机名，表示事件发生的服务器。",
+          "useradd[829]: 进程名称和进程ID，表示执行用户添加操作的进程。",
+          "add 'ait' to shadow group 'sudo': 事件描述，表示将用户 'ait' 添加到 sudo 组。"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "sudo",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "如果 'ait' 不是预期用户，或者此操作未经授权，则可能表示攻击者创建了后门账户并赋予管理员权限，以便持久化访问。",
+        "limits": [
+          "仅凭此日志无法确定操作是否合法，需要结合其他上下文（如用户认证记录、操作者身份等）进行判断。",
+          "日志未记录执行该命令的用户，因此无法直接追溯到具体操作者。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000016",
+      "timestamp": "2022-01-24T13:30:30.357000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to shadow group 'audio'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户添加操作：将用户'ait'添加到'audio'组",
+        "field_breakdown": [
+          "Jan 24 08:25:38：时间戳",
+          "intranet-server：主机名",
+          "useradd[829]：进程名和PID",
+          "add 'ait' to shadow group 'audio'：操作详情"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "audio",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能通过添加用户到特权组来提升权限，或创建后门账户",
+        "limits": [
+          "仅记录用户添加操作，不包含密码或认证信息",
+          "日志可能被篡改或删除，需配合其他安全监控"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000017",
+      "timestamp": "2022-01-24T13:30:30.357000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to group 'floppy'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户 'ait' 被添加到 'floppy' 组，表明系统权限变更。",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 日志时间戳",
+          "intranet-server: 主机名",
+          "useradd[829]: 进程名和PID",
+          "add 'ait' to group 'floppy': 操作详情"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "floppy",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能通过添加用户到特权组来提升权限，或为后门账户授权。",
+        "limits": [
+          "仅凭此日志无法判断操作是否恶意，需结合上下文（如操作者、时间、其他日志）"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000018",
+      "timestamp": "2022-01-24T13:30:30.357000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to group 'sudo'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户 'ait' 被添加到 'sudo' 组，表明该用户获得了管理员权限。",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 日志时间戳，表示事件发生的日期和时间。",
+          "intranet-server: 主机名，表示事件发生的服务器。",
+          "useradd[829]: 进程名称和进程ID，表示执行用户添加操作的进程。",
+          "add 'ait' to group 'sudo': 事件描述，表示将用户 'ait' 添加到 'sudo' 组。"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "sudo",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "如果 'ait' 不是预期用户，或者此操作未经授权，则可能表示恶意用户获得了管理员权限，可能导致系统被控制或数据泄露。",
+        "limits": [
+          "日志仅显示用户被添加到 sudo 组，未显示操作者身份或操作来源。",
+          "日志未提供上下文，无法判断此操作是否合法。",
+          "日志时间戳为系统本地时间，可能与其他时区不一致。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000019",
+      "timestamp": "2022-01-24T13:30:30.357000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to group 'audio'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户 'ait' 被添加到 'audio' 组，表明系统管理员或具有相应权限的用户执行了用户组修改操作。",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 日志时间戳，表示事件发生的日期和时间。",
+          "intranet-server: 主机名，表示事件发生的服务器。",
+          "useradd[829]: 进程名称和PID，表示执行用户添加或修改的命令。",
+          "add 'ait' to group 'audio': 具体操作，将用户 'ait' 添加到 'audio' 组。"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被修改的用户"
+          },
+          {
+            "name": "audio",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "如果 'ait' 是未授权用户或 'audio' 组具有特殊权限，此操作可能被用于提升权限或进行未授权访问。",
+        "limits": [
+          "日志未显示执行该操作的用户身份，无法确定是否为合法管理员操作。",
+          "日志未显示操作来源IP或终端，无法追踪操作来源。",
+          "日志未显示操作结果，无法确认是否成功。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000020",
+      "timestamp": "2022-01-24T13:30:30.357000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to group 'dip'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户 'ait' 被添加到 'dip' 组中，表明系统管理员或具有相应权限的用户执行了用户组变更操作。",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 日志时间戳，表示事件发生的日期和时间。",
+          "intranet-server: 主机名，表示事件发生的服务器。",
+          "useradd[829]: 进程名称和PID，表示执行用户添加操作的进程。",
+          "add 'ait' to group 'dip': 事件描述，表示将用户 'ait' 添加到组 'dip'。"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "dip",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "如果 'ait' 不是预期用户，或者 'dip' 组具有特殊权限，此操作可能被用于权限提升或未授权访问。",
+        "limits": [
+          "日志未显示执行此操作的用户身份，无法确定是否为授权操作。",
+          "日志未显示操作来源IP或终端，无法追踪操作来源。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000021",
+      "timestamp": "2022-01-24T13:30:30.357000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to group 'video'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户 'ait' 被添加到 'video' 组，表明用户权限变更。",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 日志时间戳，表示事件发生的日期和时间。",
+          "intranet-server: 主机名，表示事件发生的服务器。",
+          "useradd[829]: 进程名和进程ID，表示执行用户添加操作的进程。",
+          "add 'ait' to group 'video': 事件描述，表示将用户 'ait' 添加到 'video' 组。"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "video",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "如果 'ait' 是未授权用户或 'video' 组包含敏感权限，此操作可能被用于提升权限或未授权访问。",
+        "limits": [
+          "日志仅显示用户添加操作，不包含操作者身份或来源IP。",
+          "无法确认 'ait' 是否已存在或是否被授权。",
+          "日志未记录添加操作后的具体权限变化。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000022",
+      "timestamp": "2022-01-24T13:30:30.357000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to group 'plugdev'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户 'ait' 被添加到 'plugdev' 组，表明系统管理员或具有相应权限的用户执行了用户组变更操作。",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 日志时间戳，表示事件发生的日期和时间。",
+          "intranet-server: 主机名，表示事件发生的服务器。",
+          "useradd[829]: 进程名和进程ID，表示执行用户添加操作的程序及其进程ID。",
+          "add 'ait' to group 'plugdev': 事件描述，表示将用户 'ait' 添加到 'plugdev' 组。"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "plugdev",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "如果 'ait' 是未授权用户或 'plugdev' 组具有特殊权限，此操作可能被用于提升权限或进行未授权访问。",
+        "limits": [
+          "仅凭此日志无法确定操作是否合法，需要结合用户身份、操作时间、上下文等信息进行判断。",
+          "日志未记录执行命令的用户，无法直接追溯到具体操作者。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000023",
+      "timestamp": "2022-01-24T13:30:30.357000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to group 'lxd'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户 'ait' 被添加到 'lxd' 组，这通常发生在系统管理操作中，可能表示用户被授予了访问容器或虚拟化功能的权限。",
+        "field_breakdown": [
+          "时间戳: Jan 24 08:25:38",
+          "主机名: intranet-server",
+          "进程: useradd[829]",
+          "操作: 添加用户 'ait' 到组 'lxd'"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "lxd",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "如果 'ait' 不是预期用户，或者 'lxd' 组权限被滥用，可能表示未授权用户获得了容器管理权限，可能导致系统资源滥用或进一步提权。",
+        "limits": [
+          "该日志仅显示用户被添加到组，不包含添加原因或执行者身份",
+          "无法确认 'ait' 是否已登录或实际使用权限",
+          "日志时间戳为系统本地时间，可能受时区影响"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000024",
+      "timestamp": "2022-01-24T13:30:30.357000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to group 'netdev'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户 'ait' 被添加到 'netdev' 组，表明系统管理员正在修改用户权限。",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 日志时间戳，表示事件发生的日期和时间。",
+          "intranet-server: 主机名，表示事件发生的服务器。",
+          "useradd[829]: 进程名和进程ID，表示执行用户添加操作的进程。",
+          "add 'ait' to group 'netdev': 事件描述，表示将用户 'ait' 添加到组 'netdev'。"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "netdev",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "如果 'ait' 是未授权用户或 'netdev' 组具有敏感权限，此操作可能被用于提升权限或横向移动。",
+        "limits": [
+          "仅凭此日志无法确定操作是否恶意，需要结合用户身份、组权限和上下文分析。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000025",
+      "timestamp": "2022-01-24T13:30:30.357000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to group 'cdrom'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户 'ait' 被添加到 'cdrom' 组",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 时间戳",
+          "intranet-server: 主机名",
+          "useradd[829]: 进程和PID",
+          "add 'ait' to group 'cdrom': 操作描述"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "用户"
+          },
+          {
+            "name": "cdrom",
+            "role": "组"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能通过添加用户到特权组来提升权限，或利用组权限访问敏感资源",
+        "limits": [
+          "仅反映用户和组变更，不包含密码或认证信息",
+          "无法确定操作是否由管理员执行"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000038",
+      "timestamp": "2022-01-24T13:30:30.358000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to shadow group 'dip'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户 'ait' 被添加到系统组 'dip'，表明用户权限或组成员资格发生变化。",
+        "field_breakdown": [
+          "时间戳: Jan 24 08:25:38",
+          "主机名: intranet-server",
+          "进程: useradd[829]",
+          "消息: add 'ait' to shadow group 'dip'"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "dip",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用此操作将用户添加到特权组，从而提升权限或维持持久访问。",
+        "limits": [
+          "仅凭此日志无法确定操作是否恶意，需结合其他上下文（如用户身份、操作时间、相关进程）进行判断。",
+          "该日志未提供操作者信息，无法确认是管理员还是攻击者执行。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000039",
+      "timestamp": "2022-01-24T13:30:30.358000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to shadow group 'video'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户ait被添加到shadow组中的video组",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 日志时间戳",
+          "intranet-server: 主机名",
+          "useradd[829]: 进程名和PID",
+          "add 'ait' to shadow group 'video': 具体操作，将用户ait添加到video组"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "video",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "如果ait不是预期用户，可能表示未授权账户被添加到特权组，用于权限提升",
+        "limits": [
+          "仅凭此日志无法确定操作是否恶意，需结合用户行为、上下文和策略判断"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000040",
+      "timestamp": "2022-01-24T13:30:30.358000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to shadow group 'plugdev'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户ait被添加到shadow组plugdev中",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 日志时间戳",
+          "intranet-server: 主机名",
+          "useradd[829]: 进程名和PID",
+          "add 'ait' to shadow group 'plugdev': 事件描述"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "plugdev",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "如果ait不是预期用户，可能表示未授权账户被添加到特权组，用于提权或访问控制",
+        "limits": [
+          "日志未显示操作者身份",
+          "未显示是否通过sudo或直接root执行",
+          "未显示添加操作的具体原因"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000041",
+      "timestamp": "2022-01-24T13:30:30.358000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to shadow group 'lxd'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户 'ait' 被添加到系统组 'lxd'，这通常发生在用户被授予 LXD 容器管理权限时。",
+        "field_breakdown": [
+          "Jan 24 08:25:38: 日志时间戳，表示事件发生的日期和时间。",
+          "intranet-server: 主机名，表示事件发生的服务器。",
+          "useradd[829]: 进程名和进程ID，表示执行用户添加操作的命令。",
+          "add 'ait' to shadow group 'lxd': 事件描述，表示用户 'ait' 被添加到 'lxd' 组。"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "lxd",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "如果 'ait' 不是预期用户，或者添加操作未经授权，可能表示攻击者获得了权限并试图提升权限或管理容器。",
+        "limits": [
+          "无法确定添加操作是否经过授权。",
+          "无法确定 'ait' 用户的身份或意图。",
+          "无法确定此操作是否与安全事件相关。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000042",
+      "timestamp": "2022-01-24T13:30:30.358000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 08:25:38 intranet-server useradd[829]: add 'ait' to shadow group 'netdev'",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "用户添加操作：用户ait被添加到shadow组netdev中",
+        "field_breakdown": [
+          "Jan 24 08:25:38：时间戳，表示事件发生的日期和时间",
+          "intranet-server：主机名，表示事件发生的服务器",
+          "useradd[829]：进程名和进程ID，表示执行用户添加操作的程序",
+          "add 'ait' to shadow group 'netdev'：具体操作，将用户ait添加到shadow组netdev"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "被添加的用户"
+          },
+          {
+            "name": "netdev",
+            "role": "目标组"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能通过添加用户到特权组来提升权限，或创建后门账户以维持访问权限",
+        "limits": [
+          "该日志仅显示用户被添加到组，不包含添加操作的执行者身份",
+          "无法确定该操作是管理员正常操作还是恶意行为，需要结合其他日志或上下文分析"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000279",
+      "timestamp": "2022-01-24T13:30:30.364000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 09:39:02 intranet-server useradd[20070]: new group: name=gmarsh, GID=1001",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "A new user group named 'gmarsh' was created with GID 1001 on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 09:39:02",
+          "Hostname: intranet-server",
+          "Process: useradd[20070]",
+          "Action: new group",
+          "Group name: gmarsh",
+          "GID: 1001"
+        ],
+        "entities": [
+          {
+            "name": "gmarsh",
+            "role": "new group"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host"
+          }
+        ],
+        "possible_malicious_use": "An attacker could create a group to mimic a legitimate user or service, potentially for privilege escalation or to hide malicious activities.",
+        "limits": [
+          "The log does not indicate the user who executed the command, so attribution is limited.",
+          "The log does not show if the group was created with special privileges or if it was part of a larger attack."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000285",
+      "timestamp": "2022-01-24T13:30:30.364000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 09:39:02 intranet-server useradd[20070]: new user: name=gmarsh, UID=1001, GID=1001, home=/home/gmarsh, shell=/bin/bash",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "A new user account was created on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 09:39:02",
+          "Hostname: intranet-server",
+          "Process: useradd[20070]",
+          "Action: new user",
+          "Username: gmarsh",
+          "UID: 1001",
+          "GID: 1001",
+          "Home directory: /home/gmarsh",
+          "Shell: /bin/bash"
+        ],
+        "entities": [
+          {
+            "name": "gmarsh",
+            "role": "new user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "server"
+          }
+        ],
+        "possible_malicious_use": "An attacker could create a backdoor account for persistent access, or a legitimate user could be added without proper authorization.",
+        "limits": [
+          "The log does not indicate who initiated the useradd command.",
+          "The log does not show if the account was created with sudo privileges or other special permissions."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000349",
+      "timestamp": "2022-01-24T13:30:30.366000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:06:02 intranet-server useradd[21067]: new user: name=mysql, UID=111, GID=115, home=/nonexistent, shell=/bin/false",
+      "severity": "high",
+      "score": 0.77,
+      "analysis": {
+        "log_meaning": "系统在intranet-server主机上创建了一个名为mysql的新用户，UID为111，GID为115，家目录为/nonexistent，shell为/bin/false。",
+        "field_breakdown": [
+          "Jan 24 10:06:02: 日志时间戳，表示1月24日10:06:02",
+          "intranet-server: 主机名，表示日志来源主机",
+          "useradd[21067]: 进程名和PID，表示执行useradd命令的进程",
+          "new user: name=mysql, UID=111, GID=115, home=/nonexistent, shell=/bin/false: 用户创建详情，包括用户名、UID、GID、家目录和shell"
+        ],
+        "entities": [
+          {
+            "name": "mysql",
+            "role": "新创建的用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能创建后门账户，用于持久化访问或提权。",
+        "limits": [
+          "该用户的家目录为/nonexistent，shell为/bin/false，限制了交互式登录，但可能仍被用于服务账户。",
+          "UID和GID较低，可能暗示系统账户，但需确认是否授权创建。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000593",
+      "timestamp": "2022-01-24T13:30:30.377000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:47 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-xgilbxhdjsindantxabwlxyycihztvuf ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474168.5944934-25226-275437330490931/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "Ansible task execution on intranet-server via sudo as www-data user",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:08:47",
+          "Host: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "TTY: pts/0",
+          "Working directory: /home/ait",
+          "Target user: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS... ; /usr/bin/python3 /var/tmp/ansible-tmp-.../AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "source user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials could use Ansible to execute arbitrary commands as www-data, potentially escalating privileges or moving laterally.",
+        "limits": [
+          "Requires valid credentials for user 'ait'",
+          "Requires sudo privileges to run as www-data",
+          "Command execution is limited to the Ansible module's capabilities"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000594",
+      "timestamp": "2022-01-24T13:30:30.377000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:45 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-ucxnmpkpnbbjkfzxwsdtjarzipxxyhaf ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474166.1140094-25215-226071220597986/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "Ansible sudo command execution on intranet-server by user 'ait' to run a Python script as www-data.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:08:45",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "TTY: pts/0",
+          "Working directory: /home/ait",
+          "Target user: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-... ; /usr/bin/python3 /var/tmp/ansible-tmp-.../AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "source user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "target host"
+          }
+        ],
+        "possible_malicious_use": "If the Ansible playbook or command is compromised, an attacker could execute arbitrary commands as www-data, potentially leading to privilege escalation or lateral movement.",
+        "limits": [
+          "The log only shows the command invocation, not the output or success/failure.",
+          "The actual Python script content is not visible, so its behavior is unknown.",
+          "The log does not indicate whether the command was authorized or part of a legitimate automation."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000597",
+      "timestamp": "2022-01-24T13:30:30.377000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:47 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo session was opened for user www-data by user ait with root privileges on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:08:47",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM service: pam_unix(sudo:session)",
+          "Event: session opened",
+          "User: www-data",
+          "By user: ait (uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "server"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "ait",
+            "role": "initiating user"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials of user 'ait' could escalate privileges to run commands as www-data, potentially accessing web application data or executing arbitrary code.",
+        "limits": [
+          "The log does not show the command executed in the session.",
+          "The log does not indicate if the session was interactive or non-interactive.",
+          "The log does not provide the source IP address of the user 'ait'."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000598",
+      "timestamp": "2022-01-24T13:30:30.377000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:48 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "The sudo session for user www-data has been closed, indicating the end of a privileged command execution session.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:08:48",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM module: pam_unix",
+          "Session type: sudo:session",
+          "Event: session closed",
+          "User: www-data"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "server"
+          },
+          {
+            "name": "www-data",
+            "role": "user"
+          }
+        ],
+        "possible_malicious_use": "An attacker may close a sudo session to hide traces of unauthorized privileged command execution, or to disrupt legitimate administrative activities.",
+        "limits": [
+          "The log does not indicate which command was executed during the session.",
+          "The log does not show the source IP or terminal from which the session was initiated."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000600",
+      "timestamp": "2022-01-24T13:30:30.377000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:45 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo session was opened for user www-data by user ait with root privileges on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:08:45",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM service: pam_unix(sudo:session)",
+          "Event: session opened",
+          "User: www-data",
+          "By user: ait (uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "server"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "ait",
+            "role": "privileged user"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials of user 'ait' could open a session as www-data to escalate privileges or access sensitive data.",
+        "limits": [
+          "The log does not indicate the command executed in the session.",
+          "The log does not show the source IP or terminal from which the session was initiated."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000601",
+      "timestamp": "2022-01-24T13:30:30.377000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:47 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了一个sudo会话的关闭事件，表明www-data用户的sudo会话已结束。",
+        "field_breakdown": [
+          "Jan 24 10:08:47: 事件发生的日期和时间",
+          "intranet-server: 主机名",
+          "sudo: 服务或进程名称",
+          "pam_unix(sudo:session): PAM模块和会话类型",
+          "session closed for user www-data: 会话关闭的用户"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器"
+          },
+          {
+            "name": "www-data",
+            "role": "用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话关闭日志来掩盖其恶意操作，或通过伪造日志干扰安全审计。",
+        "limits": [
+          "日志不包含会话的持续时间或具体命令，无法判断会话期间执行的操作。",
+          "日志仅记录关闭事件，不包含会话开始或认证信息。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000608",
+      "timestamp": "2022-01-24T13:30:30.378000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:51 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-prqbedtmerpdjgfkcmbwtpnhjfoeprhe ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474171.451297-25226-146675343801026/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo command executed by user 'ait' on the intranet-server, switching to user 'www-data' to run a shell command that echoes a success marker and executes a Python script via Ansible.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:08:51",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "Terminal: pts/0",
+          "Working directory: /home/ait",
+          "Target user: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-prqbedtmerpdjgfkcmbwtpnhjfoeprhe ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474171.451297-25226-146675343801026/AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "source user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials of user 'ait' could escalate privileges to www-data and execute arbitrary commands, potentially leading to further compromise of the server or lateral movement.",
+        "limits": [
+          "The log only shows the command executed, not the content of the Python script, so the full impact is unknown.",
+          "The log does not indicate whether the command was successful or if any output was produced.",
+          "The log does not provide context on the Ansible playbook or task that triggered this command."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000609",
+      "timestamp": "2022-01-24T13:30:30.378000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:49 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-esmnrdtverjrnxtlhltqwmtrarqrgbmd ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474170.0257516-25226-134474822424456/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "Ansible task execution on intranet-server via sudo as www-data user",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:08:49",
+          "Host: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "TTY: pts/0",
+          "Working directory: /home/ait",
+          "Target user: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-esmnrdtverjrnxtlhltqwmtrarqrgbmd ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474170.0257516-25226-134474822424456/AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "sudo user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials could use Ansible to execute arbitrary commands with elevated privileges, potentially leading to system compromise or data exfiltration.",
+        "limits": [
+          "Log only shows command execution, not the actual content of the Python script",
+          "No indication of the Ansible playbook or task name",
+          "Timestamp may be spoofed or inaccurate"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000610",
+      "timestamp": "2022-01-24T13:30:30.378000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:52 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-xktwzpvhzjuqxlrqspmnmkkhfrwoniel ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474173.1285825-25249-109482958308171/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "Ansible automation task executed via sudo on an intranet server, running a Python command as the www-data user.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:08:52",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "Terminal: pts/0",
+          "Working directory: /home/ait",
+          "Target user: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-xktwzpvhzjuqxlrqspmnmkkhfrwoniel ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474173.1285825-25249-109482958308171/AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "sudo user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host"
+          }
+        ],
+        "possible_malicious_use": "If the Ansible task is compromised, an attacker could execute arbitrary commands as www-data, potentially escalating privileges or accessing sensitive data.",
+        "limits": [
+          "The log only shows the command invocation, not the actual output or success/failure of the task.",
+          "The log does not reveal the content of the Python script executed, which could contain malicious code."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000611",
+      "timestamp": "2022-01-24T13:30:30.378000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:51 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "用户ait通过sudo命令以root权限为www-data用户打开了会话，表明有管理员权限的操作发生。",
+        "field_breakdown": [
+          "时间戳: Jan 24 10:08:51",
+          "主机名: intranet-server",
+          "进程: sudo",
+          "模块: pam_unix(sudo:session)",
+          "事件: session opened",
+          "目标用户: www-data",
+          "执行用户: ait(uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "执行者"
+          },
+          {
+            "name": "www-data",
+            "role": "目标用户"
+          }
+        ],
+        "possible_malicious_use": "如果ait不是合法管理员，可能表示权限提升攻击；或者www-data被用于运行恶意服务。",
+        "limits": [
+          "日志未显示命令内容，无法确认具体操作",
+          "未记录会话关闭时间",
+          "未包含源IP地址"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000612",
+      "timestamp": "2022-01-24T13:30:30.378000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:51 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了一个sudo会话的结束，用户www-data的sudo会话已关闭。",
+        "field_breakdown": [
+          "Jan 24 10:08:51：时间戳，表示事件发生的日期和时间",
+          "intranet-server：主机名，表示事件发生的服务器",
+          "sudo：进程名，表示与sudo命令相关",
+          "pam_unix(sudo:session)：PAM模块，表示sudo会话的PAM处理",
+          "session closed：事件描述，表示会话已关闭",
+          "for user www-data：用户信息，表示会话属于www-data用户"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器"
+          },
+          {
+            "name": "www-data",
+            "role": "用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话的关闭来掩盖其恶意操作，例如在会话中执行了未授权的命令后，通过关闭会话清除痕迹。",
+        "limits": [
+          "日志仅显示会话关闭，不包含会话期间执行的命令，无法判断是否有恶意行为",
+          "日志时间戳可能受系统时间影响，不准确"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000613",
+      "timestamp": "2022-01-24T13:30:30.378000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:49 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo session was opened for user www-data by user ait with root privileges on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:08:49",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM service: pam_unix(sudo:session)",
+          "Event: session opened",
+          "Target user: www-data",
+          "Initiating user: ait (uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "server"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "ait",
+            "role": "initiating user"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials for user 'ait' could escalate privileges to the 'www-data' account, potentially gaining access to web application data or executing arbitrary commands.",
+        "limits": [
+          "The log does not indicate the command executed in the session.",
+          "The log does not show the source IP or terminal from which the session was initiated."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000614",
+      "timestamp": "2022-01-24T13:30:30.378000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:50 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了sudo会话的关闭事件，表明www-data用户的sudo会话已结束。",
+        "field_breakdown": [
+          "Jan 24 10:08:50：时间戳，表示事件发生的日期和时间",
+          "intranet-server：主机名，表示事件发生的服务器",
+          "sudo: pam_unix(sudo:session)：服务与模块，表示sudo的PAM会话模块",
+          "session closed for user www-data：事件详情，表示www-data用户的会话已关闭"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器"
+          },
+          {
+            "name": "www-data",
+            "role": "用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话关闭事件来掩盖其恶意操作，例如在关闭会话前执行了未授权的命令，或者通过伪造日志来干扰安全审计。",
+        "limits": [
+          "日志仅显示会话关闭，不包含会话期间执行的命令，无法判断是否有恶意行为",
+          "日志未记录会话的起始时间，无法确定会话持续时间"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000615",
+      "timestamp": "2022-01-24T13:30:30.378000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:53 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了sudo会话的关闭事件，表明www-data用户的sudo会话已结束。",
+        "field_breakdown": [
+          "Jan 24 10:08:53：时间戳，表示事件发生的日期和时间",
+          "intranet-server：主机名，表示事件发生的服务器",
+          "sudo: pam_unix(sudo:session)：服务与模块，表示sudo的PAM会话模块",
+          "session closed for user www-data：具体事件，表示www-data用户的会话已关闭"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器"
+          },
+          {
+            "name": "www-data",
+            "role": "用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话关闭事件来掩盖其恶意操作，例如在关闭会话前执行了未授权的命令，或者通过伪造日志来干扰安全审计。",
+        "limits": [
+          "日志仅显示会话关闭，不包含会话期间执行的命令，无法判断是否有恶意行为",
+          "日志未记录会话的起始时间，无法确定会话持续时间"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000616",
+      "timestamp": "2022-01-24T13:30:30.378000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:52 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo session was opened for user www-data by user ait with root privileges on the intranet-server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:08:52",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM service: pam_unix(sudo:session)",
+          "Event: session opened",
+          "User: www-data",
+          "By user: ait (uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "host"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "ait",
+            "role": "initiating user"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials of user 'ait' could open a sudo session to escalate privileges to www-data, potentially leading to further system compromise.",
+        "limits": [
+          "The log does not indicate the command executed in the session",
+          "The log does not show the source IP or terminal from which the session was initiated",
+          "The log does not reveal the duration of the session"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000626",
+      "timestamp": "2022-01-24T13:30:30.379000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:53 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-btgiqifpoajuyixolakyefukutzfjwnr ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474174.6219308-25249-153513775327583/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "Ansible automation executed a command on the intranet server via sudo, switching to the www-data user to run a Python script from a temporary directory.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:08:53",
+          "Host: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "Terminal: pts/0",
+          "Working Directory: /home/ait",
+          "Target User: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-... ; /usr/bin/python3 /var/tmp/ansible-tmp-.../AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "source user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "target host"
+          }
+        ],
+        "possible_malicious_use": "If an attacker compromises the Ansible control node or the 'ait' account, they could abuse this mechanism to execute arbitrary commands as the www-data user on the server, potentially leading to privilege escalation or lateral movement.",
+        "limits": [
+          "The command is restricted to the www-data user, limiting direct root access.",
+          "The execution is tied to Ansible's temporary directory, which may be cleaned up after the task.",
+          "The log does not show the actual content of the Python script, so the full impact is unknown."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000628",
+      "timestamp": "2022-01-24T13:30:30.379000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:53 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo session was opened for user www-data by user ait with root privileges on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:08:53",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM service: pam_unix(sudo:session)",
+          "Event: session opened",
+          "User: www-data",
+          "By user: ait (uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "server"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "ait",
+            "role": "initiating user"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials for user 'ait' could escalate privileges to run commands as www-data, potentially leading to unauthorized access or data exfiltration.",
+        "limits": [
+          "The log does not indicate the command executed in the session.",
+          "The log does not show the source IP or terminal from which the session was initiated."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000629",
+      "timestamp": "2022-01-24T13:30:30.379000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:54 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了sudo会话结束的事件，表明www-data用户的sudo会话已关闭。",
+        "field_breakdown": [
+          "Jan 24 10:08:54：时间戳，表示事件发生的日期和时间。",
+          "intranet-server：主机名，表示事件发生的服务器。",
+          "sudo: pam_unix(sudo:session)：服务与模块，表示sudo的PAM会话模块。",
+          "session closed：事件描述，表示会话已关闭。",
+          "for user www-data：用户信息，表示会话属于www-data用户。"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器"
+          },
+          {
+            "name": "www-data",
+            "role": "用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话关闭事件来掩盖其恶意操作，例如在关闭会话前执行了未授权的命令，或者通过伪造日志来干扰安全审计。",
+        "limits": [
+          "日志仅显示会话关闭，不包含会话期间的具体命令或操作。",
+          "时间戳可能受系统时间设置影响，存在偏差风险。",
+          "无法确认会话关闭是正常退出还是异常终止。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000647",
+      "timestamp": "2022-01-24T13:30:30.381000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:57 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-stdkjilcyozcqaipzlizwderturdjosy ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474178.3785014-25283-230730674635862/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "Ansible task execution on intranet-server via sudo as www-data user",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:08:57",
+          "Host: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "TTY: pts/0",
+          "Working directory: /home/ait",
+          "Executed as user: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-... ; /usr/bin/python3 /var/tmp/ansible-tmp-.../AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "sudo user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "target host"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials could use Ansible to execute arbitrary commands on the server, potentially escalating privileges or installing backdoors.",
+        "limits": [
+          "Logs only show command execution, not the actual content of the Ansible module",
+          "Ansible temp directory may be cleaned up after execution, limiting forensic analysis"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000648",
+      "timestamp": "2022-01-24T13:30:30.381000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:03 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo session was opened for user www-data by user ait with root privileges on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:03",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM service: pam_unix(sudo:session)",
+          "Event: session opened",
+          "User: www-data",
+          "By user: ait (uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "ait",
+            "role": "initiating user (root)"
+          }
+        ],
+        "possible_malicious_use": "An attacker with root access could open a session as www-data to perform actions under that user's identity, potentially to access web server files or escalate privileges laterally.",
+        "limits": [
+          "The log does not indicate the commands executed in the session.",
+          "The log does not show the source IP or terminal from which the session was initiated."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000650",
+      "timestamp": "2022-01-24T13:30:30.381000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:05 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo session was opened for user www-data by user ait with root privileges on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:05",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM service: pam_unix(sudo:session)",
+          "Event: session opened",
+          "User: www-data",
+          "By user: ait (uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "server"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "ait",
+            "role": "initiating user"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials for user 'ait' could escalate privileges to run commands as www-data, potentially leading to unauthorized access or data exfiltration.",
+        "limits": [
+          "The log does not show the command executed in the session.",
+          "The log does not indicate if the session was interactive or non-interactive."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000651",
+      "timestamp": "2022-01-24T13:30:30.381000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:02 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了一个sudo会话的结束，用户www-data的sudo会话在intranet-server上关闭。",
+        "field_breakdown": [
+          "Jan 24 10:09:02：时间戳，表示事件发生的日期和时间",
+          "intranet-server：主机名，表示事件发生的服务器",
+          "sudo: pam_unix(sudo:session)：表示sudo模块中的PAM会话管理",
+          "session closed for user www-data：表示用户www-data的会话已关闭"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器"
+          },
+          {
+            "name": "www-data",
+            "role": "用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话的关闭来掩盖其恶意活动，例如在会话中执行了未授权的命令后关闭会话以清除痕迹。",
+        "limits": [
+          "该日志仅显示会话关闭，不包含会话期间执行的命令，因此无法判断是否有恶意操作。",
+          "日志未记录会话的持续时间或关闭原因，可能无法区分正常关闭和异常终止。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000652",
+      "timestamp": "2022-01-24T13:30:30.381000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:03 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-wxpcmlboemromydbhfmlpgyczydnygys ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474184.3791127-25292-42282096183514/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "Ansible sudo command execution log showing a user 'ait' escalating privileges to 'www-data' to run a Python script via /bin/sh.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:03",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "TTY: pts/0",
+          "Working directory: /home/ait",
+          "Target user: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-wxpcmlboemromydbhfmlpgyczydnygys ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474184.3791127-25292-42282096183514/AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "source user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host"
+          }
+        ],
+        "possible_malicious_use": "If the Ansible task is compromised, an attacker could use this sudo privilege to execute arbitrary commands as www-data, potentially leading to data theft or system compromise.",
+        "limits": [
+          "The log only shows the command executed, not the content of the Python script, so the full impact is unknown.",
+          "The log does not indicate whether the sudo command was authorized or part of a legitimate Ansible playbook."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000653",
+      "timestamp": "2022-01-24T13:30:30.381000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:06 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了sudo会话的关闭事件，表明www-data用户的sudo会话已结束。",
+        "field_breakdown": [
+          "Jan 24 10:09:06: 事件发生的日期和时间",
+          "intranet-server: 主机名",
+          "sudo: 服务或进程名称",
+          "pam_unix(sudo:session): PAM模块和会话类型",
+          "session closed for user www-data: 会话关闭的用户"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器主机"
+          },
+          {
+            "name": "www-data",
+            "role": "sudo会话的用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话关闭日志来掩盖其恶意操作，或通过伪造此类日志干扰安全审计。",
+        "limits": [
+          "日志仅显示会话关闭，不包含命令执行细节",
+          "无法确认会话期间执行的操作是否合法"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000654",
+      "timestamp": "2022-01-24T13:30:30.381000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:07 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-litbsyihhfwieiheybqbahmwulqhnjgf ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474187.6532793-25311-143614926297798/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo command executed by user 'ait' on the intranet server, switching to user 'www-data' to run a shell command that echoes a success marker and executes a Python script via Ansible.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:07",
+          "Host: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "TTY: pts/0",
+          "Working directory: /home/ait",
+          "Target user: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-litbsyihhfwieiheybqbahmwulqhnjgf ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474187.6532793-25311-143614926297798/AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "source user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host"
+          }
+        ],
+        "possible_malicious_use": "An attacker with access to the 'ait' account could abuse sudo privileges to execute arbitrary commands as www-data, potentially escalating privileges or compromising the web server. The Ansible temporary directory and script could be tampered with to run malicious code.",
+        "limits": [
+          "The log only shows the command executed, not the output or success/failure status.",
+          "The log does not indicate whether the sudo command was authorized or if it was part of a legitimate Ansible run.",
+          "The log does not provide context on the user's intent or the overall system state."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000655",
+      "timestamp": "2022-01-24T13:30:30.381000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:08:57 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo session was opened for user www-data by user ait with root privileges on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:08:57",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM service: pam_unix(sudo:session)",
+          "Event: session opened",
+          "User: www-data",
+          "Initiating user: ait (uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "server"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "ait",
+            "role": "initiating user"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials of user 'ait' could escalate privileges to run commands as www-data, potentially accessing sensitive web application data or executing arbitrary code.",
+        "limits": [
+          "The log does not indicate the command executed in the session.",
+          "The log does not show the source IP or terminal from which the session was initiated."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000657",
+      "timestamp": "2022-01-24T13:30:30.381000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:04 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "The sudo session for user www-data has been closed, indicating the end of a privileged command execution.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:04",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM module: pam_unix",
+          "Session type: sudo:session",
+          "Event: session closed",
+          "User: www-data"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "host"
+          },
+          {
+            "name": "www-data",
+            "role": "user"
+          }
+        ],
+        "possible_malicious_use": "An attacker may close a sudo session to cover tracks after executing malicious commands with elevated privileges.",
+        "limits": [
+          "The log does not indicate which command was executed during the session.",
+          "The log does not show the source IP or terminal from which the session was initiated."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000658",
+      "timestamp": "2022-01-24T13:30:30.381000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:05 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-myikqhznxbumlznybtddnyueybzujwkz ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474186.1136718-25301-94058502772162/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "Ansible sudo command execution log showing user 'ait' using sudo to run a command as 'www-data' on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:05",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "TTY: pts/0",
+          "Working directory: /home/ait",
+          "Target user: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-myikqhznxbumlznybtddnyueybzujwkz ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474186.1136718-25301-94058502772162/AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "sudo user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          }
+        ],
+        "possible_malicious_use": "If the sudo permissions are misconfigured, an attacker could exploit this to execute arbitrary commands as www-data, potentially leading to privilege escalation or unauthorized access.",
+        "limits": [
+          "The log only shows the command executed, not the output or success/failure status.",
+          "The log does not indicate whether the sudo command was authorized or if it was part of a legitimate Ansible operation."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000671",
+      "timestamp": "2022-01-24T13:30:30.382000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:07 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo session was opened for user www-data by user ait with root privileges on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:07",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM service: pam_unix(sudo:session)",
+          "Event: session opened",
+          "User: www-data",
+          "By user: ait (uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "server"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "ait",
+            "role": "initiating user"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials for user 'ait' could open a session as www-data to escalate privileges or access sensitive data.",
+        "limits": [
+          "The log does not indicate the command executed in the session.",
+          "The log does not show the source IP or terminal from which the session was initiated."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000672",
+      "timestamp": "2022-01-24T13:30:30.382000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:10 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-wehusdmgzatbuqncaxblkxkmvyonbkkh ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474191.1085467-25311-93195419071857/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "Ansible automation executed a command on the intranet server via sudo, switching to the www-data user to run a Python script from a temporary Ansible directory.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:10",
+          "Host: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "Terminal: pts/0",
+          "Working Directory: /home/ait",
+          "Target User: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-wehusdmgzatbuqncaxblkxkmvyonbkkh ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474191.1085467-25311-93195419071857/AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "sudo user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host"
+          }
+        ],
+        "possible_malicious_use": "An attacker could exploit this to execute arbitrary commands as the www-data user if they compromise the Ansible control node or the sudo credentials, potentially leading to privilege escalation or lateral movement.",
+        "limits": [
+          "The log only shows the command execution, not the output or success/failure status.",
+          "The log does not reveal the content of the Python script, which could be malicious.",
+          "The log does not indicate whether the sudo access was authorized or if it was part of a legitimate automation workflow."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000673",
+      "timestamp": "2022-01-24T13:30:30.382000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:10 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo session was opened for user www-data by user ait with root privileges on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:10",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM service: pam_unix(sudo:session)",
+          "Event: session opened",
+          "User: www-data",
+          "By user: ait (uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "server"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "ait",
+            "role": "initiating user"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials for user 'ait' could escalate privileges to root and access or modify web server files, potentially leading to data breach or server compromise.",
+        "limits": [
+          "Log does not indicate the command executed in the session",
+          "Log does not show if the session was successful or terminated",
+          "Log does not provide source IP or terminal information"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000674",
+      "timestamp": "2022-01-24T13:30:30.382000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:11 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了sudo会话结束的事件，表明www-data用户的sudo会话已关闭。",
+        "field_breakdown": [
+          "Jan 24 10:09:11: 事件发生的日期和时间",
+          "intranet-server: 主机名",
+          "sudo: 服务或进程名称",
+          "pam_unix(sudo:session): PAM模块和会话类型",
+          "session closed for user www-data: 会话关闭的用户"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器"
+          },
+          {
+            "name": "www-data",
+            "role": "用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话关闭日志来掩盖其恶意操作，或通过伪造此类日志干扰安全审计。",
+        "limits": [
+          "日志仅显示会话关闭，不包含会话期间的具体操作",
+          "无法确定会话是否正常结束或异常终止"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000675",
+      "timestamp": "2022-01-24T13:30:30.382000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:12 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-jxxxtoihjtydswphnrqujukiulrqhwsm ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474192.7404053-25311-74714116938435/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "Ansible automation task executed via sudo on an intranet server, switching to www-data user to run a Python command.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:12",
+          "Host: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "Terminal: pts/0",
+          "Working directory: /home/ait",
+          "Target user: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-... ; /usr/bin/python3 /var/tmp/ansible-tmp-.../AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "sudo user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host"
+          }
+        ],
+        "possible_malicious_use": "If the Ansible task is compromised, an attacker could execute arbitrary commands as www-data, potentially escalating privileges or accessing sensitive data.",
+        "limits": [
+          "The log only shows the command invocation, not the actual output or success/failure of the task.",
+          "The log does not reveal the content of the Python script or the Ansible playbook, limiting visibility into the exact actions performed."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000676",
+      "timestamp": "2022-01-24T13:30:30.382000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:12 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo session was opened for user www-data by user ait with root privileges on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:12",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM service: pam_unix(sudo:session)",
+          "Event: session opened",
+          "User: www-data",
+          "By user: ait (uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "ait",
+            "role": "initiating user (root)"
+          }
+        ],
+        "possible_malicious_use": "An attacker with root access could open a session as www-data to escalate privileges or perform actions under that user's identity, potentially hiding malicious activity.",
+        "limits": [
+          "The log does not show the command executed in the session.",
+          "The log does not indicate if the session was interactive or non-interactive."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000677",
+      "timestamp": "2022-01-24T13:30:30.382000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:12 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了一个sudo会话的关闭事件，表明www-data用户的sudo会话已结束。",
+        "field_breakdown": [
+          "Jan 24 10:09:12: 事件发生的日期和时间",
+          "intranet-server: 主机名",
+          "sudo: 服务或进程名称",
+          "pam_unix(sudo:session): PAM模块和会话类型",
+          "session closed for user www-data: 会话关闭的用户"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器"
+          },
+          {
+            "name": "www-data",
+            "role": "用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话关闭日志来掩盖其恶意操作，或通过伪造日志干扰安全审计。",
+        "limits": [
+          "日志不包含会话的持续时间或关闭原因",
+          "无法确认会话是否正常结束"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000678",
+      "timestamp": "2022-01-24T13:30:30.382000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:13 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-mhlbtundqywphiighdwirseoguacoqxq ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474194.1936483-25311-106406650963739/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo command executed by user 'ait' on the intranet server, switching to user 'www-data' to run a Python script via Ansible.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:13",
+          "Host: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "TTY: pts/0",
+          "Working directory: /home/ait",
+          "Target user: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-... ; /usr/bin/python3 /var/tmp/ansible-tmp-.../AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "sudo user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised 'ait' account could escalate privileges to www-data and execute arbitrary Python code, potentially leading to further compromise.",
+        "limits": [
+          "The log only shows the command invocation, not the actual output or success/failure.",
+          "The Ansible temp directory path suggests automated deployment, but the specific task is unknown.",
+          "No indication of whether the command was authorized or part of a legitimate playbook."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000679",
+      "timestamp": "2022-01-24T13:30:30.382000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:08 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo session was opened for user www-data by user ait with root privileges on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:08",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM service: pam_unix(sudo:session)",
+          "Event: session opened",
+          "User: www-data",
+          "By user: ait (uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "server"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "ait",
+            "role": "initiating user"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials of user 'ait' could escalate privileges to run commands as www-data, potentially leading to unauthorized access or data exfiltration.",
+        "limits": [
+          "The log does not show the command executed in the session.",
+          "The log does not indicate if the session was interactive or non-interactive."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000680",
+      "timestamp": "2022-01-24T13:30:30.382000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:09 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了一个sudo会话的结束，用户www-data的sudo会话被关闭。",
+        "field_breakdown": [
+          "Jan 24 10:09:09: 时间戳，表示事件发生的日期和时间",
+          "intranet-server: 主机名，表示事件发生的服务器",
+          "sudo: 进程名称，表示产生日志的程序",
+          "pam_unix(sudo:session): 模块和会话类型，表示PAM模块处理sudo会话",
+          "session closed for user www-data: 事件描述，表示用户www-data的sudo会话已关闭"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器主机"
+          },
+          {
+            "name": "www-data",
+            "role": "用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话的关闭来掩盖其恶意操作，或者通过观察会话关闭时间推断系统活动规律。",
+        "limits": [
+          "日志未记录会话的持续时间或具体命令，无法判断会话期间执行的操作",
+          "日志未记录会话关闭的原因，可能是正常退出或异常终止"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000681",
+      "timestamp": "2022-01-24T13:30:30.382000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:07 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了一个sudo会话的关闭事件，表明www-data用户的sudo会话已结束。",
+        "field_breakdown": [
+          "Jan 24 10:09:07: 事件发生的日期和时间",
+          "intranet-server: 主机名",
+          "sudo: 服务或进程名称",
+          "pam_unix(sudo:session): PAM模块和会话类型",
+          "session closed for user www-data: 会话关闭的用户"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器"
+          },
+          {
+            "name": "www-data",
+            "role": "用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话关闭日志来掩盖其恶意操作，或通过伪造此类日志来干扰安全监控。",
+        "limits": [
+          "日志不包含会话的持续时间或具体命令，无法判断会话期间执行的操作。",
+          "日志仅显示会话关闭，不提供会话开启或认证失败的上下文。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000682",
+      "timestamp": "2022-01-24T13:30:30.382000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:08 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-szmbxzispgvklosivwthhlozhxjpwmte ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474189.2023013-25311-220655471845239/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "Ansible sudo command execution log showing a user 'ait' escalating privileges to 'www-data' to run a Python script via sudo.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:08",
+          "Host: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "TTY: pts/0",
+          "Working directory: /home/ait",
+          "Target user: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-... ; /usr/bin/python3 /var/tmp/ansible-tmp-.../AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "source user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host"
+          }
+        ],
+        "possible_malicious_use": "If the Ansible task is compromised, an attacker could use this to execute arbitrary commands as www-data, potentially leading to privilege escalation or lateral movement.",
+        "limits": [
+          "The log only shows the command executed, not the content of the Python script.",
+          "The log does not indicate whether the command succeeded or failed.",
+          "The log does not show the full command line if it was truncated."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000692",
+      "timestamp": "2022-01-24T13:30:30.384000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:13 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo session was opened for user www-data by user ait with root privileges on the intranet-server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:13",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM service: pam_unix(sudo:session)",
+          "Event: session opened",
+          "User: www-data",
+          "By user: ait (uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "server"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "ait",
+            "role": "privileged user"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials of user 'ait' could open a session as www-data to escalate privileges or access web server resources.",
+        "limits": [
+          "The log does not indicate the command executed in the session.",
+          "The log does not show the source IP or terminal from which the session was initiated."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000693",
+      "timestamp": "2022-01-24T13:30:30.384000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:14 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了sudo会话结束的事件，表明www-data用户的sudo会话已关闭。",
+        "field_breakdown": [
+          "Jan 24 10:09:14：时间戳，表示事件发生的日期和时间。",
+          "intranet-server：主机名，表示事件发生的服务器。",
+          "sudo: pam_unix(sudo:session)：服务与模块，表示sudo的PAM会话模块。",
+          "session closed：事件描述，表示会话已关闭。",
+          "for user www-data：用户信息，表示会话属于www-data用户。"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器"
+          },
+          {
+            "name": "www-data",
+            "role": "用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话关闭日志来掩盖其恶意活动，例如在关闭会话前执行了未授权的命令，或者试图通过伪造日志来干扰安全审计。",
+        "limits": [
+          "日志仅显示会话关闭，不包含会话期间执行的命令，因此无法判断是否有恶意操作。",
+          "日志时间戳可能受系统时间设置影响，若系统时间被篡改，日志的准确性会降低。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000694",
+      "timestamp": "2022-01-24T13:30:30.384000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:15 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-qkscwksyaynvwtjbsdjgzntzldhdytch ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474195.6522317-25311-190484836484280/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "Ansible automation executed a command on the intranet server via sudo, switching to the www-data user to run a Python script.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:15",
+          "Host: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "Terminal: pts/0",
+          "Working Directory: /home/ait",
+          "Target User: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-... ; /usr/bin/python3 /var/tmp/ansible-tmp-.../AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "sudo user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host"
+          }
+        ],
+        "possible_malicious_use": "If the Ansible playbook or command is compromised, an attacker could execute arbitrary commands as www-data, potentially leading to privilege escalation or lateral movement.",
+        "limits": [
+          "The log only shows the command execution, not the content of the Python script.",
+          "The log does not indicate whether the command succeeded or failed.",
+          "The log does not provide the source IP or user authentication details."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000695",
+      "timestamp": "2022-01-24T13:30:30.384000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:15 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了intranet-server主机上通过sudo命令为www-data用户开启会话的事件，由用户ait（uid=0）触发，表明ait具有root权限并成功为www-data用户启动了sudo会话。",
+        "field_breakdown": [
+          "时间戳：Jan 24 10:09:15，表示事件发生的具体时间",
+          "主机名：intranet-server，表示事件发生的服务器",
+          "进程：sudo，表示使用sudo命令",
+          "模块：pam_unix(sudo:session)，表示PAM会话模块",
+          "事件：session opened，表示会话已开启",
+          "用户：www-data，表示会话的目标用户",
+          "执行者：ait(uid=0)，表示执行sudo的用户及其UID"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "sudo执行者，具有root权限"
+          },
+          {
+            "name": "www-data",
+            "role": "会话目标用户"
+          }
+        ],
+        "possible_malicious_use": "如果ait不是合法管理员，或该操作未授权，可能表示权限滥用或账户被入侵；也可能用于隐藏恶意操作，通过www-data用户执行命令。",
+        "limits": [
+          "该日志仅显示会话开启，不包含会话期间执行的命令",
+          "无法确认ait是否被授权执行此操作",
+          "日志未记录源IP或终端信息，难以追踪来源"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000696",
+      "timestamp": "2022-01-24T13:30:30.384000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:15 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了www-data用户通过sudo结束会话的事件",
+        "field_breakdown": [
+          "Jan 24 10:09:15: 时间戳",
+          "intranet-server: 主机名",
+          "sudo: 进程名",
+          "pam_unix(sudo:session): PAM模块及会话类型",
+          "session closed: 会话关闭",
+          "for user www-data: 目标用户"
+        ],
+        "entities": [
+          {
+            "name": "www-data",
+            "role": "目标用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo权限执行恶意操作后关闭会话，以掩盖痕迹",
+        "limits": [
+          "日志未记录命令详情",
+          "无法确认会话关闭是否正常"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000697",
+      "timestamp": "2022-01-24T13:30:30.384000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:16 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-aodazzfjyyfdefyeatttlbpuzohikkuj ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474197.2310362-25311-248405998950849/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A user 'ait' used sudo to run a command as 'www-data' on the intranet server, executing a Python script via Ansible.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:16",
+          "Host: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "TTY: pts/0",
+          "Working Directory: /home/ait",
+          "Target User: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-aodazzfjyyfdefyeatttlbpuzohikkuj ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474197.2310362-25311-248405998950849/AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "sudo user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised 'ait' credentials could escalate privileges to 'www-data' and execute arbitrary Python code, potentially leading to system compromise or lateral movement.",
+        "limits": [
+          "The command is part of an Ansible operation, indicating legitimate automation, but the sudo usage should be monitored for unusual patterns.",
+          "The Python script is in a temporary directory, which may be cleaned up, but its contents could be malicious if tampered with."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000707",
+      "timestamp": "2022-01-24T13:30:30.385000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:16 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo session was opened for user www-data by user ait with root privileges on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:16",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM service: pam_unix(sudo:session)",
+          "Event: session opened",
+          "User: www-data",
+          "By user: ait (uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "server"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "ait",
+            "role": "privileged user"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials of user 'ait' could open a session as www-data to escalate privileges or execute malicious commands.",
+        "limits": [
+          "The log does not show the command executed in the session.",
+          "The log does not indicate if the session was interactive or non-interactive."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000708",
+      "timestamp": "2022-01-24T13:30:30.385000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:17 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了一个sudo会话的结束，用户www-data的sudo会话关闭。",
+        "field_breakdown": [
+          "Jan 24 10:09:17: 时间戳，表示事件发生的日期和时间",
+          "intranet-server: 主机名，表示事件发生的服务器",
+          "sudo: 进程名称，表示sudo命令",
+          "pam_unix(sudo:session): 模块和会话类型，表示PAM的Unix模块处理sudo会话",
+          "session closed for user www-data: 事件描述，表示www-data用户的会话已关闭"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器"
+          },
+          {
+            "name": "www-data",
+            "role": "用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话的关闭来掩盖其恶意操作，或者通过伪造日志来干扰安全审计。",
+        "limits": [
+          "日志仅显示会话关闭，不包含会话期间的具体操作，无法判断是否有恶意行为",
+          "日志可能被篡改，需要结合其他日志进行验证"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000709",
+      "timestamp": "2022-01-24T13:30:30.385000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:28 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了www-data用户通过sudo结束会话的事件",
+        "field_breakdown": [
+          "Jan 24 10:09:28：时间戳",
+          "intranet-server：主机名",
+          "sudo: pam_unix(sudo:session)：服务与模块",
+          "session closed for user www-data：会话关闭信息"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器"
+          },
+          {
+            "name": "www-data",
+            "role": "用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话关闭日志来掩盖其操作痕迹，或通过伪造此类日志干扰安全审计。",
+        "limits": [
+          "日志仅显示会话关闭，不包含具体命令或操作内容",
+          "无法确认会话关闭是正常退出还是异常终止"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000710",
+      "timestamp": "2022-01-24T13:30:30.385000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:28 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-uphxawdlsytayufrtkbdemuzvncrhnym ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474209.520465-25373-39380519735461/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "Ansible task execution on intranet-server via sudo as www-data user, running a command module.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:28",
+          "Host: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "TTY: pts/0",
+          "Working directory: /home/ait",
+          "Target user: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-... ; /usr/bin/python3 /var/tmp/ansible-tmp-.../AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "source user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "target host"
+          }
+        ],
+        "possible_malicious_use": "If the Ansible control node is compromised, an attacker could use this mechanism to execute arbitrary commands on the target host with elevated privileges (www-data). The temporary directory and script could be tampered with to run malicious code.",
+        "limits": [
+          "The log only shows the command execution, not the actual command content or its output.",
+          "The log does not indicate whether the command was successful or what it did.",
+          "The log does not provide context on the Ansible playbook or task that triggered this execution."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000711",
+      "timestamp": "2022-01-24T13:30:30.385000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:28 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了一个sudo会话的开启，用户www-data通过ait（uid=0）在intranet-server上成功建立了sudo会话。",
+        "field_breakdown": [
+          "Jan 24 10:09:28: 日志时间戳，表示事件发生的具体时间。",
+          "intranet-server: 主机名，表示事件发生的服务器。",
+          "sudo: 程序名，表示事件与sudo命令相关。",
+          "pam_unix(sudo:session): 表示PAM模块用于sudo会话管理。",
+          "session opened for user www-data: 表示会话已为www-data用户开启。",
+          "by ait(uid=0): 表示会话由ait用户（uid=0，即root）开启。"
+        ],
+        "entities": [
+          {
+            "name": "www-data",
+            "role": "会话目标用户"
+          },
+          {
+            "name": "ait",
+            "role": "会话发起者"
+          }
+        ],
+        "possible_malicious_use": "如果ait不是合法管理员，可能表示未授权用户尝试获取www-data的权限；或者www-data被用于执行恶意操作。",
+        "limits": [
+          "日志仅显示会话开启，未记录后续命令，无法判断具体操作。",
+          "uid=0表明ait具有root权限，但未验证其身份真实性。"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false
+      }
+    },
+    {
+      "event_id": "LONG-000712",
+      "timestamp": "2022-01-24T13:30:30.385000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:29 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了sudo会话的关闭，表明www-data用户的sudo会话已结束。",
+        "field_breakdown": [
+          "Jan 24 10:09:29: 时间戳，表示事件发生的日期和时间",
+          "intranet-server: 主机名，表示事件发生的服务器",
+          "sudo: 进程名称，表示sudo命令",
+          "pam_unix(sudo:session): PAM模块，用于会话管理",
+          "session closed for user www-data: 会话关闭，指定用户为www-data"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器"
+          },
+          {
+            "name": "www-data",
+            "role": "用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话的关闭来掩盖其恶意操作，或通过伪造日志来干扰安全审计。",
+        "limits": [
+          "日志仅显示会话关闭，不包含会话期间的具体操作，无法判断是否有恶意行为",
+          "日志可能被篡改，需结合其他日志进行验证"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000713",
+      "timestamp": "2022-01-24T13:30:30.385000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:30 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-pergsgctjdfmekqdsljoeakkpggxnypi ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474211.1201584-25373-183767146391377/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo command executed by user 'ait' on the intranet server, switching to user 'www-data' to run a shell command that echoes a success marker and executes a Python script via Ansible.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:30",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "Terminal: pts/0",
+          "Working directory: /home/ait",
+          "Target user: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-pergsgctjdfmekqdsljoeakkpggxnypi ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474211.1201584-25373-183767146391377/AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "source user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host"
+          }
+        ],
+        "possible_malicious_use": "If the Ansible temporary directory or script is tampered with, an attacker could execute arbitrary code as www-data, potentially leading to privilege escalation or lateral movement.",
+        "limits": [
+          "The log only shows the command invocation, not the script content or its output.",
+          "The temporary directory path suggests Ansible automation, but the script's purpose is unknown.",
+          "The log does not indicate whether the command succeeded or failed."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000714",
+      "timestamp": "2022-01-24T13:30:30.385000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:18 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-vrhwxehftyrwzazjlyzxsaemlcjikiow ; WP_CLI_CACHE_DIR=/tmp/.wp-cli/cache /usr/bin/python3 /var/tmp/ansible-tmp-1642474198.8708827-25364-95720458475522/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "Ansible task execution on intranet-server via sudo, running a command as www-data user.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:18",
+          "Host: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "TTY: pts/0",
+          "Working directory: /home/ait",
+          "Target user: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-... ; WP_CLI_CACHE_DIR=/tmp/.wp-cli/cache /usr/bin/python3 /var/tmp/ansible-tmp-.../AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "sudo user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised sudo credentials could execute arbitrary commands as www-data, potentially escalating privileges or moving laterally within the network.",
+        "limits": [
+          "The log only shows the command invocation, not the actual output or success/failure of the Ansible task.",
+          "The log does not reveal the content of the Python script executed, which could contain malicious code."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000715",
+      "timestamp": "2022-01-24T13:30:30.385000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:18 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo session was opened for user www-data by user ait with root privileges on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:18",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM service: pam_unix(sudo:session)",
+          "Event: session opened",
+          "User: www-data",
+          "Initiating user: ait (uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "server"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "ait",
+            "role": "initiating user"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials for user 'ait' could escalate privileges to run commands as www-data, potentially accessing web application data or executing arbitrary code.",
+        "limits": [
+          "The log does not show the command executed in the session.",
+          "The log does not indicate if the session was interactive or non-interactive."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000716",
+      "timestamp": "2022-01-24T13:30:30.385000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:26 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了一个sudo会话的结束，具体是www-data用户的sudo会话关闭。",
+        "field_breakdown": [
+          "Jan 24 10:09:26: 时间戳，表示事件发生的日期和时间",
+          "intranet-server: 主机名，表示事件发生的服务器",
+          "sudo: 进程名称，表示产生日志的程序",
+          "pam_unix(sudo:session): 模块和会话类型，表示PAM的Unix模块处理sudo会话",
+          "session closed for user www-data: 事件描述，表示www-data用户的会话已关闭"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器主机"
+          },
+          {
+            "name": "www-data",
+            "role": "用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话的关闭来掩盖其恶意操作，或者通过伪造此类日志来干扰安全监控。",
+        "limits": [
+          "日志仅显示会话关闭，不包含会话期间的具体命令或操作",
+          "无法确定会话关闭是正常退出还是异常终止"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000717",
+      "timestamp": "2022-01-24T13:30:30.385000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:27 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-upyfiurdpdshwkhxkqgsafgixumxrbvm ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474207.9111586-25373-176558992749227/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo command executed by user 'ait' to run a command as 'www-data' on an intranet server, likely part of an Ansible automation task.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:27",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "TTY: pts/0",
+          "Working directory: /home/ait",
+          "Target user: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-upyfiurdpdshwkhxkqgsafgixumxrbvm ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474207.9111586-25373-176558992749227/AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "user executing sudo"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host"
+          }
+        ],
+        "possible_malicious_use": "If the Ansible task is compromised, an attacker could execute arbitrary commands as www-data, potentially leading to privilege escalation or lateral movement.",
+        "limits": [
+          "The log only shows the command invocation, not the actual output or success/failure.",
+          "The Ansible temp directory path suggests a legitimate automation, but the command could be modified if the playbook is tampered with."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000718",
+      "timestamp": "2022-01-24T13:30:30.385000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:27 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo session was opened for user www-data by user ait with root privileges on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:27",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM service: pam_unix(sudo:session)",
+          "Event: session opened",
+          "User: www-data",
+          "Initiating user: ait (uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "server"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "ait",
+            "role": "initiating user"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials for user 'ait' could escalate privileges to run commands as www-data, potentially accessing web application data or executing malicious scripts.",
+        "limits": [
+          "The log does not show the command executed in the session.",
+          "The log does not indicate if the session was interactive or non-interactive.",
+          "The log does not provide the source IP or terminal information."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000728",
+      "timestamp": "2022-01-24T13:30:30.386000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:30 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "用户ait通过sudo以root权限为www-data用户开启了一个会话",
+        "field_breakdown": [
+          "Jan 24 10:09:30: 日志时间戳",
+          "intranet-server: 主机名",
+          "sudo: 服务或进程",
+          "pam_unix(sudo:session): PAM模块及会话类型",
+          "session opened for user www-data by ait(uid=0): 会话开启详情，包括目标用户和操作用户"
+        ],
+        "entities": [
+          {
+            "name": "www-data",
+            "role": "目标用户"
+          },
+          {
+            "name": "ait",
+            "role": "执行sudo的用户"
+          },
+          {
+            "name": "intranet-server",
+            "role": "服务器主机"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo权限提升，以www-data身份执行恶意操作，或通过ait账户进行未授权访问",
+        "limits": [
+          "日志未记录具体执行的命令",
+          "无法确认会话是否成功关闭",
+          "日志仅反映会话开启，不包含后续操作"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000729",
+      "timestamp": "2022-01-24T13:30:30.386000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:31 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了sudo会话的关闭事件，表明www-data用户的sudo会话已结束。",
+        "field_breakdown": [
+          "Jan 24 10:09:31：时间戳，表示事件发生的日期和时间",
+          "intranet-server：主机名，表示事件发生的服务器",
+          "sudo：进程名称，表示与sudo命令相关",
+          "pam_unix(sudo:session)：PAM模块，表示sudo会话的PAM认证",
+          "session closed：事件描述，表示会话已关闭",
+          "for user www-data：用户信息，表示会话属于www-data用户"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器"
+          },
+          {
+            "name": "www-data",
+            "role": "用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话的关闭日志来掩盖其恶意操作，例如在关闭会话前执行了未授权的命令，或者通过伪造日志来干扰安全审计。",
+        "limits": [
+          "日志仅显示会话关闭，不包含会话期间执行的命令，无法判断是否有恶意操作",
+          "日志时间戳可能受系统时间影响，若系统时间被篡改，日志的准确性会降低"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000730",
+      "timestamp": "2022-01-24T13:30:30.386000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:34 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了sudo会话的关闭事件，表明www-data用户的sudo会话已结束。",
+        "field_breakdown": [
+          "Jan 24 10:09:34：时间戳，表示事件发生的日期和时间",
+          "intranet-server：主机名，表示事件发生的服务器",
+          "sudo: pam_unix(sudo:session)：服务与模块，表示sudo的PAM会话模块",
+          "session closed for user www-data：事件详情，表示www-data用户的会话已关闭"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器"
+          },
+          {
+            "name": "www-data",
+            "role": "用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话关闭事件来掩盖其恶意操作，例如在关闭会话前执行了未授权的命令，或者通过伪造日志来干扰审计。",
+        "limits": [
+          "日志仅显示会话关闭，不包含会话期间执行的命令，无法判断是否有恶意行为",
+          "时间戳可能受系统时间设置影响，存在不准确性"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000731",
+      "timestamp": "2022-01-24T13:30:30.386000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:32 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-xhmicvavobiyhjqtysnccphsxiyopkhm ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474212.6809494-25407-87274904840410/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "Ansible sudo command execution log showing a user 'ait' using sudo to run a command as 'www-data' to execute a Python script via Ansible.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:32",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "TTY: pts/0",
+          "Working directory: /home/ait",
+          "Target user: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-xhmicvavobiyhjqtysnccphsxiyopkhm ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474212.6809494-25407-87274904840410/AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "sudo user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials could use sudo to escalate privileges to www-data and execute arbitrary commands, potentially leading to system compromise or data exfiltration.",
+        "limits": [
+          "Log only shows command execution, not the actual content of the Python script.",
+          "No indication of whether the command succeeded or failed.",
+          "The log does not include the full command arguments or environment variables."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000732",
+      "timestamp": "2022-01-24T13:30:30.386000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:32 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo session was opened for user www-data by user ait with root privileges on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:32",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM service: pam_unix(sudo:session)",
+          "Event: session opened",
+          "User: www-data",
+          "By user: ait (uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "server"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "ait",
+            "role": "initiating user"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials of user 'ait' could escalate privileges to run commands as www-data, potentially accessing web server files or executing malicious scripts.",
+        "limits": [
+          "The log does not show the command executed in the session.",
+          "The log does not indicate if the session was successful or if any commands were run."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000733",
+      "timestamp": "2022-01-24T13:30:30.386000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:32 intranet-server sudo: pam_unix(sudo:session): session closed for user www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "记录了一个sudo会话的结束，用户www-data的sudo会话在intranet-server上关闭。",
+        "field_breakdown": [
+          "Jan 24 10:09:32: 时间戳，表示事件发生的日期和时间",
+          "intranet-server: 主机名，表示事件发生的服务器",
+          "sudo: 服务或进程名称，表示sudo命令",
+          "pam_unix(sudo:session): PAM模块，表示sudo会话的PAM认证",
+          "session closed: 事件描述，表示会话已关闭",
+          "for user www-data: 用户信息，表示会话属于www-data用户"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "服务器"
+          },
+          {
+            "name": "www-data",
+            "role": "用户"
+          }
+        ],
+        "possible_malicious_use": "攻击者可能利用sudo会话的关闭来掩盖其恶意操作，例如在会话中执行了未授权的命令后关闭会话以清除痕迹。",
+        "limits": [
+          "日志仅显示会话关闭，不包含会话期间执行的命令，无法判断是否有恶意行为",
+          "日志未记录会话的启动时间，无法确定会话持续时间"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "strict_chinese_quality_retry_v2"
+      }
+    },
+    {
+      "event_id": "LONG-000734",
+      "timestamp": "2022-01-24T13:30:30.386000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:33 intranet-server sudo:      ait : TTY=pts/0 ; PWD=/home/ait ; USER=www-data ; COMMAND=/bin/sh -c echo BECOME-SUCCESS-vwofqddhkvhadajwcmxttopnadcofbdo ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474214.1448152-25416-211673016860939/AnsiballZ_command.py",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "Ansible automation executed a command on the intranet server via sudo, switching to the www-data user to run a Python script from a temporary directory.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:33",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "User: ait",
+          "Terminal: pts/0",
+          "Working directory: /home/ait",
+          "Target user: www-data",
+          "Command: /bin/sh -c echo BECOME-SUCCESS-vwofqddhkvhadajwcmxttopnadcofbdo ; /usr/bin/python3 /var/tmp/ansible-tmp-1642474214.1448152-25416-211673016860939/AnsiballZ_command.py"
+        ],
+        "entities": [
+          {
+            "name": "ait",
+            "role": "source user"
+          },
+          {
+            "name": "www-data",
+            "role": "target user"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host"
+          }
+        ],
+        "possible_malicious_use": "An attacker with compromised credentials could use Ansible to execute arbitrary commands as www-data, potentially escalating privileges or moving laterally within the network.",
+        "limits": [
+          "The log does not reveal the content of the executed Python script, so the exact action remains unknown.",
+          "The log only shows the command invocation, not the outcome or output."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-000735",
+      "timestamp": "2022-01-24T13:30:30.386000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+      "raw": "Jan 24 10:09:33 intranet-server sudo: pam_unix(sudo:session): session opened for user www-data by ait(uid=0)",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A sudo session was opened for user www-data by user ait with root privileges on the intranet server.",
+        "field_breakdown": [
+          "Timestamp: Jan 24 10:09:33",
+          "Hostname: intranet-server",
+          "Process: sudo",
+          "PAM service: pam_unix(sudo:session)",
+          "Event: session opened",
+          "User: www-data",
+          "By user: ait (uid=0)"
+        ],
+        "entities": [
+          {
+            "name": "intranet-server",
+            "role": "target system"
+          },
+          {
+            "name": "www-data",
+            "role": "user whose session was opened"
+          },
+          {
+            "name": "ait",
+            "role": "user who initiated the session (root)"
+          }
+        ],
+        "possible_malicious_use": "An attacker with root access could open a session as www-data to perform actions under that user's privileges, potentially to access web server files or escalate privileges further.",
+        "limits": [
+          "The log does not indicate the commands executed during the session",
+          "The log does not show the source IP or terminal from which the session was initiated"
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    },
+    {
+      "event_id": "LONG-033574",
+      "timestamp": "2022-01-29T15:20:54.878000Z",
+      "source_file": "gather/monitoring/logs/logstash/intranet-server/2022-01-29-system.auth.log",
+      "raw": "Jan 29 15:20:51 intranet-server su[28625]: Successful su for gmarsh by www-data",
+      "severity": "high",
+      "score": 0.88,
+      "analysis": {
+        "log_meaning": "A successful su (switch user) operation was performed by the user 'www-data' to become 'gmarsh' on the intranet-server at the specified time.",
+        "field_breakdown": [
+          "Timestamp: Jan 29 15:20:51",
+          "Hostname: intranet-server",
+          "Process: su[28625]",
+          "Event: Successful su for gmarsh by www-data"
+        ],
+        "entities": [
+          {
+            "name": "www-data",
+            "role": "source user (the user who initiated the su command)"
+          },
+          {
+            "name": "gmarsh",
+            "role": "target user (the user being switched to)"
+          },
+          {
+            "name": "intranet-server",
+            "role": "host where the su command was executed"
+          }
+        ],
+        "possible_malicious_use": "An attacker who has compromised the www-data account could use this to escalate privileges to the gmarsh account, potentially gaining access to sensitive data or systems.",
+        "limits": [
+          "The log does not indicate the terminal or session from which the su command was issued, limiting the ability to trace the exact source.",
+          "The log does not show whether the su command required a password or used other authentication methods, which could affect the assessment of risk."
+        ]
+      },
+      "provenance": {
+        "provider": "DeepSeek",
+        "model": "deepseek-chat",
+        "purpose": "????????",
+        "labels_sent_to_model": false,
+        "retry": "chinese_translation_quality_retry"
+      }
+    }
+  ],
+  "updated_at": "2026-08-16T21:03:30.406Z",
+  "quality_retry": {
+    "target_count": 69,
+    "success": 68,
+    "failures": 1,
+    "language": "zh-CN",
+    "final_single_retry": "success"
+  },
+  "quality_retry_v2": {
+    "target_count": 69,
+    "success": 69,
+    "failures": 0,
+    "language": "zh-CN",
+    "prompt": "strict_chinese_json_example"
+  },
+  "quality_retry_translation": {
+    "target_count": 45,
+    "success": 45,
+    "failures": 0
+  },
+  "quality_gate": {
+    "status": "failed",
+    "schema": "passed",
+    "all_items_have_output": true,
+    "no_chinese_items": 45,
+    "checked_at": "2026-08-16T21:05:05.216Z",
+    "reason": "API????????????????????????"
+  }
+}

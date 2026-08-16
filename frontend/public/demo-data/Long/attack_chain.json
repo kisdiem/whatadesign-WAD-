@@ -5,39 +5,50 @@
   "steps": [
     {
       "sequence": 1,
-      "label": "remote connection anomaly",
+      "label": "T1136.001 创建本地账户：创建用户 ait",
       "evidence_event_ids": [
-        "LONG-0189"
+        "LONG-000003"
       ]
     },
     {
       "sequence": 2,
-      "label": "web-service account to local account transition",
+      "label": "T1098.007 附加本地或域组：加入 dialout",
       "evidence_event_ids": [
-        "LONG-0198"
+        "LONG-000004"
       ]
     },
     {
       "sequence": 3,
-      "label": "privileged command context",
+      "label": "T1098.007 附加本地或域组：创建用户组 ait",
       "evidence_event_ids": [
-        "LONG-0219",
-        "LONG-0220",
-        "LONG-0223"
+        "LONG-000005"
       ]
     },
     {
       "sequence": 4,
-      "label": "sensitive file and root directory discovery",
+      "label": "T1098.007 附加本地或域组：加入 adm",
       "evidence_event_ids": [
-        "LONG-0220",
-        "LONG-0223"
+        "LONG-000006"
+      ]
+    },
+    {
+      "sequence": 5,
+      "label": "T1098.007 附加本地或域组：加入 shadow/adm",
+      "evidence_event_ids": [
+        "LONG-000011"
+      ]
+    },
+    {
+      "sequence": 6,
+      "label": "T1098.007 附加本地或域组：加入 shadow/dialout",
+      "evidence_event_ids": [
+        "LONG-000012"
       ]
     }
   ],
   "limitations": [
-    "This is a manually curated replay package, not a model prediction.",
-    "The chain is a candidate interpretation of source log facts.",
-    "AIT ground-truth labels and source labels are excluded from this package."
+    "这是基于原始日志的演示回放，不是模型预测。",
+    "候选关联只供人工调查，不是攻击事实。",
+    "未读取 AIT 标签或场景真值。"
   ]
 }

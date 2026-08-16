@@ -7,6 +7,7 @@ import './styles.css'
 import './light-theme.css'
 import './mission-control.css'
 import './agent-mode.css'
+import './blue-light-theme.css'
 import MissionControlApp from './MissionControlApp'
 
 const ApiSourceEnhancer = lazy(() => import('./ApiSourceEnhancer'))
@@ -43,6 +44,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           colorText: '#253247',
           colorTextSecondary: '#7b8796',
           borderRadius: 8,
+          fontSize: 15,
         },
       }}
     >

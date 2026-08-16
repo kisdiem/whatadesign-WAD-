@@ -1,14 +1,17 @@
 {
   "dataset_id": "Short",
   "kind": "demo_replay",
-  "source_archive": "harrison.zip",
-  "source_member": "gather/intranet_server/logs/auth.log",
-  "source_slice": "2022-02-08T08:30:00+00:00/2022-02-08T08:45:00+00:00",
-  "window_seconds": 900,
-  "event_count": 17,
-  "event_log_sha256": "47bb6a99b7577cad3a1f02680790b79b89fd6baa7391e2fe65db0fc87da2ac67",
+  "source_archive": "shaw.zip",
+  "source_members": [
+    "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.auth.log",
+    "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.network.log",
+    "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.syslog.log"
+  ],
+  "source_slice": "2022-01-24T13:30:00Z/2022-01-24T14:00:00Z",
+  "event_count": 2570,
+  "sha256_events_log": "01efaf2b3aaeada88045c3d2391acd18598da76e0b093aaeb770c786561c7f04",
   "contains_labels": false,
   "contains_facts_json": false,
-  "preserves_full_slice": true,
-  "generated_at": "2026-08-14T00:00:00Z"
+  "preserves_real_source_timestamps": true,
+  "generated_at": "2026-08-15T19:38:38.319022Z"
 }

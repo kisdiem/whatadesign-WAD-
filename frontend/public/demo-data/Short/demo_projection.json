@@ -5,23 +5,11 @@
   "synthetic_scores": true,
   "formal_evaluation": false,
   "labels_read": false,
-  "event_count": 17,
+  "event_count": 2570,
   "threat_level_policy": {
-    "info": "routine/system maintenance",
-    "low": "contextual event",
-    "medium": "suspicious event requiring context",
-    "high": "strong suspicious evidence",
-    "critical": "sensitive/high-impact action"
-  },
-  "results_file": "detection_results.json",
-  "entities_file": "entities.json",
-  "relations_file": "event_relations.json",
-  "ui_fields": [
-    "timeline",
-    "threat_level",
-    "final_score",
-    "reasons",
-    "module_projection",
-    "provenance"
-  ]
+    "info": "常规系统或网络遥测",
+    "low": "保留为上下文的低风险事件",
+    "medium": "需要结合上下文核查",
+    "high": "需要人工优先复核"
+  }
 }

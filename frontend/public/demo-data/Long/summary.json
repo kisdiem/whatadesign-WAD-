@@ -4,105 +4,14 @@
   "model_execution": false,
   "synthetic_scores": true,
   "formal_evaluation": false,
-  "event_count": 400,
+  "event_count": 44175,
   "threat_level_counts": {
-    "low": 78,
-    "info": 313,
-    "medium": 2,
-    "high": 6,
-    "critical": 1
+    "info": 42927,
+    "high": 94,
+    "medium": 426,
+    "low": 728
   },
-  "highest_threat_events": [
-    {
-      "event_id": "LONG-0220",
-      "threat_level": "critical",
-      "final_score": 0.98,
-      "reasons": [
-        "????????",
-        "root ???????"
-      ]
-    },
-    {
-      "event_id": "LONG-0223",
-      "threat_level": "high",
-      "final_score": 0.91,
-      "reasons": [
-        "root ????",
-        "root ???????"
-      ]
-    },
-    {
-      "event_id": "LONG-0198",
-      "threat_level": "high",
-      "final_score": 0.82,
-      "reasons": [
-        "www-data ?????????"
-      ]
-    },
-    {
-      "event_id": "LONG-0221",
-      "threat_level": "high",
-      "final_score": 0.78,
-      "reasons": [
-        "??????"
-      ]
-    },
-    {
-      "event_id": "LONG-0222",
-      "threat_level": "high",
-      "final_score": 0.78,
-      "reasons": [
-        "??????"
-      ]
-    },
-    {
-      "event_id": "LONG-0224",
-      "threat_level": "high",
-      "final_score": 0.78,
-      "reasons": [
-        "??????"
-      ]
-    },
-    {
-      "event_id": "LONG-0225",
-      "threat_level": "high",
-      "final_score": 0.78,
-      "reasons": [
-        "??????"
-      ]
-    },
-    {
-      "event_id": "LONG-0219",
-      "threat_level": "medium",
-      "final_score": 0.69,
-      "reasons": [
-        "sudo ????"
-      ]
-    },
-    {
-      "event_id": "LONG-0189",
-      "threat_level": "medium",
-      "final_score": 0.63,
-      "reasons": [
-        "?? SSH ????"
-      ]
-    },
-    {
-      "event_id": "LONG-0001",
-      "threat_level": "low",
-      "final_score": 0.32,
-      "reasons": [
-        "root ???????????"
-      ]
-    }
-  ],
+  "time_range": "2022-01-24T13:30:00Z/2022-01-31T13:30:00Z",
   "candidate_chain_id": "LONG-CANDIDATE-001",
-  "candidate_chain_status": "candidate",
-  "files": {
-    "timeline": "timeline.json",
-    "detection_results": "detection_results.json",
-    "entities": "entities.json",
-    "event_relations": "event_relations.json",
-    "attack_chain": "attack_chain.json"
-  }
+  "candidate_chain_status": "candidate"
 }

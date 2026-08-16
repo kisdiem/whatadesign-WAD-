@@ -5,30 +5,50 @@
   "steps": [
     {
       "sequence": 1,
-      "label": "session transition",
+      "label": "T1136.001 创建本地账户：创建用户 ait",
       "evidence_event_ids": [
-        "SHORT-0001"
+        "SHORT-000003"
       ]
     },
     {
       "sequence": 2,
-      "label": "privileged command context",
+      "label": "T1098.007 附加本地或域组：加入 dialout",
       "evidence_event_ids": [
-        "SHORT-0006",
-        "SHORT-0007"
+        "SHORT-000004"
       ]
     },
     {
       "sequence": 3,
-      "label": "host and account discovery",
+      "label": "T1098.007 附加本地或域组：创建用户组 ait",
       "evidence_event_ids": [
-        "SHORT-0010"
+        "SHORT-000005"
+      ]
+    },
+    {
+      "sequence": 4,
+      "label": "T1098.007 附加本地或域组：加入 adm",
+      "evidence_event_ids": [
+        "SHORT-000006"
+      ]
+    },
+    {
+      "sequence": 5,
+      "label": "T1098.007 附加本地或域组：加入 shadow/adm",
+      "evidence_event_ids": [
+        "SHORT-000011"
+      ]
+    },
+    {
+      "sequence": 6,
+      "label": "T1098.007 附加本地或域组：加入 shadow/dialout",
+      "evidence_event_ids": [
+        "SHORT-000012"
       ]
     }
   ],
   "limitations": [
-    "This is a manually curated replay package, not a model prediction.",
-    "The chain is a candidate interpretation of source log facts.",
-    "AIT ground-truth labels and source labels are excluded from this package."
+    "这是基于原始日志的演示回放，不是模型预测。",
+    "候选关联只供人工调查，不是攻击事实。",
+    "未读取 AIT 标签或场景真值。"
   ]
 }

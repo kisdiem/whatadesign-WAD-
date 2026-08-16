@@ -74,11 +74,11 @@ type ChatItem = {
 type InvestigationStatus = Investigation['status']
 
 const severityMeta: Record<Severity, { label: string; color: string }> = {
-  info: { label: '正常', color: 'blue' },
   critical: { label: '严重', color: 'red' },
   high: { label: '高危', color: 'orange' },
   medium: { label: '中危', color: 'gold' },
   low: { label: '低危', color: 'blue' },
+  info: { label: '正常', color: 'default' },
 }
 
 const caseStatusLabel: Record<InvestigationStatus, string> = {
@@ -511,7 +511,7 @@ function InvestigationsPage({ cases, windows, onAsk }: { cases: Investigation[];
       value: Math.round(item.score * 100),
       x: 130 + index * 210,
       y: index % 2 === 0 ? 140 : 215,
-      label: { show: true, formatter: `${item.id.replace('WIN-20260809-', '')}\n${item.title}`, color: '#d8e1ea', fontSize: 11 },
+      label: { show: true, formatter: `${item.id.replace('WIN-20260809-', '')}\n${item.title}`, color: '#d8e1ea', fontSize: 12 },
     }))
     const entitySet = Array.from(new Set(caseWindows.flatMap((item) => item.entities))).slice(0, 7)
     const entityNodes = entitySet.map((entity, index) => ({
@@ -521,7 +521,7 @@ function InvestigationsPage({ cases, windows, onAsk }: { cases: Investigation[];
       category: 1,
       x: 140 + index * 105,
       y: index % 2 === 0 ? 350 : 405,
-      label: { show: true, formatter: entity, color: '#9eb0c0', fontSize: 10 },
+      label: { show: true, formatter: entity, color: '#9eb0c0', fontSize: 11 },
     }))
     const links = [] as { source: string; target: string; value?: string }[]
     for (let index = 0; index < caseWindows.length - 1; index += 1) {

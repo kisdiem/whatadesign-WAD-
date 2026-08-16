@@ -9,19 +9,19 @@ import { normalActivityEvents } from './mocks/normalActivity'
 const { Text } = Typography
 
 const severityWeight: Record<Severity, number> = {
-  info: 0,
   critical: 4,
   high: 3,
   medium: 2,
   low: 1,
+  info: 0,
 }
 
 const severityLabel: Record<Severity, string> = {
-  info: '正常',
   critical: '严重',
   high: '高危',
   medium: '中危',
   low: '低危',
+  info: '正常',
 }
 
 const sourceOptions = Array.from(new Set(anomalyWindows.flatMap((item) => item.sourceTypes)))
@@ -47,7 +47,7 @@ export default function AnomalyTimelineEnhancer() {
   const location = useLocation()
   const [host, setHost] = useState<HTMLDivElement | null>(null)
   const [selectedId, setSelectedId] = useState<string>('all')
-  const [severities, setSeverities] = useState<Severity[]>(['critical', 'high', 'medium', 'low', 'info'])
+  const [severities, setSeverities] = useState<Severity[]>(['critical', 'high', 'medium', 'low'])
   const [sources, setSources] = useState<string[]>(sourceOptions)
   const [progress, setProgress] = useState(0)
   const [playing, setPlaying] = useState(true)

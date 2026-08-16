@@ -47,15 +47,14 @@ import {
 } from '@ant-design/icons'
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import {
-  anomalyWindows,
-  investigations,
-  overviewSeries,
+  type AnomalyWindow,
   type Investigation,
   type LogSource,
   type SecurityEvent,
   type Severity,
 } from './mocks/data'
 import { loadDemoDataset, type DemoDatasetId } from './services/demoData'
+import { deleteIngestedSource, getIngestionSnapshot, uploadLogFile, type IngestResult, type ModuleScores } from './services/ingestion'
 import { downloadAttackChainReport } from './services/attackChainReport'
 import {
   askAssistant,
@@ -88,23 +87,75 @@ import {
   type FindingStage,
   type FindingStatus,
 } from './services/investigationDomain'
+import {
+  buildAttackChainGraph,
+  buildM3GraphSnapshot,
+  loadM3GraphSnapshots,
+  persistM3GraphSnapshot,
+  removeM3GraphSnapshot,
+  limitGraphExplanation,
+  type M3GraphSnapshot,
+} from './services/caseGraphs'
+import InteractiveCaseGraph from './InteractiveCaseGraph'
 
 const { Header, Sider, Content } = Layout
 const { Title, Text, Paragraph } = Typography
 const { Dragger } = Upload
 const PREFER_DEMO_DATA = import.meta.env.VITE_PREFER_DEMO_DATA !== 'false'
 const EChartsView = lazy(() => import('./EChartsView'))
+const PERSISTED_CASES_KEY = 'wad-demo-case-items-v1'
+const PERSISTED_CASE_BOARDS_KEY = 'wad-demo-case-boards-v1'
+
+function readPersistedCases() {
+  try { return JSON.parse(window.localStorage.getItem(PERSISTED_CASES_KEY) || '[]') as Investigation[] } catch { return [] }
+}
+
+function readPersistedCaseBoards() {
+  try { return JSON.parse(window.localStorage.getItem(PERSISTED_CASE_BOARDS_KEY) || '{}') as Record<string, CaseBoard> } catch { return {} }
+}
+
+function mergePersistedCases(baseCases: Investigation[]) {
+  const merged = new Map(baseCases.map((item) => [item.id, item]))
+  readPersistedCases()
+    .filter((item) => item.id !== 'CASE-XLOG-30D-001')
+    .forEach((item) => merged.set(item.id, item))
+  return Array.from(merged.values()).filter((item) => !item.id.startsWith('CASE-XLOG-'))
+}
 
 const preparedDemoSources: LogSource[] = [
-  { id: 'DEMO-SHORT', name: 'Short', path: '/demo-data/Short', kind: '演示日志源', status: 'online', size: '17 条事件 / 15 分钟', lastRead: '2022-02-08 08:30 - 08:45（UTC）' },
-  { id: 'DEMO-LONG', name: 'Long', path: '/demo-data/Long', kind: '演示日志源', status: 'online', size: '400 条事件 / 24 小时', lastRead: '2022-01-23 00:00 - 23:59（UTC）' },
+  { id: 'DEMO-SHORT', name: 'Short', path: 'stream://short', kind: '事件流', status: 'online', size: '2,570 条事件 / 30 天窗口', lastRead: '2026-07-11 - 2026-08-09（UTC）' },
+  { id: 'DEMO-LONG', name: 'Long', path: 'stream://long', kind: '事件流', status: 'online', size: '44,175 条事件 / 30 天窗口', lastRead: '2026-07-11 - 2026-08-09（UTC）' },
 ]
+
+function eventStreamText(value?: string) {
+  return String(value || '')
+    .replace('实时上传 · M0-M6', '事件流')
+    .replace(/^实时上传\//, '事件流/')
+    .replace('由实时上传文件经过', '由文件接入事件流经过')
+}
+
+function presentEventStreamSource(source: LogSource): LogSource {
+  if (!source.id.startsWith('UPLOAD-') && !source.path.startsWith('upload://')) return source
+  return {
+    ...source,
+    path: `stream://${source.name}`,
+    kind: '事件流',
+  }
+}
+
+type DemoReplayEvent = SecurityEvent & {
+  dataset: string
+  module_scores?: ModuleScores
+  raw_log_ref?: string
+  score?: number
+}
 
 type EventRow = {
   id: string
   time: string
   source: string
   action: string
+  normalizedAction?: string
   actor?: string
   host?: string
   process?: string
@@ -115,13 +166,24 @@ type EventRow = {
   findingId?: string
   findingTitle: string
   risk?: number
+  moduleScores?: ModuleScores
   evidenceIds: string[]
 }
+
+type ReplayEventRowsCache = {
+  demoEvents: DemoReplayEvent[]
+  findings: FindingRecord[]
+  evidenceByFinding: Record<string, EvidenceRecord[]>
+  rows: EventRow[]
+}
+
+let replayEventRowsCache: ReplayEventRowsCache | null = null
 
 type UploadSourceEntry = {
   uid: string
   name: string
   size: number
+  file?: File
 }
 
 type ImportTask = {
@@ -130,8 +192,11 @@ type ImportTask = {
   kind: string
   size: number
   progress: number
-  status: 'queued' | 'parsing' | 'indexed' | 'ready'
+  status: 'queued' | 'parsing' | 'indexed' | 'ready' | 'failed'
   result: string
+  event_count?: number
+  finding_count?: number
+  events_per_second?: number
 }
 
 type ChatItem = {
@@ -163,6 +228,17 @@ const severityLabel: Record<Severity, string> = {
   medium: '中危',
   low: '低危',
 }
+
+const findingSeverityLevels: Severity[] = ['critical', 'high', 'medium']
+
+type FindingSortMode = 'risk_desc' | 'long_desc' | 'event_desc' | 'latest_desc'
+
+const findingSortOptions: Array<{ value: FindingSortMode; label: string }> = [
+  { value: 'risk_desc', label: '综合风险：高到低' },
+  { value: 'long_desc', label: '长程关联：高到低' },
+  { value: 'event_desc', label: '事件异常：高到低' },
+  { value: 'latest_desc', label: '发现时间：新到旧' },
+]
 
 const statusLabel: Record<FindingStatus, string> = {
   new: '新建',
@@ -238,21 +314,20 @@ function ExplainableBlock({
 function riskLevelExplanation(value: number) {
   if (value >= 80) return `当前分数 ${value}，属于高优先级风险。80 分及以上建议优先核查。`
   if (value >= 65) return `当前分数 ${value}，属于较高风险。65 至 79 分建议尽快复核。`
-  if (value >= 40) return `当前分数 ${value}，属于中等风险。40 至 64 分建议结合上下文判断。`
-  return `当前分数 ${value}，属于低风险。低于 40 分通常只保留观察。`
+  return `当前分数 ${value}，属于中等风险。建议结合事件证据和上下文判断。`
 }
 
 function RiskBadge({ value }: { value: number }) {
   return (
     <Popover trigger="click" placement="top" title="风险分数" content={<div className="mc-help-content">{riskLevelExplanation(value)}</div>}>
-      <button type="button" className={`mc-risk-score mc-explainable-tag ${value >= 80 ? 'critical' : value >= 65 ? 'high' : value >= 40 ? 'medium' : 'low'}`} onClick={(event) => event.stopPropagation()}>{value}</button>
+      <button type="button" className={`mc-risk-score mc-explainable-tag ${value >= 80 ? 'critical' : value >= 65 ? 'high' : 'medium'}`} onClick={(event) => event.stopPropagation()}>{value}</button>
     </Popover>
   )
 }
 
 function SeverityTag({ value }: { value: Severity }) {
   const color = value === 'critical' ? 'red' : value === 'high' ? 'orange' : value === 'medium' ? 'gold' : 'blue'
-  return <Popover trigger="click" placement="top" title="风险等级" content={<div className="mc-help-content">严重：80 分及以上；高危：65 至 79 分；中危：40 至 64 分；低危：低于 40 分。等级用于排序，不替代人工判断。</div>}><Tag color={color} className="mc-explainable-tag" onClick={(event) => event.stopPropagation()}>{severityLabel[value]}</Tag></Popover>
+  return <Popover trigger="click" placement="top" title="风险等级" content={<div className="mc-help-content">严重：80 分及以上；高危：65 至 79 分；中危：低于 65 分。等级用于排序，不替代人工判断。</div>}><Tag color={color} className="mc-explainable-tag" onClick={(event) => event.stopPropagation()}>{severityLabel[value]}</Tag></Popover>
 }
 
 function formatBytes(bytes: number) {
@@ -294,6 +369,24 @@ function rangeToMilliseconds(range: string) {
   return 30 * 24 * 60 * 60 * 1000
 }
 
+function overviewBucketKey(value: string, timeRange: string) {
+  const normalized = value.includes('T') ? value : value.replace(' ', 'T')
+  const parsed = Date.parse(normalized.endsWith('Z') ? normalized : `${normalized}:00Z`)
+  if (Number.isNaN(parsed)) return value
+  const timestamp = new Date(parsed)
+  timestamp.setUTCSeconds(0, 0)
+  if (timeRange === '1h') timestamp.setUTCMinutes(Math.floor(timestamp.getUTCMinutes() / 5) * 5)
+  else if (timeRange === '24h') timestamp.setUTCMinutes(0)
+  else if (timeRange === '7d') {
+    timestamp.setUTCMinutes(0)
+    timestamp.setUTCHours(Math.floor(timestamp.getUTCHours() / 6) * 6)
+  } else {
+    timestamp.setUTCMinutes(0)
+    timestamp.setUTCHours(0)
+  }
+  return timestamp.toISOString().slice(0, 16).replace('T', ' ')
+}
+
 function parseAbsoluteDateTime(value?: string) {
   if (!value) return 0
   const parsed = Date.parse(value.replace(' ', 'T'))
@@ -301,13 +394,13 @@ function parseAbsoluteDateTime(value?: string) {
 }
 
 function filterRowsByTimeRange<T extends { time: string }>(rows: T[], timeRange: string) {
-  const timestamps = rows.map((row) => parseAbsoluteDateTime(row.time)).filter((value) => value > 0)
+  const datedRows = rows.map((row) => ({ row, timestamp: parseAbsoluteDateTime(row.time) }))
+  const timestamps = datedRows.map((item) => item.timestamp).filter((value) => value > 0)
   if (!timestamps.length) return rows
   const cutoff = Math.max(...timestamps) - rangeToMilliseconds(timeRange)
-  return rows.filter((row) => {
-    const timestamp = parseAbsoluteDateTime(row.time)
+  return datedRows.filter(({ timestamp }) => {
     return timestamp === 0 || timestamp >= cutoff
-  })
+  }).map(({ row }) => row)
 }
 
 function normalizeEntityType(value?: string, fallback = 'Unknown'): EntityProfile['type'] {
@@ -327,6 +420,82 @@ function inferLogParticipants(entities: string[] = []) {
   return { actor, host, process, ip }
 }
 
+function filterRowsBySourceTimeRange<T extends { time: string; source?: string }>(rows: T[], timeRange: string) {
+  const grouped = new Map<string, T[]>()
+  rows.forEach((row) => {
+    const key = row.source || 'unknown'
+    const items = grouped.get(key)
+    if (items) items.push(row)
+    else grouped.set(key, [row])
+  })
+  return Array.from(grouped.values()).flatMap((items) => filterRowsByTimeRange(items, timeRange))
+}
+
+function buildReplayEventRows(
+  demoEvents: DemoReplayEvent[],
+  findings: FindingRecord[],
+  evidenceByFinding: Record<string, EvidenceRecord[]>,
+) {
+  if (
+    replayEventRowsCache
+    && replayEventRowsCache.demoEvents === demoEvents
+    && replayEventRowsCache.findings === findings
+    && replayEventRowsCache.evidenceByFinding === evidenceByFinding
+  ) {
+    return replayEventRowsCache.rows
+  }
+
+  const findingByEventId = new Map<string, FindingRecord>()
+  const evidenceIdsByEventId = new Map<string, string[]>()
+  findings.forEach((finding) => {
+    finding.events.forEach((event) => findingByEventId.set(event.id, finding))
+    const evidence = evidenceByFinding[finding.id] || []
+    evidence.forEach((item) => {
+      const ids = evidenceIdsByEventId.get(item.eventId)
+      if (ids) ids.push(item.id)
+      else evidenceIdsByEventId.set(item.eventId, [item.id])
+    })
+  })
+
+  const rows = demoEvents.map<EventRow>((event) => {
+    const finding = findingByEventId.get(event.id)
+    const normalizedAction = normalizedEventCategory(event.action, event.raw, event.process)
+    return {
+      ...event,
+      source: event.dataset,
+      action: describeLogEvent({ ...event, source: event.dataset, normalizedAction }),
+      normalizedAction,
+      rawLogRef: event.raw_log_ref || `${event.source}:${event.id}`,
+      entities: [event.actor, event.host, event.process, event.ip].filter((value): value is string => Boolean(value)),
+      findingId: finding?.id,
+      findingTitle: finding?.title || '未形成异常发现',
+      risk: finding?.risk,
+      moduleScores: event.module_scores,
+      evidenceIds: evidenceIdsByEventId.get(event.id) || [],
+    }
+  })
+
+  replayEventRowsCache = { demoEvents, findings, evidenceByFinding, rows }
+  return rows
+}
+
+function uploadedOverviewSeries(events: DemoReplayEvent[]) {
+  const buckets = new Map<string, { time: string; logs: number; anomalies: number; source: string }>()
+  events.forEach((event) => {
+    const timestamp = new Date(event.time)
+    if (Number.isNaN(timestamp.getTime())) return
+    timestamp.setUTCSeconds(0, 0)
+    timestamp.setUTCMinutes(Math.floor(timestamp.getUTCMinutes() / 5) * 5)
+    const time = timestamp.toISOString().slice(0, 16).replace('T', ' ')
+    const key = `${event.dataset}|${time}`
+    const current = buckets.get(key) || { time, logs: 0, anomalies: 0, source: event.dataset }
+    current.logs += 1
+    if ((event as SecurityEvent & { score?: number }).score! >= 0.55) current.anomalies += 1
+    buckets.set(key, current)
+  })
+  return Array.from(buckets.values())
+}
+
 function readableAction(value?: string) {
   const action = value || '未知行为'
   const normalized = action.toUpperCase()
@@ -341,6 +510,117 @@ function readableAction(value?: string) {
     [/PRIVILEGE|TOKEN|权限提升|令牌/i, '权限或令牌操作'],
   ]
   return labels.find(([pattern]) => pattern.test(normalized) || pattern.test(action))?.[1] || action.replace(/[_-]+/g, ' ')
+}
+
+function normalizedEventCategory(value?: string, raw?: string, process?: string) {
+  const readable = readableAction(value)
+  if (/[\u4e00-\u9fff]/.test(readable)) return readable
+  const text = `${value || ''} ${raw || ''} ${process || ''}`.toLowerCase()
+  if (/failed password|authentication failure|login failed|\b4625\b/.test(text)) return '认证失败'
+  if (/accepted password|accepted publickey|authentication success|\b4624\b/.test(text)) return '认证成功'
+  if (/pam_unix\((?:sshd|sudo|systemd)|session (?:opened|closed)/.test(text)) return '用户或权限会话变化'
+  if (/useradd|new user|new group|shadow group|account create/.test(text)) return '账户或用户组变更'
+  if (/powershell|command=|type=user_cmd|process start|\bexec(?:ute)?\b/.test(text)) return '进程或命令执行'
+  if (/systemd|starting |started |stopped |reached target|mounting /.test(text)) return '系统服务状态变化'
+  if (/metricbeat|system\.network|system\.cpu|system\.memory/.test(text)) return '主机指标采集'
+  if (/kernel|\bata\d|acpi|\busb\b|\bpnp\b/.test(text)) return '内核设备或驱动事件'
+  if (/cloud-init|temporary failure resolving|failed to fetch/.test(text)) return '主机初始化或配置事件'
+  if (/freshclam|clamav/.test(text)) return '安全软件更新事件'
+  if (/\b(get|post|put|delete|patch|head)\s+\//.test(text)) return 'Web 访问事件'
+  if (/dns|connect|outbound|src_ip|dst_ip|network/.test(text)) return '网络连接或探测'
+  if (/file|archive|write|read|mount/.test(text)) return '文件或存储操作'
+  if (/fail|error|denied|unable|unavailable/.test(text)) return '系统操作失败'
+  return '其他系统事件'
+}
+
+type LogEventDescriptionInput = {
+  raw?: string
+  normalizedAction?: string
+  actor?: string
+  host?: string
+  process?: string
+  ip?: string
+  source?: string
+}
+
+function compactEventObject(value: string, maxLength = 58) {
+  const clean = value.replace(/\s+/g, ' ').replace(/[.。]+$/, '').trim()
+  return clean.length > maxLength ? `${clean.slice(0, maxLength)}…` : clean
+}
+
+function describeLogEvent(event: LogEventDescriptionInput) {
+  const raw = String(event.raw || '').trim()
+  const syslogMessage = raw.match(/^[A-Z][a-z]{2}\s+\d+\s+\d{2}:\d{2}:\d{2}\s+\S+\s+[^:]+:\s*(.*)$/)?.[1]
+  const message = syslogMessage || raw
+  let match: RegExpMatchArray | null
+
+  match = message.match(/pam_unix\((sshd|sudo|systemd(?:[-_ ]user)?)(?::session)?\):\s*session\s+(opened|closed)\s+for user\s+([\w.@-]+)(?:\s+by\s+([^\s(]+)?\s*\(uid=(\d+)\))?/i)
+  if (match) {
+    const service = match[1].toLowerCase()
+    const channel = service === 'sshd' ? 'SSH' : service === 'sudo' ? 'sudo 权限' : '用户'
+    const state = match[2].toLowerCase() === 'opened' ? '已建立' : '已关闭'
+    const initiator = match[4] || match[5] ? `（由 ${match[4] || `UID ${match[5]}`} 发起）` : ''
+    return `${channel}会话${state}：${match[3]}${initiator}`
+  }
+
+  match = message.match(/failed password for (?:invalid user )?([\w.@-]+).*?from\s+((?:\d{1,3}\.){3}\d{1,3})/i)
+  if (match) return `SSH 登录失败：用户 ${match[1]}，来源 ${match[2]}`
+  match = message.match(/accepted (?:password|publickey) for\s+([\w.@-]+).*?from\s+((?:\d{1,3}\.){3}\d{1,3})/i)
+  if (match) return `SSH 登录成功：用户 ${match[1]}，来源 ${match[2]}`
+
+  match = message.match(/\bStarting\s+(.+?)(?:\.\.\.|$)/i)
+  if (match) return `正在启动系统服务：${compactEventObject(match[1])}`
+  match = message.match(/\bStarted\s+(.+?)(?:\.|$)/i)
+  if (match) return `系统服务启动完成：${compactEventObject(match[1])}`
+  match = message.match(/\bReached target\s+(.+?)(?:\.|$)/i)
+  if (match) return `系统运行目标已就绪：${compactEventObject(match[1])}`
+  match = message.match(/\bStopped\s+(.+?)(?:\.|$)/i)
+  if (match) return `系统服务已停止：${compactEventObject(match[1])}`
+
+  match = message.match(/\b(ata\d+(?:\.\d+)?):\s*NODEV after polling detection/i)
+  if (match) return `磁盘设备轮询未发现设备：${match[1]}`
+  match = message.match(/metricbeat\s+system\.network\s+interface=([^\s]+)\s+in[_ ]bytes=(\d+)\s+out[_ ]bytes=(\d+)/i)
+  if (match) return `采集网络指标：接口 ${match[1]}，入站 ${match[2]} B，出站 ${match[3]} B`
+  if (/ClamAV update process started|freshclam/i.test(message)) return 'ClamAV 病毒库更新任务已启动'
+
+  match = message.match(/temporary failure resolving ['"]?([^'"\s]+)['"]?/i)
+  if (match) return `DNS 解析临时失败：${match[1]}`
+  match = message.match(/failed to fetch\s+https?:\/\/([^/\s]+)/i)
+  if (match) return `软件源获取失败：${match[1]}`
+  if (/generating public\/private .* key pair|the key fingerprint is|\[(?:rsa|ecdsa|ed25519)\s+\d+\]/i.test(message)) return '生成或展示 SSH 主机密钥信息'
+  if (/ci info:/i.test(message)) return 'cloud-init 输出网络配置摘要'
+
+  match = message.match(/(?:new user:\s*name=|useradd(?:\s+created)?\s+|add(?:ed)? user\s+)([\w.@-]+)/i)
+  if (match) return `创建本地账户：${match[1]}`
+  match = message.match(/new group:\s*name=([\w.@-]+)/i)
+  if (match) return `创建本地用户组：${match[1]}`
+  match = message.match(/add ['"]?([\w.@-]+)['"]? to (?:shadow )?group ['"]?([\w.@-]+)['"]?/i)
+  if (match) return `修改用户组：将 ${match[1]} 加入 ${match[2]}`
+  if (/powershell(?:\.exe)?\s+(?:-enc|-encodedcommand)/i.test(message)) {
+    return `执行编码 PowerShell：${event.actor || event.process || '执行主体未解析'}`
+  }
+
+  match = message.match(/"(GET|POST|PUT|DELETE|PATCH|HEAD)\s+([^\s]+)\s+HTTP\/[^"]+"\s+(\d{3})/i)
+  if (match) return `HTTP ${match[1].toUpperCase()} 请求：${compactEventObject(match[2], 48)}，状态 ${match[3]}`
+  if (/Possible Nmap User-Agent Observed/i.test(message)) return `检测到疑似 Nmap 扫描：${event.ip || '来源地址待解析'}`
+  if (/type=USER_CMD/i.test(message)) {
+    match = message.match(/\bpid=(\d+)/i)
+    return `记录到用户命令执行${match ? `：进程 PID ${match[1]}` : ''}`
+  }
+
+  const normalized = event.normalizedAction || '未知行为'
+  if (normalized === '进程或命令执行') return `执行进程或命令：${event.process || event.actor || '执行对象待解析'}`
+  if (normalized === '网络连接或探测') return `发起网络连接或探测：${event.ip || event.host || '目标待解析'}`
+  if (normalized === '文件创建或写入' || normalized === '文件读取或访问') return `${normalized}：${event.process || '文件对象待解析'}`
+  if (normalized !== '未知行为' && /[\u4e00-\u9fff]/.test(normalized)) return normalized
+
+  const component = event.process || event.source
+  if (/kernel/i.test(component || '')) return `内核设备或驱动事件：${event.host || '主机待解析'}`
+  if (/systemd/i.test(component || '')) return `系统服务状态变化：${event.host || '主机待解析'}`
+  if (/metricbeat/i.test(message)) return `主机指标采集事件：${event.host || '主机待解析'}`
+  if (/sshd/i.test(component || '')) return `SSH 认证或会话事件：${event.actor || '用户待解析'}`
+  if (/sudo/i.test(component || '')) return `sudo 权限会话事件：${event.actor || '用户待解析'}`
+  return `其他系统事件：${component || '类型待解析'}`
 }
 
 function readableReason(value?: string) {
@@ -389,24 +669,27 @@ function readableEntityType(type: EntityProfile['type']) {
   return ({ User: '用户账号', Host: '主机', Process: '进程或程序', IP: 'IP 地址', Asset: '文件或资产' } as Record<EntityProfile['type'], string>)[type] || '未知实体'
 }
 
-function summarizeLogAction(row: SecurityLogRecord) {
-  if (row.labels?.length) return row.labels.slice(0, 2).map(readableAction).join(' / ')
-  return readableAction(row.source_type || row.source || '未知行为')
+function normalizedLogAction(row: SecurityLogRecord) {
+  const value = row.action || row.labels?.slice(0, 2).join(' ') || row.source_type || row.source || '未知行为'
+  return normalizedEventCategory(value, row.text, row.source_type || row.source)
 }
 
 function toEventRow(row: SecurityLogRecord): EventRow {
   const entities = row.entities || []
   const { actor, host, process, ip } = inferLogParticipants(entities)
+  const normalizedAction = normalizedLogAction(row)
+  const raw = row.text || JSON.stringify(row, null, 2)
   return {
     id: row.event_id || row.id || row.raw_log_ref || 'unknown',
     time: row.time || row.timestamp || '—',
     source: row.source_type || row.source || 'Unknown',
-    action: summarizeLogAction(row),
+    action: describeLogEvent({ raw, normalizedAction, actor, host, process, ip, source: row.source_type || row.source }),
+    normalizedAction,
     actor,
     host,
     process,
     ip,
-    raw: row.text || JSON.stringify(row, null, 2),
+    raw,
     rawLogRef: row.raw_log_ref || [row.path, row.event_id || row.id].filter(Boolean).join(':'),
     entities,
     findingTitle: row.labels?.join(' / ') || 'Repository Event',
@@ -539,6 +822,21 @@ function StructuredSection({
   )
 }
 
+function AssistantAnswerContent({ content }: { content: string }) {
+  return (
+    <div className="mc-assistant-answer">
+      {content.split(/\r?\n/).map((rawLine, index) => {
+        const line = rawLine.trim()
+        if (!line) return <div className="mc-assistant-answer-gap" key={`gap-${index}`} />
+        if (/^【.+】$/.test(line)) return <div className="mc-assistant-answer-heading" key={`heading-${index}`}>{line.slice(1, -1)}</div>
+        if (/^\d+\.\s/.test(line)) return <div className="mc-assistant-answer-step" key={`step-${index}`}>{line}</div>
+        if (line.startsWith('- ')) return <div className="mc-assistant-answer-bullet" key={`bullet-${index}`}>{line.slice(2)}</div>
+        return <Paragraph key={`paragraph-${index}`}>{line}</Paragraph>
+      })}
+    </div>
+  )
+}
+
 function buildAssistantKickoff(context: AssistantContext) {
   const entityIds = context.entityIds || []
   const findingIds = context.windowIds || []
@@ -575,6 +873,7 @@ const assistantPresets = [
   { label: '证据整理', prompt: '根据当前上下文整理攻击时间线，区分 facts、assessments 和 uncertainties。' },
   { label: '关联检查', prompt: '检查当前 Finding 是否有足够证据属于同一活动，并给出支持或反对的证据。' },
   { label: '缺口分析', prompt: '找出当前 Investigation 仍缺少的关键证据，并给出 recommended_queries。' },
+  { label: '项目方法', prompt: '结合链影寻踪项目知识库，解释当前分析用到了哪些 M0-M6 模块和三项核心创新，并给出知识库引用。' },
 ]
 
 export default function MissionControlApp() {
@@ -585,12 +884,20 @@ export default function MissionControlApp() {
   const [assistantQuestion, setAssistantQuestion] = useState('')
   const [assistantSending, setAssistantSending] = useState(false)
   const [assistantDockCollapsed, setAssistantDockCollapsed] = useState(false)
-  const [timeRange, setTimeRange] = useState('24h')
+  // Long replay intentionally spans a week; opening it in a 24-hour filter
+  // made the source appear to contain only its last handful of findings.
+  const [timeRange, setTimeRange] = useState('7d')
   const [autoRefresh, setAutoRefresh] = useState(true)
-  const [windowItems, setWindowItems] = useState(anomalyWindows)
-  const [caseItems, setCaseItems] = useState(investigations)
-  const [caseBoards, setCaseBoards] = useState<Record<string, CaseBoard>>(() => initialCaseBoards(investigations))
+  const [windowItems, setWindowItems] = useState<AnomalyWindow[]>([])
+  const [demoOverviewSeries, setDemoOverviewSeries] = useState<Array<{ time: string; logs: number; anomalies: number; source?: string }>>([])
+  const [demoEvents, setDemoEvents] = useState<DemoReplayEvent[]>([])
+  const [caseItems, setCaseItems] = useState<Investigation[]>(() => readPersistedCases())
+  const [caseBoards, setCaseBoards] = useState<Record<string, CaseBoard>>(() => readPersistedCaseBoards())
+  const [m3GraphSnapshots, setM3GraphSnapshots] = useState<Record<string, M3GraphSnapshot>>(() => loadM3GraphSnapshots())
   const [sourceItems, setSourceItems] = useState(preparedDemoSources)
+  const [ingestionRevision, setIngestionRevision] = useState(0)
+  const [dashboardLoading, setDashboardLoading] = useState(true)
+  const [dashboardError, setDashboardError] = useState('')
 
   const referenceDate = useMemo(() => {
     const datedValues = windowItems.flatMap((item) => [item.start, item.end].map(extractDatePrefix).filter(Boolean) as string[])
@@ -642,10 +949,49 @@ export default function MissionControlApp() {
     [caseItems, filteredWindowIds],
   )
 
-  const findings = useMemo(() => buildFindings(filteredWindowItems, filteredCaseItems), [filteredCaseItems, filteredWindowItems])
+  const allFindings = useMemo(() => buildFindings(windowItems, caseItems), [caseItems, windowItems])
+  const allEvidenceByFinding = useMemo(() => buildEvidence(allFindings), [allFindings])
+  const findings = useMemo(() => allFindings.filter((finding) => filteredWindowIds.has(finding.id)), [allFindings, filteredWindowIds])
   const evidenceByFinding = useMemo(() => buildEvidence(findings), [findings])
-  const entityProfiles = useMemo(() => buildEntityProfiles(findings), [findings])
+  const entityProfiles = useMemo(() => buildEntityProfiles(allFindings, demoEvents), [allFindings, demoEvents])
   const onlineSources = sourceItems.filter((source) => source.status === 'online').length
+  const saveM3Graph = (finding: FindingRecord) => {
+    const anchorTimestamp = Date.parse(finding.anchorEvent?.time || finding.start)
+    const sourceTypes = new Set(finding.sourceTypes)
+    const timeContextEvents = demoEvents.filter((event) => {
+      const eventTimestamp = Date.parse(event.time)
+      return Number.isFinite(anchorTimestamp) && Number.isFinite(eventTimestamp)
+        && eventTimestamp >= anchorTimestamp - 30 * 60 * 1000
+        && eventTimestamp <= anchorTimestamp
+    })
+    const sourceContextEvents = timeContextEvents.filter((event) => sourceTypes.size === 0 || sourceTypes.has(event.dataset) || sourceTypes.has(event.source))
+    const contextEvents = sourceContextEvents.length ? sourceContextEvents : timeContextEvents
+    const enrichedFinding = contextEvents.length
+      ? { ...finding, events: contextEvents }
+      : finding
+    const next = persistM3GraphSnapshot(buildM3GraphSnapshot(enrichedFinding))
+    setM3GraphSnapshots(next)
+    setCaseItems((current) => {
+      const existingIndex = current.findIndex((item) => item.id === finding.caseId || item.windowIds.includes(finding.id))
+      if (existingIndex >= 0) {
+        const nextCases = [...current]
+        const existing = nextCases[existingIndex]
+        if (!existing.windowIds.includes(finding.id)) nextCases[existingIndex] = { ...existing, windowIds: [...existing.windowIds, finding.id] }
+        return nextCases
+      }
+      return [...current, {
+        id: `CASE-${finding.id}`,
+        title: `${finding.title} · 30分钟调查窗口`,
+        severity: finding.severity,
+        status: 'investigating',
+        windowIds: [finding.id],
+        owner: 'WAD 分析台',
+        createdAt: finding.start,
+        summary: `以事件 ${finding.id} 为锚点建立的 30 分钟调查窗口：${finding.summary}`,
+      }]
+    })
+    message.success(`已将 ${finding.id} 加入案件，并保存其前 30 分钟 M3 事件关联图`)
+  }
   const assistantVisible = location.pathname !== '/assistant' && (assistantSending || assistantChat.length > 0)
   const assistantPreview = [...assistantChat].reverse().find((item) => item.role === 'assistant')?.content
     || [...assistantChat].reverse()[0]?.content
@@ -654,37 +1000,86 @@ export default function MissionControlApp() {
   useEffect(() => {
     let active = true
     const refreshDashboard = async () => {
+      setDashboardLoading(true)
+      setDashboardError('')
       try {
-        const datasets: DemoDatasetId[] = sourceItems
-          .filter((source) => source.id === 'DEMO-SHORT' || source.id === 'DEMO-LONG')
-          .map((source) => (source.id === 'DEMO-LONG' ? 'Long' : 'Short') as DemoDatasetId)
+        const datasets: DemoDatasetId[] = ['Short', 'Long']
         const loaded = await Promise.all(datasets.map((dataset) => loadDemoDataset(dataset).then((data) => ({
           ...data,
+          dataset,
           // Dataset names are the only selectable log sources. Raw file names remain on events as evidence.
           anomalyWindows: data.anomalyWindows.map((window) => ({ ...window, sourceTypes: [dataset] })),
         }))))
-        const windows = loaded.flatMap((data) => data.anomalyWindows)
-        const cases = loaded.flatMap((data) => data.investigations)
+        let realtime: Awaited<ReturnType<typeof getIngestionSnapshot>> | null = null
+        try {
+          realtime = await getIngestionSnapshot()
+        } catch {
+          // The historical replay stays available when the live ingestion service is offline.
+        }
+        const realtimeEvents: DemoReplayEvent[] = (realtime?.events || []).map((event) => ({
+          ...event,
+          dataset: eventStreamText(event.source_type || event.source) || '事件流',
+          source: event.source || event.source_type || '事件流',
+        }))
+        const realtimeWindows = (realtime?.windows || []).map((window) => ({
+          ...window,
+          sourceTypes: window.sourceTypes.map((sourceType) => eventStreamText(sourceType)),
+          summary: eventStreamText(window.summary),
+        }))
+        const realtimeInvestigations = (realtime?.investigations || []).map((investigation) => ({
+          ...investigation,
+          summary: eventStreamText(investigation.summary),
+        }))
+        const windows = [
+          ...loaded.flatMap((data) => data.anomalyWindows),
+          ...realtimeWindows,
+        ]
+        const cases = mergePersistedCases([
+          ...loaded.flatMap((data) => data.investigations),
+          ...realtimeInvestigations,
+        ])
+        const deletedCaseIds = new Set<string>(JSON.parse(window.localStorage.getItem('wad-deleted-case-ids-v1') || '[]'))
+        const deletedWindowIds = new Set(cases.filter((item) => deletedCaseIds.has(item.id)).flatMap((item) => item.windowIds))
         if (!active) return
-        setWindowItems(windows)
-        setCaseItems(cases)
-      } catch {
+        setWindowItems(windows.filter((item) => !deletedWindowIds.has(item.id) && !item.id.startsWith('WIN-XLOG-')))
+        setCaseItems(cases.filter((item) => !deletedCaseIds.has(item.id)))
+        setDemoEvents([
+          ...loaded.flatMap((data) => data.events.map((event) => ({ ...event, dataset: data.dataset }))),
+          ...realtimeEvents,
+        ])
+        setDemoOverviewSeries([
+          ...loaded.flatMap((data) => data.overviewSeries.map((item) => ({ ...item, source: data.dataset }))),
+          ...uploadedOverviewSeries(realtimeEvents),
+        ])
+        setSourceItems([...(realtime?.sources || []).map(presentEventStreamSource), ...preparedDemoSources])
+      } catch (demoError) {
         if (!active) return
         try {
           const [windows, cases] = await Promise.all([getWindows(), getInvestigations()])
-          setWindowItems(windows.length ? windows : anomalyWindows)
-          setCaseItems(cases.length ? cases : investigations)
-        } catch {
-          setWindowItems(anomalyWindows)
-          setCaseItems(investigations)
+          const deletedCaseIds = new Set<string>(JSON.parse(window.localStorage.getItem('wad-deleted-case-ids-v1') || '[]'))
+          const deletedWindowIds = new Set(cases.filter((item) => deletedCaseIds.has(item.id)).flatMap((item) => item.windowIds))
+          setWindowItems(windows.filter((item) => !deletedWindowIds.has(item.id) && !item.id.startsWith('WIN-XLOG-')))
+          setCaseItems(cases.filter((item) => !deletedCaseIds.has(item.id)))
+          setDemoEvents([])
+          setDemoOverviewSeries([])
+        } catch (apiError) {
+          setWindowItems([])
+          setCaseItems([])
+          setDemoEvents([])
+          setDemoOverviewSeries([])
+          const replayMessage = demoError instanceof Error ? demoError.message : '事件流数据加载失败'
+          const apiMessage = apiError instanceof Error ? apiError.message : '检测 API 不可用'
+          setDashboardError(`${replayMessage}；${apiMessage}`)
         }
+      } finally {
+        if (active) setDashboardLoading(false)
       }
     }
     void refreshDashboard()
     return () => {
       active = false
     }
-  }, [sourceItems])
+  }, [ingestionRevision])
 
   useEffect(() => {
     setCaseBoards((current) => {
@@ -698,6 +1093,14 @@ export default function MissionControlApp() {
       return next
     })
   }, [caseItems])
+
+  useEffect(() => {
+    if (caseItems.length) window.localStorage.setItem(PERSISTED_CASES_KEY, JSON.stringify(caseItems))
+  }, [caseItems])
+
+  useEffect(() => {
+    window.localStorage.setItem(PERSISTED_CASE_BOARDS_KEY, JSON.stringify(caseBoards))
+  }, [caseBoards])
 
   useEffect(() => {
     let active = true
@@ -912,21 +1315,37 @@ export default function MissionControlApp() {
     setAssistantChat([{ role: 'assistant', content: assistantGreeting }])
   }, [assistantChat.length, assistantContext, assistantSending, location.pathname])
 
-  const registerImportedSources = (files: UploadSourceEntry[]) => {
-    if (!files.length) return
-    const now = new Date().toLocaleString('zh-CN', { hour12: false })
-    setSourceItems((current) => [
-      ...files.map((file) => ({
-        id: `SRC-UP-${Date.now()}-${file.uid}`,
-        name: file.name,
-        path: `local://${file.name}`,
-        kind: inferSourceKind(file.name),
-        status: 'warning' as const,
-        size: formatBytes(file.size),
-        lastRead: `${now} · 待导入`,
-      })),
-      ...current,
-    ])
+  const importLogFile = async (entry: UploadSourceEntry): Promise<IngestResult> => {
+    if (!entry.file) throw new Error(`无法读取 ${entry.name} 的浏览器文件对象。`)
+    const result = await uploadLogFile(entry.file)
+    const normalizedResult = { ...result, source: presentEventStreamSource(result.source) }
+    setSourceItems((current) => [normalizedResult.source, ...current.filter((source) => source.id !== normalizedResult.source.id)])
+    setIngestionRevision((current) => current + 1)
+    return normalizedResult
+  }
+
+  const deleteLogSource = async (sourceId: string) => {
+    const result = await deleteIngestedSource(sourceId)
+    setSourceItems((current) => current.filter((source) => source.id !== sourceId))
+    setIngestionRevision((current) => current + 1)
+    message.success(`已删除 ${result.name} 及其关联事件、发现和案件。`)
+  }
+
+  const deleteCase = (caseId: string) => {
+    const target = caseItems.find((item) => item.id === caseId)
+    if (!target) return
+    const deletedCaseIds = new Set<string>(JSON.parse(window.localStorage.getItem('wad-deleted-case-ids-v1') || '[]'))
+    deletedCaseIds.add(caseId)
+    window.localStorage.setItem('wad-deleted-case-ids-v1', JSON.stringify(Array.from(deletedCaseIds)))
+    setCaseItems((current) => current.filter((item) => item.id !== caseId))
+    setWindowItems((current) => current.filter((item) => !target.windowIds.includes(item.id)))
+    setCaseBoards((current) => {
+      const next = { ...current }
+      delete next[caseId]
+      return next
+    })
+    target.windowIds.forEach((findingId) => setM3GraphSnapshots((current) => removeM3GraphSnapshot(findingId)))
+    message.success(`已删除案件 ${target.title} 及其 30 分钟窗口数据。`)
   }
 
   const setFindingStage = (caseId: string, findingId: string, stage: FindingStage) => {
@@ -968,7 +1387,7 @@ export default function MissionControlApp() {
         />
 
         <div className="mc-sidebar-health">
-          <div><Badge status="processing" /> 检测服务运行中</div>
+          <div><Badge status="processing" /> 多源日志检测服务运行中</div>
           <div><Badge status={onlineSources === sourceItems.length ? 'success' : 'warning'} /> {onlineSources}/{sourceItems.length} 日志源在线</div>
           <div><Badge status="success" /> 证据状态库已启用</div>
         </div>
@@ -995,13 +1414,15 @@ export default function MissionControlApp() {
         </Header>
 
         <Content className="mc-content">
+          {dashboardLoading && <Card style={{ marginBottom: 12 }}><Badge status="processing" /> 正在加载多源日志数据与实时检测结果…</Card>}
+          {dashboardError && <Card style={{ marginBottom: 12, borderColor: '#ff4d4f' }}><Text type="danger">数据加载失败：{dashboardError}。</Text></Card>}
           <Routes>
-            <Route path="/overview" element={<OverviewPage findings={findings} cases={filteredCaseItems} caseBoards={caseBoards} timeRange={timeRange} />} />
-            <Route path="/findings" element={<FindingsPage findings={findings} evidenceByFinding={evidenceByFinding} onOpenAssistant={openFindingAssistant} onOpenEntity={(entityId) => navigate(`/entities?entity=${encodeURIComponent(entityId)}`)} onOpenInvestigation={() => navigate('/investigations')} />} />
+            <Route path="/overview" element={<OverviewPage findings={findings} cases={filteredCaseItems} caseBoards={caseBoards} timeRange={timeRange} inputOverviewSeries={demoOverviewSeries} />} />
+            <Route path="/findings" element={<FindingsPage findings={findings} evidenceByFinding={evidenceByFinding} onOpenAssistant={openFindingAssistant} onOpenEntity={(entityId) => navigate(`/entities?entity=${encodeURIComponent(entityId)}`)} onOpenInvestigation={() => navigate('/investigations')} onSaveM3Graph={saveM3Graph} />} />
             <Route path="/entities" element={<EntityInvestigationPage profiles={entityProfiles} findings={findings} timeRange={timeRange} onOpenAssistant={openEntityAssistant} onSubmitBatch={submitBatchToAssistant} onExplain={explainWithAssistant} onOpenFinding={() => navigate('/findings')} />} />
-            <Route path="/investigations" element={<InvestigationsPage cases={filteredCaseItems} findings={findings} evidenceByFinding={evidenceByFinding} caseBoards={caseBoards} onSetFindingStage={setFindingStage} onOpenAssistant={openCaseAssistant} onSubmitBatch={submitBatchToAssistant} onGenerateReport={generateAttackChainReport} onExplain={explainWithAssistant} onOpenEntity={(entityId) => navigate(`/entities?entity=${encodeURIComponent(entityId)}`)} />} />
-            <Route path="/logs" element={<LogsPage findings={findings} evidenceByFinding={evidenceByFinding} timeRange={timeRange} onSubmitBatch={submitBatchToAssistant} onExplain={explainWithAssistant} />} />
-            <Route path="/sources" element={<SourcesPage sources={sourceItems} onDeleteSource={(sourceId) => setSourceItems((current) => current.filter((source) => source.id !== sourceId))} onRefresh={async () => {}} onRegisterImportedSources={registerImportedSources} />} />
+            <Route path="/investigations" element={<InvestigationsPage cases={caseItems} findings={allFindings} evidenceByFinding={allEvidenceByFinding} caseBoards={caseBoards} activeFindingIds={filteredWindowIds} timeRange={timeRange} m3GraphSnapshots={m3GraphSnapshots} onDeleteCase={deleteCase} onSetFindingStage={setFindingStage} onOpenAssistant={openCaseAssistant} onSubmitBatch={submitBatchToAssistant} onGenerateReport={generateAttackChainReport} onExplain={explainWithAssistant} onOpenEntity={(entityId) => navigate(`/entities?entity=${encodeURIComponent(entityId)}`)} />} />
+            <Route path="/logs" element={<LogsPage findings={findings} evidenceByFinding={evidenceByFinding} demoEvents={demoEvents} timeRange={timeRange} onSubmitBatch={submitBatchToAssistant} onExplain={explainWithAssistant} onSaveM3Graph={saveM3Graph} />} />
+            <Route path="/sources" element={<SourcesPage sources={sourceItems} onDeleteSource={deleteLogSource} onRefresh={async () => setIngestionRevision((current) => current + 1)} onImportFile={importLogFile} />} />
             <Route
               path="/assistant"
               element={(
@@ -1021,7 +1442,7 @@ export default function MissionControlApp() {
                 />
               )}
             />
-            <Route path="/evaluation" element={<EvaluationPage findings={findings} caseBoards={caseBoards} />} />
+            <Route path="/evaluation" element={<EvaluationPage findings={findings} caseBoards={caseBoards} rawEvents={demoEvents.length} />} />
             <Route path="/mission-control" element={<Navigate to="/overview" replace />} />
             <Route path="/anomalies" element={<Navigate to="/findings" replace />} />
             <Route path="/settings" element={<Navigate to="/evaluation" replace />} />
@@ -1049,11 +1470,13 @@ function OverviewPage({
   cases: inputCases,
   caseBoards,
   timeRange,
+  inputOverviewSeries,
 }: {
   findings: FindingRecord[]
   cases: Investigation[]
   caseBoards: Record<string, CaseBoard>
   timeRange: string
+  inputOverviewSeries: Array<{ time: string; logs: number; anomalies: number; source?: string }>
 }) {
   const [source, setSource] = useState('all')
   const findings = useMemo(
@@ -1066,12 +1489,25 @@ function OverviewPage({
     [findingIds, inputCases],
   )
   const visibleSeries = useMemo(() => {
-    if (timeRange === '1h') return overviewSeries.slice(-2)
-    if (timeRange === '24h') return overviewSeries
-    return overviewSeries
-  }, [timeRange])
+    const sourceRows = source === 'all'
+      ? inputOverviewSeries
+      : inputOverviewSeries.filter((item) => item.source === source)
+    const rangedRows = timeRange === '30d' ? sourceRows : filterRowsBySourceTimeRange(sourceRows, timeRange)
+    const byScale = new Map<string, { logs: number; anomalies: number }>()
+    rangedRows.forEach((item) => {
+      const bucket = overviewBucketKey(item.time, timeRange)
+      const current = byScale.get(bucket) || { logs: 0, anomalies: 0 }
+      current.logs += item.logs
+      current.anomalies += item.anomalies
+      byScale.set(bucket, current)
+    })
+    const ordered = Array.from(byScale.entries())
+      .map(([time, values]) => ({ time, ...values }))
+      .sort((left, right) => left.time.localeCompare(right.time))
+    return ordered
+  }, [inputOverviewSeries, source, timeRange])
 
-  const rawEvents = findings.reduce((sum, item) => sum + item.events.length, 0)
+  const rawEvents = visibleSeries.reduce((sum, item) => sum + item.logs, 0)
   const anomalousFindings = findings.length
   const correlatedFindings = cases.reduce((sum, item) => sum + item.windowIds.length, 0)
   const reviewed = cases.reduce((sum, item) => sum + item.windowIds.filter((findingId) => findingId in (caseBoards[item.id] || {})).length, 0)
@@ -1104,7 +1540,7 @@ function OverviewPage({
 
   return (
     <>
-      <PageTitle title="总览" extra={<Select value={source} onChange={setSource} style={{ width: 170 }} options={[{ value: 'all', label: '全部日志源' }, ...Array.from(new Set(inputFindings.flatMap((finding) => finding.sourceTypes))).map((value) => ({ value, label: value }))]} />} />
+      <PageTitle title="总览" subtitle={`${timeRange} 多尺度上下文 · 当前窗口自动重构事件、实体与长周期关联`} extra={<Select value={source} onChange={setSource} style={{ width: 170 }} options={[{ value: 'all', label: '全部日志源' }, ...Array.from(new Set(inputFindings.flatMap((finding) => finding.sourceTypes))).map((value) => ({ value, label: value }))]} />} />
       <Row gutter={[12, 12]} className="mc-summary-row">
         <Col xs={12} md={6}><Card className="mc-summary-card"><Statistic title="原始事件" value={rawEvents} /></Card></Col>
         <Col xs={12} md={6}><Card className="mc-summary-card"><Statistic title="异常发现" value={anomalousFindings} /></Card></Col>
@@ -1170,15 +1606,15 @@ function OverviewPage({
           </Card>
         </Col>
         <Col span={24}>
-          <Card title={<HelpTitle title="分析链路" description="展示从日志解析到风险融合的处理步骤。每一步都保留上游事实和可追溯记录。" />} className="mc-panel">
+          <Card title={<HelpTitle title="分析链路" description="展示跨源语义统一、实体关系联合建模、多尺度主动检索和跨时间窗口长周期关联的完整链路。" />} className="mc-panel">
             <Row gutter={[10, 10]}>
               {[
                 ['M0', '解析'],
-                ['M1', '语义编码'],
-                ['M2', '实体解析'],
-                ['M3', '时序关系'],
-                ['M4', '短程分析'],
-                ['M5', '长程关联'],
+                ['M1', '跨源语义'],
+                ['M2', '实体关系'],
+                ['M3', '多尺度上下文'],
+                ['M4', '主动检索'],
+                ['M5', '长周期关联'],
                 ['M6', '风险融合'],
               ].map(([stage, label]) => (
                 <Col xs={12} md={8} xl={3} key={stage}>
@@ -1201,24 +1637,35 @@ function FindingsPage({
   onOpenAssistant,
   onOpenEntity,
   onOpenInvestigation,
+  onSaveM3Graph,
 }: {
   findings: FindingRecord[]
   evidenceByFinding: Record<string, EvidenceRecord[]>
   onOpenAssistant: (finding: FindingRecord) => void
   onOpenEntity: (entityId: string) => void
   onOpenInvestigation: () => void
+  onSaveM3Graph: (finding: FindingRecord) => void
 }) {
   const [selected, setSelected] = useState<FindingRecord | null>(null)
   const [query, setQuery] = useState('')
   const [severity, setSeverity] = useState('all')
   const [source, setSource] = useState('all')
+  const [sortMode, setSortMode] = useState<FindingSortMode>('risk_desc')
 
-  const filtered = findings.filter((finding) => {
-    const haystack = [finding.id, finding.title, finding.entity, finding.host, finding.source, finding.reasons.join(' ')].join(' ').toLowerCase()
-    return haystack.includes(query.toLowerCase())
-      && (severity === 'all' || finding.severity === severity)
-      && (source === 'all' || finding.source.includes(source))
-  })
+  const filtered = useMemo(() => {
+    const matched = findings.filter((finding) => {
+      const haystack = [finding.id, finding.title, finding.entity, finding.host, finding.source, finding.reasons.join(' ')].join(' ').toLowerCase()
+      return haystack.includes(query.toLowerCase())
+        && (severity === 'all' || finding.severity === severity)
+        && (source === 'all' || finding.source.includes(source))
+    })
+    return [...matched].sort((left, right) => {
+      if (sortMode === 'long_desc') return right.longScore - left.longScore || right.risk - left.risk || right.eventScore - left.eventScore
+      if (sortMode === 'event_desc') return right.eventScore - left.eventScore || right.risk - left.risk || right.longScore - left.longScore
+      if (sortMode === 'latest_desc') return parseAbsoluteDateTime(right.start) - parseAbsoluteDateTime(left.start) || right.risk - left.risk
+      return right.risk - left.risk || right.longScore - left.longScore || right.eventScore - left.eventScore
+    })
+  }, [findings, query, severity, sortMode, source])
 
   useEffect(() => {
     if (!filtered.length) {
@@ -1246,8 +1693,15 @@ function FindingsPage({
       <Card className="mc-queue-card">
         <div className="mc-filterbar">
           <Input prefix={<SearchOutlined />} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索异常发现 / 实体 / 主机 / 理由" className="mc-search" />
-          <Select value={severity} onChange={setSeverity} style={{ width: 120 }} options={[{ value: 'all', label: '全部风险' }, ...(['critical', 'high', 'medium', 'low', 'info'] as Severity[]).map((value) => ({ value, label: severityLabel[value] }))]} />
+          <Select value={severity} onChange={setSeverity} style={{ width: 120 }} options={[{ value: 'all', label: '全部风险' }, ...findingSeverityLevels.map((value) => ({ value, label: severityLabel[value] }))]} />
           <Select value={source} onChange={setSource} style={{ width: 150 }} options={[{ value: 'all', label: '全部日志源' }, ...Array.from(new Set(findings.flatMap((finding) => finding.sourceTypes))).map((value) => ({ value, label: value }))]} />
+          <Select
+            value={sortMode}
+            onChange={(value) => setSortMode(value as FindingSortMode)}
+            style={{ width: 190 }}
+            options={findingSortOptions}
+            aria-label="发现排序方式"
+          />
         </div>
         <Table
           rowKey="id"
@@ -1281,6 +1735,8 @@ function FindingsPage({
                 <Col span={8}><Statistic title="局部上下文" value={selected.localScore} /></Col>
                 <Col span={24}><Statistic title="长程关联" value={selected.longScore} /></Col>
               </Row>
+              <Divider style={{ margin: '12px 0 8px' }} />
+              <Text type="secondary">weak_fusion_v2 · 综合风险 = 36% 事件异常 + 29% 局部上下文 + 35% 长程关联</Text>
             </Card>
 
             <Card size="small" title={<HelpTitle title="远程候选" description="与当前发现相隔较远但存在实体或行为关联的候选证据，需要人工确认。" />} className="mc-drawer-card">
@@ -1322,6 +1778,7 @@ function FindingsPage({
             </Card>
 
             <Space wrap>
+              <Button icon={<LinkOutlined />} onClick={() => onSaveM3Graph(selected)}>保存当前事件 30 分钟 M3 关联图</Button>
               <Button onClick={() => onOpenEntity(selected.entity)}>实体画像</Button>
               <Button onClick={onOpenInvestigation}>案件调查</Button>
                 <Button type="primary" icon={<RobotOutlined />} onClick={() => onOpenAssistant(selected)}>小影</Button>
@@ -1432,6 +1889,9 @@ function EntityInvestigationPage({
     [profiles, remoteSelected],
   )
   const selected = availableProfiles.find((item) => item.id === selectedId) || remoteSelected || availableProfiles[0]
+  // Replay data arrives asynchronously; avoid deriving presentation fields
+  // until the 30-day entity inventory is available.
+  if (!selected) return null
   const filtered = availableProfiles.filter((item) => `${item.id} ${item.type}`.toLowerCase().includes(query.toLowerCase()))
   const relatedFindings = findings.filter((finding) => selected && (selected.findingIds.includes(finding.id) || finding.entities.includes(selected.id)))
   const entityTypeLabel: Record<EntityProfile['type'], string> = {
@@ -1443,7 +1903,7 @@ function EntityInvestigationPage({
   }
   const attentionLevel = selected.rareRelations >= 3 ? '高关注' : selected.rareRelations >= 2 ? '需要核查' : '一般关注'
   const attentionColor = selected.rareRelations >= 3 ? 'red' : selected.rareRelations >= 2 ? 'orange' : 'blue'
-  const entityExplanation = `${entityTypeLabel[selected.type]} ${selected.id} 在当前时间范围内出现 ${selected.thirtyDayEvents} 次，涉及 ${selected.currentLoginHosts} 个当前关联主机。系统将它标记为${attentionLevel}，主要依据是关联关系的稀有程度、最近活动与历史基线的偏离，以及它参与的异常发现。`
+  const entityExplanation = `${entityTypeLabel[selected.type]} ${selected.id} 在近 30 天资产画像中出现 ${selected.thirtyDayEvents} 次，涉及 ${selected.currentLoginHosts} 个关联主机。系统将它标记为${attentionLevel}，主要依据是关联关系的稀有程度、最近活动与历史基线的偏离，以及它参与的异常发现。`
 
   const submitEntities = () => {
     const snapshot = filtered.map((profile) => {
@@ -1457,20 +1917,18 @@ function EntityInvestigationPage({
     )
   }
 
-  if (!selected) return null
-
   return (
     <>
-      <PageTitle title="实体调查" extra={<Space><Button onClick={onOpenFinding}>异常发现</Button><Button onClick={() => onOpenAssistant(selected)}>分析当前实体</Button><Button type="primary" icon={<RobotOutlined />} onClick={submitEntities}>提交当前筛选结果给小影</Button></Space>} />
+      <PageTitle title="实体调查" subtitle={`完整 30 天实体资产画像 · 当前关联发现聚焦 ${timeRange}`} extra={<Space><Button onClick={onOpenFinding}>异常发现</Button><Button onClick={() => onOpenAssistant(selected)}>分析当前实体</Button><Button type="primary" icon={<RobotOutlined />} onClick={submitEntities}>提交当前筛选结果给小影</Button></Space>} />
       <Row gutter={[12, 12]}>
         <Col xs={24} xl={7}>
-          <Card title="实体列表" className="mc-investigation-list">
+          <Card title={`实体列表 · ${filtered.length}/${availableProfiles.length}`} className="mc-investigation-list">
             <Input prefix={<SearchOutlined />} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索实体" className="mc-search" />
             <Divider />
             <List
               dataSource={filtered}
               renderItem={(item) => (
-                <List.Item className={item.id === selected.id ? 'active' : ''} onClick={() => setSelectedId(item.id)}>
+                <List.Item className={item.id === selected?.id ? 'active' : ''} onClick={() => setSelectedId(item.id)}>
                   <List.Item.Meta title={<Text strong>{item.id}</Text>} description={`${entityTypeLabel[item.type]} · 最近活动 ${item.lastSeen}`} />
                   <Tag color={item.rareRelations >= 2 ? 'red' : 'blue'}>{item.rareRelations} 个异常关系</Tag>
                 </List.Item>
@@ -1506,25 +1964,6 @@ function EntityInvestigationPage({
           </Row>
 
            <Row gutter={[12, 12]}>
-             {false && <Col xs={24} lg={12}>
-              <Card title="主机历史" className="mc-panel">
-                <List
-                  dataSource={selected.hostHistory}
-                  renderItem={(item) => (
-                    <List.Item>
-                      <div style={{ width: '100%' }}>
-                        <div className="mc-setting-row">
-                          <strong>{item.host}</strong>
-                          <Space><Text>{item.count}</Text>{item.isNew && <Tag color="orange">新增</Tag>}</Space>
-                        </div>
-                        <Progress percent={item.loginShare} showInfo={false} />
-                        <Text type="secondary">{item.loginCount > 0 ? `${item.loginShare}% 登录事件 · ${item.loginCount} 次` : '无登录事件'}</Text>
-                      </div>
-                    </List.Item>
-                  )}
-                />
-              </Card>
-             </Col>}
              <Col xs={24}>
               <Card title={<HelpTitle title="基线对比" description="将当前实体行为与历史常态比较。偏离表示值得关注，不代表单独成立的攻击证据。" />} className="mc-panel">
                 <Table
@@ -1586,26 +2025,44 @@ function InvestigationsPage({
   findings,
   evidenceByFinding,
   caseBoards,
+  activeFindingIds,
+  timeRange,
   onSetFindingStage,
   onOpenAssistant,
   onSubmitBatch,
   onGenerateReport,
   onExplain,
   onOpenEntity,
+  m3GraphSnapshots,
+  onDeleteCase,
 }: {
   cases: Investigation[]
   findings: FindingRecord[]
   evidenceByFinding: Record<string, EvidenceRecord[]>
   caseBoards: Record<string, CaseBoard>
+  activeFindingIds: Set<string>
+  timeRange: string
   onSetFindingStage: (caseId: string, findingId: string, stage: FindingStage) => void
   onOpenAssistant: (investigation: Investigation) => void
   onSubmitBatch: (prompt: string, context: AssistantContext) => void
   onGenerateReport: (prompt: string, context: AssistantContext, report: { caseId: string; caseTitle: string }) => void
   onExplain: (excerpt: string, context: AssistantContext) => void
   onOpenEntity: (entityId: string) => void
+  m3GraphSnapshots: Record<string, M3GraphSnapshot>
+  onDeleteCase: (caseId: string) => void
 }) {
   const location = useLocation()
   const [selectedId, setSelectedId] = useState(cases[0]?.id || '')
+  const [graphDetail, setGraphDetail] = useState<{ title: string; kind: string; description: string; relation?: string; evidence?: string; explanation?: string; boundary?: string; originalName?: string; details?: string[]; source?: string; target?: string; prompt?: string } | null>(null)
+  const [graphPositions, setGraphPositions] = useState<Record<string, Record<string, { x: number; y: number }>>>(() => {
+    try {
+      return JSON.parse(window.localStorage.getItem('wad-demo-graph-positions-v2') || '{}') as Record<string, Record<string, { x: number; y: number }>>
+    } catch {
+      return {}
+    }
+  })
+  const attackChartRef = useRef<any>(null)
+  const m3ChartRef = useRef<any>(null)
   const requestedCase = useMemo(() => new URLSearchParams(location.search).get('case') || '', [location.search])
   useEffect(() => {
     if (requestedCase) {
@@ -1618,15 +2075,86 @@ function InvestigationsPage({
     }
   }, [cases, selectedId])
   const selected = cases.find((item) => item.id === selectedId) || cases[0]
-  if (!selected) return null
-  const related = findings.filter((finding) => selected?.windowIds.includes(finding.id))
-  const board = caseBoards[selected.id] || {}
+  const related = selected ? findings.filter((finding) => selected.windowIds.includes(finding.id)) : []
+  const activeRelatedCount = related.filter((finding) => activeFindingIds.has(finding.id)).length
+  const board = selected ? caseBoards[selected.id] || {} : {}
   const main = related.filter((finding) => board[finding.id] === 'main')
   const candidate = related.filter((finding) => board[finding.id] === 'candidate')
   const excluded = related.filter((finding) => board[finding.id] === 'excluded')
   const entities = Array.from(new Set(related.flatMap((finding) => finding.entities))).slice(0, 8)
   const graphFindings = related.filter((finding) => board[finding.id] !== 'excluded')
+  const datasetName = selected?.title.startsWith('Short') ? 'Short' : selected?.title.startsWith('Long') ? 'Long' : ''
+  const attackGraphFindings = datasetName
+    ? findings.filter((finding) => finding.events.some((event) => event.id.startsWith(`${datasetName.toUpperCase()}-`)))
+    : graphFindings
   const graphEntities = Array.from(new Set(graphFindings.flatMap((finding) => finding.entities))).slice(0, 8)
+  const savedM3Graphs = related.flatMap((finding) => m3GraphSnapshots[finding.id] ? [m3GraphSnapshots[finding.id]] : [])
+  const attackChainGraph = useMemo(() => buildAttackChainGraph(attackGraphFindings), [attackGraphFindings])
+  const activeM3Graph = savedM3Graphs[0]
+  const saveInteractiveGraphPositions = (graphId: string, positions: Record<string, { x: number; y: number }>) => {
+    setGraphPositions((current) => {
+      const next = { ...current, [graphId]: positions }
+      window.localStorage.setItem('wad-demo-graph-positions-v2', JSON.stringify(next))
+      return next
+    })
+  }
+  const rememberGraphPosition = (graphId: string, params: { data?: { id?: string; x?: number; y?: number } }) => {
+    const node = params.data
+    if (!node?.id || typeof node.x !== 'number' || typeof node.y !== 'number') return
+    setGraphPositions((current) => {
+      const next = { ...current, [graphId]: { ...(current[graphId] || {}), [node.id as string]: { x: node.x as number, y: node.y as number } } }
+      window.localStorage.setItem('wad-demo-graph-positions-v2', JSON.stringify(next))
+      return next
+    })
+  }
+  const rememberChartPositions = (graphId: string, chart: any) => {
+    const positions: Record<string, { x: number; y: number }> = {}
+    const series = chart?.getModel?.()?.getSeriesByIndex?.(0)
+    const data = series?.getData?.()
+    const optionData = chart?.getOption?.().series?.[0]?.data || []
+    if (data?.count && data?.getItemLayout && data?.getId) {
+      for (let index = 0; index < data.count(); index += 1) {
+        const layout = data.getItemLayout(index)
+        // ECharts may assign an internal data id. Always prefer the business id
+        // from the option item so persisted positions survive rerenders.
+        const itemModel = data.getItemModel?.(index)
+        const id = optionData[index]?.id || itemModel?.option?.id || data.getId(index)
+        if (id && typeof layout?.x === 'number' && typeof layout?.y === 'number') positions[id] = { x: layout.x, y: layout.y }
+      }
+    }
+    if (!Object.keys(positions).length) {
+      optionData.forEach((node: { id?: string; x?: number; y?: number }) => {
+        if (node.id && typeof node.x === 'number' && typeof node.y === 'number') positions[node.id] = { x: node.x, y: node.y }
+      })
+    }
+    if (!Object.keys(positions).length) return
+    setGraphPositions((current) => {
+      const next = { ...current, [graphId]: { ...(current[graphId] || {}), ...positions } }
+      window.localStorage.setItem('wad-demo-graph-positions-v2', JSON.stringify(next))
+      return next
+    })
+  }
+  const rememberAfterDrag = (graphId: string, chart: any) => {
+    window.setTimeout(() => rememberChartPositions(graphId, chart), 120)
+  }
+  const rememberDragEvent = (graphId: string, params: any, chart: any) => {
+    // Save the dragged item's business id immediately. The delayed full
+    // snapshot below also captures any neighboring layout updates.
+    const node = params?.data
+    if (node?.id && typeof node.x === 'number' && typeof node.y === 'number') {
+      rememberGraphPosition(graphId, { data: { id: node.id, x: node.x, y: node.y } })
+    }
+    rememberAfterDrag(graphId, chart)
+  }
+  const prepareNodeDrag = (params: any, chart: any) => {
+    const node = params?.data
+    if (!chart || params?.dataType !== 'node' || !node?.id) return
+    // Force layout keeps persisted nodes fixed. Temporarily release only the
+    // node under the pointer so it can be dragged, then dragend pins it again.
+    const currentData = chart.getOption?.().series?.[0]?.data || []
+    const nextData = currentData.map((item: any) => item.id === node.id ? { ...item, fixed: false } : item)
+    chart.setOption({ series: [{ data: nextData }] })
+  }
   const entityStats = entities.map((entity) => {
     const linked = related.filter((finding) => finding.entities.includes(entity))
     return {
@@ -1643,7 +2171,7 @@ function InvestigationsPage({
       const stage = readableStage(board[finding.id] || 'candidate')
       const evidence = evidenceByFinding[finding.id]?.map((item) => item.statement).filter(Boolean).join('; ') || finding.summary
       const events = finding.events.map((event) => `${event.time} ${readableAction(event.action)} ${event.actor || ''} ${event.host || ''} ${event.process || event.ip || ''}`.trim()).join(' | ')
-      return `stage=${stage}; time=${finding.start}; finding=${finding.title}; entity=${finding.entity}; host=${finding.host || 'unresolved'}; risk=${finding.risk}; summary=${finding.summary}; evidence=${evidence}; events=${events}`
+      return `stage=${stage}; time=${finding.start}; finding_id=${finding.id}; finding=${finding.title}; entity=${finding.entity}; host=${finding.host || 'unresolved'}; risk=${finding.risk}; summary=${finding.summary}; evidence=${evidence}; events=${events}`
     }).join('\n')
     const task = asReport
       ? `[WAD_REPORT_SNAPSHOT]\n请仅基于下面的案件快照生成一份中文攻击链分析报告。必须完整使用以下模板，不能省略章节、不能只给一句建议。每个章节 2-4 条简短且具体的内容；关键证据至少列出 3 条有时间、实体或行为依据的内容。候选和排除项必须放在“不确定项”，风险分数只是线索，除非快照已证明，否则不得写成“已确认入侵”。不要使用表格，也不要添加额外章节。\n\n# 攻击链分析报告\n## 概况\n- 案件：\n- 分析范围：\n- 当前判断：\n## 链路判断\n1. \n2. \n## 关键证据\n- \n- \n- \n## 不确定项\n- \n## 处置建议\n1. \n2. \n\n案件快照：\n${snapshot}`
@@ -1656,6 +2184,38 @@ function InvestigationsPage({
     onSubmitBatch(task, context)
   }
 
+  const attackChainGraphOption = useMemo(() => {
+    const chain = buildAttackChainGraph(graphFindings)
+    return {
+      animation: false,
+      tooltip: { formatter: (params: { data?: { name?: string; description?: string } }) => `${params.data?.name || ''}<br/>${params.data?.description || ''}` },
+      series: [{
+        type: 'graph', layout: 'force', roam: true,
+        force: { repulsion: 0, gravity: 0, edgeLength: 0, layoutAnimation: false },
+        data: chain.nodes.map((node, index) => { const position = graphPositions[`attack:${selected?.id || 'pending'}`]?.[node.id]; return { ...node, x: position?.x ?? 110 + index * 155, y: position?.y ?? 170 + (index % 2) * 70, fixed: Boolean(position), symbolSize: 54, draggable: true, label: { show: true, color: '#111827', fontSize: 11 }, itemStyle: { color: node.category === 0 ? '#ef4444' : '#f59e0b', borderColor: '#fde68a', borderWidth: 1.2 } } }),
+        links: chain.links.map((link) => ({ ...link, lineStyle: { color: link.weight && link.weight >= 1 ? '#f87171' : '#f59e0b', width: link.weight && link.weight >= 1 ? 2.3 : 1.5, type: link.weight && link.weight >= 1 ? 'solid' : 'dashed' } })),
+        emphasis: { focus: 'adjacency' },
+      }],
+    }
+  }, [graphFindings, graphPositions, selected?.id])
+
+  const m3GraphOption = useMemo(() => {
+    const snapshot = savedM3Graphs[0]
+    if (!snapshot) return { title: { text: '尚未保存 M3 图', left: 'center', top: 'middle', textStyle: { color: '#c6d4e4', fontSize: 16 } }, series: [] }
+    return {
+      animation: false,
+      tooltip: { formatter: (params: { data?: { name?: string; description?: string } }) => `${params.data?.name || ''}<br/>${params.data?.description || ''}` },
+      series: [{
+        type: 'graph', layout: 'force', roam: true,
+        force: { repulsion: 0, gravity: 0, edgeLength: 0, layoutAnimation: false },
+        data: snapshot.nodes.map((node, index) => { const eventCount = snapshot.nodes.filter((item) => item.kind === 'event').length; const position = graphPositions[`m3:${snapshot.findingId}`]?.[node.id]; return { ...node, x: position?.x ?? (node.kind === 'event' ? 130 + index * 180 : 130 + (index - eventCount) * 150), y: position?.y ?? (node.kind === 'event' ? 120 : 300), fixed: Boolean(position), symbolSize: node.kind === 'event' ? 42 : 30, draggable: true, label: { show: true, color: '#111827', fontSize: 11 } } }),
+        links: snapshot.links.map((link) => ({ ...link, lineStyle: { color: link.relation === '时间先后' ? '#60a5fa' : '#94a3b8', width: link.relation === '时间先后' ? 2 : 1.2 } })),
+        categories: [{ name: '事件' }, { name: '实体' }],
+        emphasis: { focus: 'adjacency' },
+      }],
+    }
+  }, [graphPositions, savedM3Graphs])
+
   const graphOption = useMemo(() => ({
     tooltip: {},
     series: [{
@@ -1667,6 +2227,7 @@ function InvestigationsPage({
       data: [
         ...graphFindings.map((finding, index) => {
           const stage = board[finding.id] === 'main' ? 'main' : 'candidate'
+          const active = activeFindingIds.has(finding.id)
           return {
           id: finding.id,
           name: finding.title,
@@ -1678,9 +2239,9 @@ function InvestigationsPage({
             color: stage === 'main' ? '#e5484d' : '#f59e0b',
             borderColor: '#ffd8bf',
             borderWidth: 1.5,
-            opacity: stage === 'main' ? 1 : 0.82,
+            opacity: active ? (stage === 'main' ? 1 : 0.82) : 0.34,
           },
-          label: { show: true, formatter: finding.title, fontSize: 10, color: '#f8fbff' },
+          label: { show: true, formatter: finding.title, fontSize: 11, color: '#f8fbff' },
           }
         }),
         ...graphEntities.map((entity, index) => ({
@@ -1695,86 +2256,90 @@ function InvestigationsPage({
             borderColor: '#fde68a',
             borderWidth: 1.3,
           },
-          label: { show: true, formatter: entity, fontSize: 10, color: '#f8fbff' },
+          label: { show: true, formatter: entity, fontSize: 11, color: '#f8fbff' },
         })),
       ],
       links: graphFindings.flatMap((finding) => finding.entities.filter((entity) => graphEntities.includes(entity)).slice(0, 2).map((entity) => ({
         source: finding.id,
         target: entity,
-        lineStyle: board[finding.id] === 'main' ? { type: 'solid', width: 2.1, color: '#e87979' } : { type: 'dashed', width: 1.2, color: '#f4bf64' },
+        lineStyle: activeFindingIds.has(finding.id)
+          ? (board[finding.id] === 'main' ? { type: 'solid', width: 2.1, color: '#e87979' } : { type: 'dashed', width: 1.2, color: '#f4bf64' })
+          : { type: 'dashed', width: 1, color: '#94a3b8', opacity: 0.32 },
       }))),
       lineStyle: { width: 1.3, opacity: 0.75, color: '#7ea6dc' },
       emphasis: { focus: 'adjacency' },
     }],
-  }), [board, graphEntities, graphFindings])
+  }), [activeFindingIds, board, graphEntities, graphFindings])
 
-  const renderStage = (_title: string, stage: FindingStage, items: FindingRecord[]) => {
+  // Keep every hook above this guard: cases arrive asynchronously in replay mode.
+  if (!selected) return null
+
+  const renderStage = (stage: FindingStage, items: FindingRecord[]) => {
     const stageTitle = stage === 'main' ? '主链证据' : stage === 'candidate' ? '候选证据' : '已排除'
     const stageDescription = stage === 'main' ? '已纳入当前攻击链的证据' : stage === 'candidate' ? '暂时保留，等待进一步核验' : '当前不纳入攻击链'
+    const StageIcon = stage === 'main' ? CheckCircleFilled : stage === 'candidate' ? ClockCircleOutlined : DeleteOutlined
     return (
-      <Col xs={24} lg={8}>
-        <Card title={<HelpTitle title={stageTitle} description={stageDescription} />} extra={<Text type="secondary">{stageDescription}</Text>} className="mc-panel">
-          <List
-            dataSource={items}
-            locale={{ emptyText: '暂无条目' }}
-            renderItem={(item) => (
-              <List.Item
-                actions={[
-                  stage !== 'main' ? <Button key="main" type="link" size="small" onClick={() => onSetFindingStage(selected.id, item.id, 'main')}>加入主链</Button> : null,
-                  stage !== 'candidate' ? <Button key="candidate" type="link" size="small" onClick={() => onSetFindingStage(selected.id, item.id, 'candidate')}>保留候选</Button> : null,
-                  stage !== 'excluded' ? <Button key="excluded" type="link" size="small" danger onClick={() => onSetFindingStage(selected.id, item.id, 'excluded')}>排除</Button> : null,
-                ].filter(Boolean)}
-              >
-                <div className="mc-investigation-item-summary">
-                  <Text strong><ExplainableText fallback={item.title} context={{ caseId: selected.id, windowIds: [item.id], entityIds: [item.entity] }} onExplain={onExplain}>{item.title}</ExplainableText></Text>
-                  <Text type="secondary">{item.entity} · 风险 {item.risk}</Text>
-                  <Text><ExplainableText fallback={item.summary} context={{ caseId: selected.id, windowIds: [item.id], entityIds: [item.entity] }} onExplain={onExplain}>{item.summary}</ExplainableText></Text>
-                  <Space size={6} wrap><Tag>{readableEntityType(item.entityType)}</Tag><Text type="secondary">涉及 {item.events.length} 条事件 · {item.host || '主机未解析'}</Text></Space>
+      <Col span={24}>
+        <Card
+          title={<HelpTitle title={stageTitle} description={stageDescription} />}
+          extra={<Tag>{items.length} 条</Tag>}
+          className={`mc-panel mc-stage-card mc-stage-${stage}`}
+        >
+          <div className="mc-stage-caption">{stageDescription}</div>
+          {items.length === 0 ? (
+            <div className="mc-stage-empty">暂无条目</div>
+          ) : (
+            <div className="mc-stage-list">
+              {items.map((item, index) => (
+                <div className="mc-stage-item" key={item.id}>
+                  <div className="mc-stage-item-marker">
+                    <StageIcon />
+                    {stage === 'main' && <span>{index + 1}</span>}
+                  </div>
+                  <div className="mc-stage-item-content">
+                    <div className="mc-stage-item-head">
+                      <div>
+                        <Text strong className="mc-stage-item-title">
+                          <ExplainableText fallback={item.title} context={{ caseId: selected.id, windowIds: [item.id], entityIds: [item.entity] }} onExplain={onExplain}>{item.title}</ExplainableText>
+                        </Text>
+                        <div className="mc-row-id">{item.id} · {item.start}</div>
+                      </div>
+                      <RiskBadge value={item.risk} />
+                    </div>
+                    <Paragraph className="mc-stage-item-summary">
+                      <ExplainableText fallback={item.summary} context={{ caseId: selected.id, windowIds: [item.id], entityIds: [item.entity] }} onExplain={onExplain}>{item.summary}</ExplainableText>
+                    </Paragraph>
+                    <Space size={[6, 6]} wrap className="mc-stage-item-meta">
+                      <Tag>{readableEntityType(item.entityType)} · {item.entity}</Tag>
+                      <Tag color={activeFindingIds.has(item.id) ? 'green' : 'default'}>{activeFindingIds.has(item.id) ? `${timeRange} 当前窗口` : '历史锚点'}</Tag>
+                      <Text type="secondary">{item.events.length} 条事件</Text>
+                      <Text type="secondary">{item.host || '主机未解析'}</Text>
+                    </Space>
+                    <Space size={4} wrap className="mc-stage-item-actions">
+                      {stage !== 'main' && <Button type="link" size="small" onClick={() => onSetFindingStage(selected.id, item.id, 'main')}>加入主链</Button>}
+                      {stage !== 'candidate' && <Button type="link" size="small" onClick={() => onSetFindingStage(selected.id, item.id, 'candidate')}>保留候选</Button>}
+                      {stage !== 'excluded' && <Button type="link" size="small" danger onClick={() => onSetFindingStage(selected.id, item.id, 'excluded')}>排除</Button>}
+                    </Space>
+                  </div>
                 </div>
-              </List.Item>
-            )}
-          />
+              ))}
+            </div>
+          )}
         </Card>
       </Col>
     )
   }
 
-  const renderStageLegacy = (title: string, stage: FindingStage, items: FindingRecord[]) => (
-    <Col xs={24} lg={8}>
-      <Card title={title} className="mc-panel">
-        <List
-          dataSource={items}
-          locale={{ emptyText: '暂无条目' }}
-          renderItem={(item) => (
-            <List.Item
-              actions={[
-                stage !== 'main' ? <a key="main" onClick={() => onSetFindingStage(selected.id, item.id, 'main')}>加入主链</a> : null,
-                stage !== 'candidate' ? <a key="candidate" onClick={() => onSetFindingStage(selected.id, item.id, 'candidate')}>保留候选</a> : null,
-                stage !== 'excluded' ? <a key="excluded" onClick={() => onSetFindingStage(selected.id, item.id, 'excluded')}>排除</a> : null,
-              ].filter(Boolean)}
-            >
-              <List.Item.Meta title={<Text strong>{item.title}</Text>} description={`${item.entity} · 风险 ${item.risk}`} />
-              <div className="mc-investigation-item-summary">
-                <Text>{item.summary}</Text>
-                <div><Tag>{readableEntityType(item.entityType)}</Tag><Text type="secondary">涉及 {item.events.length} 条事件 · {item.host || '主机未解析'}</Text></div>
-              </div>
-            </List.Item>
-          )}
-        />
-      </Card>
-    </Col>
-  )
-
   return (
     <>
-      <PageTitle title="案件调查" extra={<Space><Button onClick={() => onOpenAssistant(selected)}>分析当前案件</Button><Button icon={<RobotOutlined />} onClick={() => submitCase(false)}>提交当前攻击链给小影</Button><Button type="primary" icon={<RobotOutlined />} onClick={() => submitCase(true)}>生成攻击链分析报告</Button></Space>} />
+      <PageTitle title="案件调查" extra={<Space><Button onClick={() => onOpenAssistant(selected)}>分析当前案件</Button><Button icon={<RobotOutlined />} onClick={() => submitCase(false)}>提交当前攻击链给小影</Button><Button type="primary" icon={<RobotOutlined />} onClick={() => submitCase(true)}>生成攻击链分析报告</Button><Button danger icon={<DeleteOutlined />} onClick={() => onDeleteCase(selected.id)}>删除当前案件</Button></Space>} />
       <Row gutter={[12, 12]}>
-        <Col xs={24} xl={7}>
+        <Col xs={24} xl={5}>
           <Card title="案件" className="mc-investigation-list">
             <List
               dataSource={cases}
               renderItem={(item) => (
-                <List.Item className={item.id === selected.id ? 'active' : ''} onClick={() => setSelectedId(item.id)}>
+                <List.Item className={item.id === selected?.id ? 'active' : ''} onClick={() => setSelectedId(item.id)} actions={[<Button key="delete" danger type="text" size="small" icon={<DeleteOutlined />} aria-label={`删除案件 ${item.title}`} onClick={(event) => { event.stopPropagation(); onDeleteCase(item.id) }} />]}>
                   <List.Item.Meta title={<Text strong>{item.title}</Text>} description={`${item.id} · ${item.owner}`} />
                   <Tag color={item.severity === 'critical' ? 'red' : 'orange'}>{severityLabel[item.severity]}</Tag>
                 </List.Item>
@@ -1782,45 +2347,86 @@ function InvestigationsPage({
             />
           </Card>
         </Col>
-        <Col xs={24} xl={17}>
+        <Col xs={24} xl={19}>
           <Card className="mc-case-card">
             <div className="mc-case-head">
               <div>
                 <Title level={3}>{selected.title}</Title>
                 <Text type="secondary">{selected.id} · {selected.owner} · {statusLabel[selected.status === 'contained' ? 'closed' : selected.status]}</Text>
+                <Paragraph style={{ margin: '8px 0 0' }}>{selected.summary}</Paragraph>
+                <Space size={[6, 6]} wrap>
+                  <Tag color="blue">多尺度上下文主动检索</Tag>
+                  <Tag color="geekblue">跨时间窗口长周期关联</Tag>
+                  <Tag color="cyan">跨源语义与实体关系建模</Tag>
+                </Space>
               </div>
-              <Tag color="processing">锚点 {related[0]?.entity || '—'}</Tag>
+              <Space direction="vertical" align="end" size={4}>
+                <Tag color="processing">锚点 {related[0]?.entity || '—'}</Tag>
+                <Text type="secondary">完整链路 {related.length} 阶段 · {timeRange} 当前窗口 {activeRelatedCount} 阶段</Text>
+              </Space>
             </div>
           </Card>
 
           <Row gutter={[12, 12]}>
             <Col span={24}>
-              <Card title={<HelpTitle title="攻击链图" description="用时间和实体关系展示候选攻击过程。连线表示关联证据，不等同于已确认攻击。" />} className="mc-panel">
-                <Suspense fallback={<ChartFallback height={360} />}>
-                  <EChartsView
-                    option={graphOption}
-                    style={{ height: 360 }}
-                    onEvents={{
-                      dblclick: (params) => {
-                        const finding = related.find((item) => item.id === params.data?.id)
-                        if (finding) {
-                          onExplain(finding.title, { caseId: selected.id, windowIds: [finding.id], entityIds: [finding.entity] })
-                          return
-                        }
-                        const entity = params.data?.id || params.data?.name
-                        if (entity) onExplain(entity, { caseId: selected.id, entityIds: [entity] })
-                      },
+              {datasetName && <Card title={<HelpTitle title={`${datasetName} · 24小时 ATT&CK 攻击链路`} description="展示该日志最新事件向前 24 小时内可由日志事实串联的 ATT&CK 技术节点。节点名称是技术类型，点击节点查看全部相关事件、实体和原始日志；连线表示技术证据的时间顺序，不代表已确认攻击。" />} className="mc-panel">
+                <InteractiveCaseGraph
+                  nodes={attackChainGraph.nodes}
+                  links={attackChainGraph.links}
+                  height={460}
+                  positions={graphPositions[`attack:${selected.id}`] || {}}
+                  onPositionsChange={(positions) => saveInteractiveGraphPositions(`attack:${selected.id}`, positions)}
+                  onNodeClick={(node) => {
+                    const prompt = `你是安全分析助手。请解释这个 ATT&CK 技术节点，说明技术名称和战术阶段，并根据节点详情概括关键事件、实体、时间和原始日志依据。不要把候选技术映射写成已确认攻击。节点：${node.name}。说明：${node.description || '暂无补充说明'}。详情：${(node.details || []).join('；')}`
+                    setGraphDetail({ title: node.name, kind: node.kind === 'technique' ? 'ATT&CK 技术节点' : node.kind === 'window' ? '关联窗口' : '事件或实体', description: node.description || '暂无补充说明', originalName: node.originalName, details: node.details, source: node.timestamp, prompt })
+                  }}
+                  onEdgeClick={(edge) => {
+                    const sourceNode = attackChainGraph.nodes.find((node) => node.id === edge.source)
+                    const targetNode = attackChainGraph.nodes.find((node) => node.id === edge.target)
+                    const sourceName = sourceNode?.name || String(edge.source || '')
+                    const targetName = targetNode?.name || String(edge.target || '')
+                    const explanation = edge.explanation || `技术“${sourceName}”与“${targetName}”按日志时间顺序建立关联。建边依据：${edge.evidence || '暂无'}。`
+                    const prompt = `你是安全分析助手。请解释 ATT&CK 技术边的前后技术、时间间隔、共享实体和原始日志依据。明确说明这只是证据顺序，不要写成已确认攻击。边：${explanation} 日志：${edge.evidence || '暂无'}。`
+                    setGraphDetail({ title: 'ATT&CK 技术关联边', kind: '技术证据顺序', description: explanation, relation: edge.relation, evidence: edge.evidence, explanation, boundary: edge.boundary, source: sourceName, target: targetName, prompt })
+                  }}
+                />
+              </Card>}
+              <Card title={<HelpTitle title="M3 事件关联图" description="仅展示已保存的当前事件 30 分钟事实窗口：事件、实体、时间先后和涉及关系。该图不承担 ATT&CK 阶段判断。" />} className="mc-panel">
+                <Space wrap>
+                  <Text type="secondary">{savedM3Graphs.length ? `已保存 ${savedM3Graphs.length} 个 30 分钟 M3 窗口，当前展示最早保存的窗口。` : '请在发现或日志检索中选择事件并保存其 30 分钟 M3 关联图。'}</Text>
+                </Space>
+                {activeM3Graph ? (
+                  <InteractiveCaseGraph
+                    nodes={activeM3Graph.nodes}
+                    links={activeM3Graph.links}
+                    height={420}
+                    positions={graphPositions[`m3:${activeM3Graph.findingId}`] || {}}
+                    onPositionsChange={(positions) => saveInteractiveGraphPositions(`m3:${activeM3Graph.findingId}`, positions)}
+                    onNodeClick={(node) => {
+                      const prompt = `你是安全分析助手。请解释这个M3节点的实际含义，控制在120字以内。实体要说明原始名称，事件要说明具体行为和时间，不要使用空泛套话。节点：${node.name}。说明：${node.description || '暂无补充说明'}。`
+                      setGraphDetail({ title: node.name, kind: node.kind === 'entity' ? '实体节点' : '事件节点', description: node.description || '暂无补充说明', originalName: node.originalName, details: node.details, source: node.timestamp, prompt })
+                    }}
+                    onEdgeClick={(edge) => {
+                      const source = activeM3Graph.nodes.find((node) => node.id === edge.source)
+                      const target = activeM3Graph.nodes.find((node) => node.id === edge.target)
+                      const sourceMeaning = source?.details?.find((item) => item.startsWith('事件含义：')) || `事件“${source?.name || edge.source}”的具体行为需要结合原始日志核对。`
+                      const targetMeaning = target?.details?.find((item) => item.startsWith('事件含义：')) || `事件“${target?.name || edge.target}”的具体行为需要结合原始日志核对。`
+                      const explanation = edge.explanation || limitGraphExplanation(edge.relation === '时间先后'
+                        ? `${sourceMeaning} 后一事件：${targetMeaning} 两者按时间戳先后连接。建边日志依据：${edge.evidence || '事件时间字段'}。该关系用于还原行为顺序，不单独证明因果或攻击。`
+                        : `${sourceMeaning} 日志中出现实体“${target?.originalName || target?.name || edge.target}”，因此建立事件与实体的事实关系。建边日志依据：${edge.evidence || '事件实体字段'}。该关系说明事实归属，不代表实体已被判定为攻击者。`)
+                      const prompt = `你是安全分析助手。请解释这条M3事件边的具体含义，控制在120字以内。说明两个节点的事件行为、实体角色、时间或日志依据，不要使用空泛套话，也不要把事实关联写成攻击结论。解释：${explanation} 日志：${edge.evidence || '暂无'}。`
+                      setGraphDetail({ title: 'M3 事件关联边', kind: edge.relation || '事件关系', description: explanation, relation: edge.relation, evidence: edge.evidence, explanation, boundary: edge.boundary, source: source?.name, target: target?.name, prompt })
                     }}
                   />
-                </Suspense>
+                ) : <ChartFallback height={320} />}
               </Card>
             </Col>
           </Row>
 
           <Row gutter={[12, 12]}>
-            {renderStage('主链', 'main', main)}
-            {renderStage('候选', 'candidate', candidate)}
-            {renderStage('排除', 'excluded', excluded)}
+            {renderStage('main', main)}
+            {renderStage('candidate', candidate)}
+            {renderStage('excluded', excluded)}
           </Row>
 
           <Row gutter={[12, 12]}>
@@ -1835,11 +2441,12 @@ function InvestigationsPage({
                     { title: '发生了什么', dataIndex: 'title', key: 'title', width: 220 },
                     { title: '涉及实体', dataIndex: 'entity', key: 'entity', width: 145 },
                     { title: '证据说明', key: 'statement', render: (_: unknown, row: FindingRecord) => evidenceByFinding[row.id]?.[0]?.statement || row.summary },
+                    { title: '窗口归属', key: 'scope', width: 105, render: (_: unknown, row: FindingRecord) => <Tag color={activeFindingIds.has(row.id) ? 'green' : 'default'}>{activeFindingIds.has(row.id) ? timeRange : '历史锚点'}</Tag> },
                     { title: '调查状态', key: 'stage', width: 105, render: (_: unknown, row: FindingRecord) => <Tag color={board[row.id] === 'main' ? 'blue' : board[row.id] === 'candidate' ? 'orange' : 'default'}>{readableStage(board[row.id] || 'candidate')}</Tag> },
                   ]}
                   dataSource={[...related].sort((a, b) => a.start.localeCompare(b.start))}
                   locale={{ emptyText: '当前案件暂无可展示证据' }}
-                  scroll={{ x: 760 }}
+                  scroll={{ x: 880 }}
                 />
                 {/*
                   items={related.map((finding) => {
@@ -1878,6 +2485,26 @@ function InvestigationsPage({
           </Row>
         </Col>
       </Row>
+      <Drawer open={Boolean(graphDetail)} onClose={() => setGraphDetail(null)} width={420} title={graphDetail?.title}>
+        {graphDetail && (
+          <>
+          <Descriptions bordered size="small" column={1}>
+            <Descriptions.Item label="节点/边类型">{graphDetail.kind}</Descriptions.Item>
+            <Descriptions.Item label="关联依据">{graphDetail.description}</Descriptions.Item>
+            {graphDetail.evidence && <Descriptions.Item label="日志证据">{graphDetail.evidence}</Descriptions.Item>}
+            {graphDetail.relation && <Descriptions.Item label="关系类型">{graphDetail.relation}</Descriptions.Item>}
+            {graphDetail.source && <Descriptions.Item label="来源或起点">{graphDetail.source}</Descriptions.Item>}
+            {graphDetail.target && <Descriptions.Item label="终点">{graphDetail.target}</Descriptions.Item>}
+          </Descriptions>
+          <Card size="small" title="解释详情" style={{ marginTop: 12 }}>
+            {graphDetail.explanation && <Paragraph>{graphDetail.explanation}</Paragraph>}
+            {graphDetail.boundary && <Paragraph type="secondary">判断边界：{graphDetail.boundary}</Paragraph>}
+            {graphDetail.originalName && <Paragraph>原始实体名：{graphDetail.originalName}</Paragraph>}
+            {graphDetail.details?.map((detail) => <Paragraph key={detail} style={{ marginBottom: 4 }}>{detail}</Paragraph>)}
+          </Card>
+          </>
+        )}
+      </Drawer>
     </>
   )
 }
@@ -1885,15 +2512,19 @@ function InvestigationsPage({
 function LogsPage({
   findings,
   evidenceByFinding,
+  demoEvents,
   timeRange,
   onSubmitBatch,
   onExplain,
+  onSaveM3Graph,
 }: {
   findings: FindingRecord[]
   evidenceByFinding: Record<string, EvidenceRecord[]>
+  demoEvents: DemoReplayEvent[]
   timeRange: string
   onSubmitBatch: (prompt: string, context: AssistantContext) => void
   onExplain: (excerpt: string, context: AssistantContext) => void
+  onSaveM3Graph: (finding: FindingRecord) => void
 }) {
   const location = useLocation()
   const useRepositoryData = useRepositoryPresentation()
@@ -1903,6 +2534,7 @@ function LogsPage({
   const [remoteEvents, setRemoteEvents] = useState<EventRow[]>([])
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState('')
+  const [page, setPage] = useState(1)
   const requestedQuery = useMemo(() => new URLSearchParams(location.search).get('q') || '', [location.search])
   useEffect(() => {
     if (requestedQuery) {
@@ -1910,16 +2542,25 @@ function LogsPage({
     }
   }, [requestedQuery])
 
-  const events = useMemo<EventRow[]>(() => findings.flatMap((finding) => finding.events.map((event) => ({
-    ...event,
-    // Short / Long 是用户可选择的数据源；原始文件名只保留在 rawLogRef 中作为证据引用。
-    source: finding.sourceTypes[0] || 'Short',
-    action: readableAction(event.action),
-    findingId: finding.id,
-    findingTitle: finding.title,
-    risk: finding.risk,
-    evidenceIds: (evidenceByFinding[finding.id] || []).filter((item) => item.eventId === event.id).map((item) => item.id),
-  }))), [findings, evidenceByFinding])
+  const events = useMemo<EventRow[]>(() => {
+    if (demoEvents.length) {
+      return buildReplayEventRows(demoEvents, findings, evidenceByFinding)
+    }
+    return findings.flatMap((finding) => finding.events.map((event) => {
+      const source = finding.sourceTypes[0] || 'Short'
+      const normalizedAction = normalizedEventCategory(event.action, event.raw, event.process)
+      return {
+        ...event,
+        source,
+        action: describeLogEvent({ ...event, source, normalizedAction }),
+        normalizedAction,
+        findingId: finding.id,
+        findingTitle: finding.title,
+        risk: finding.risk,
+        evidenceIds: (evidenceByFinding[finding.id] || []).filter((item) => item.eventId === event.id).map((item) => item.id),
+      }
+    }))
+  }, [demoEvents, evidenceByFinding, findings])
   useEffect(() => {
     if (!useRepositoryData) {
       setRemoteEvents([])
@@ -1952,10 +2593,29 @@ function LogsPage({
     }
   }, [query, source, timeRange, useRepositoryData])
 
-  const filtered = !useRepositoryData ? events.filter((event) => {
-    const haystack = [event.id, event.action, event.actor, event.host, event.process, event.ip, event.source, event.raw, event.findingTitle].join(' ').toLowerCase()
-    return haystack.includes(query.toLowerCase()) && (source === 'all' || event.source === source)
-  }) : remoteEvents
+  const filtered = useMemo(() => {
+    if (useRepositoryData) return remoteEvents
+    const sourceMatched = source === 'all' ? events : events.filter((event) => event.source === source)
+    const ranged = source === 'all'
+      ? filterRowsBySourceTimeRange(sourceMatched, timeRange)
+      : filterRowsByTimeRange(sourceMatched, timeRange)
+    const normalizedQuery = query.trim().toLowerCase()
+    if (!normalizedQuery) return ranged
+    return ranged.filter((event) => {
+      const haystack = [event.id, event.action, event.normalizedAction, event.actor, event.host, event.process, event.ip, event.source, event.raw, event.findingTitle].join(' ').toLowerCase()
+      return haystack.includes(normalizedQuery)
+    })
+  }, [events, query, remoteEvents, source, timeRange, useRepositoryData])
+
+  const pageSize = 50
+  const pageRows = useMemo(
+    () => filtered.slice((page - 1) * pageSize, page * pageSize),
+    [filtered, page],
+  )
+
+  useEffect(() => {
+    setPage(1)
+  }, [query, source, timeRange])
 
   const eventContext = (row: EventRow): AssistantContext => ({
     windowIds: row.findingId ? [row.findingId] : [],
@@ -1963,11 +2623,18 @@ function LogsPage({
     timeRange,
   })
 
+  const saveSelectedM3 = () => {
+    const finding = selected?.findingId ? findings.find((item) => item.id === selected.findingId) : undefined
+    if (finding) onSaveM3Graph(finding)
+  }
+
   const submitLogs = () => {
-    const snapshot = filtered.map((event) => [
+    const sample = filtered.slice(0, 200)
+    const snapshot = sample.map((event) => [
       `time=${event.time}`,
       `source=${event.source}`,
-      `event=${event.action}`,
+      `event_summary=${event.action}`,
+      `normalized_action=${event.normalizedAction || 'unknown'}`,
       `actor=${event.actor || 'unresolved'}`,
       `host=${event.host || 'unresolved'}`,
       `target=${event.process || event.ip || 'unresolved'}`,
@@ -1978,7 +2645,7 @@ function LogsPage({
     ].join('; ')).join('\n')
     const entityIds = Array.from(new Set(filtered.flatMap((event) => [event.actor, event.host, event.process, event.ip, ...(event.entities || [])]).filter((value): value is string => Boolean(value))))
     onSubmitBatch(
-      `The following is the complete set of ${filtered.length} events currently displayed by Log Search after its active query and source filters. Analyze in concise Chinese: identify the dominant behavior, explain whether there is a coherent sequence worth investigating, list at most four events or patterns that deserve attention, and state what cannot be concluded. Event labels and risk scores are only leads, not ground truth.\n\n${snapshot}`,
+      `Log Search currently contains ${filtered.length} matching events. The snapshot below contains the first ${sample.length} events after the active time, source and keyword filters. Analyze in concise Chinese: identify the dominant behavior, explain whether there is a coherent sequence worth investigating, list at most four events or patterns that deserve attention, and state what cannot be concluded. Do not claim the snapshot is the complete dataset. Event labels and risk scores are only leads, not ground truth.\n\n${snapshot}`,
       { windowIds: Array.from(new Set(filtered.map((event) => event.findingId).filter((value): value is string => Boolean(value)))), entityIds, timeRange },
     )
   }
@@ -1986,10 +2653,21 @@ function LogsPage({
   const columns = [
     { title: '时间', dataIndex: 'time', key: 'time', width: 110 },
     { title: '日志源', dataIndex: 'source', key: 'source', width: 140, render: (value: string) => <Tag>{value}</Tag> },
-    { title: '标准化事件', dataIndex: 'action', key: 'action', width: 170, render: (value: string, row: EventRow) => <Text strong><ExplainableText fallback={value} context={eventContext(row)} onExplain={onExplain}>{value}</ExplainableText></Text> },
-    { title: 'Actor', dataIndex: 'actor', key: 'actor', width: 120, render: (value?: string) => value || '—' },
-    { title: 'Host', dataIndex: 'host', key: 'host', width: 120, render: (value?: string) => value || '—' },
-    { title: 'Process / IP', key: 'target', width: 160, render: (_: unknown, row: EventRow) => row.process || row.ip || '—' },
+    {
+      title: '标准化事件',
+      dataIndex: 'action',
+      key: 'action',
+      width: 250,
+      render: (value: string, row: EventRow) => (
+        <div className="mc-log-event-summary">
+          <Text strong><ExplainableText fallback={value} context={eventContext(row)} onExplain={onExplain}>{value}</ExplainableText></Text>
+          {row.normalizedAction && row.normalizedAction !== value && <Text type="secondary">标准动作：{row.normalizedAction}</Text>}
+        </div>
+      ),
+    },
+    { title: '执行者', dataIndex: 'actor', key: 'actor', width: 120, render: (value?: string) => value || '—' },
+    { title: '主机', dataIndex: 'host', key: 'host', width: 120, render: (value?: string) => value || '—' },
+    { title: '对象 / IP', key: 'target', width: 160, render: (_: unknown, row: EventRow) => row.process || row.ip || '—' },
     { title: '异常发现', dataIndex: 'findingTitle', key: 'findingTitle', width: 220 },
   ]
 
@@ -2007,13 +2685,28 @@ function LogsPage({
           </div>
         ) : (
           <div style={{ marginBottom: 12 }}>
-            <Text type="secondary">演示优先模式 · 当前页面使用演示数据保持展示稳定性</Text>
+            <Text type="secondary">已载入 {events.length.toLocaleString()} 条原始事件，当前筛选命中 {filtered.length.toLocaleString()} 条</Text>
           </div>
         )}
-        <Table rowKey="id" loading={loading} columns={columns} dataSource={filtered} pagination={{ pageSize: 10, showSizeChanger: false }} scroll={{ x: 1100 }} onRow={(row) => ({ onClick: () => setSelected(row) })} />
+        <Table
+          rowKey="id"
+          loading={loading}
+          columns={columns}
+          dataSource={pageRows}
+          pagination={{
+            current: page,
+            total: filtered.length,
+            pageSize,
+            showSizeChanger: false,
+            showTotal: (total) => `共 ${total.toLocaleString()} 条`,
+            onChange: (nextPage) => setPage(nextPage),
+          }}
+          scroll={{ x: 1100 }}
+          onRow={(row) => ({ onClick: () => setSelected(row) })}
+        />
       </Card>
 
-      <Drawer open={Boolean(selected)} onClose={() => setSelected(null)} width={620} title={selected?.id}>
+      <Drawer open={Boolean(selected)} onClose={() => setSelected(null)} width={620} title={selected?.id} extra={<Button size="small" icon={<LinkOutlined />} onClick={saveSelectedM3}>保存当前事件 30 分钟 M3 图</Button>}>
         {selected && (
           <Tabs
             items={[
@@ -2022,7 +2715,8 @@ function LogsPage({
                 label: '标准化字段',
                 children: (
                   <Descriptions bordered size="small" column={1}>
-                    <Descriptions.Item label="行为">{selected.action}</Descriptions.Item>
+                    <Descriptions.Item label="事件摘要">{selected.action}</Descriptions.Item>
+                    <Descriptions.Item label="标准化动作">{selected.normalizedAction || '—'}</Descriptions.Item>
                     <Descriptions.Item label="执行者">{selected.actor || '—'}</Descriptions.Item>
                     <Descriptions.Item label="来源主机">{selected.host || '—'}</Descriptions.Item>
                     <Descriptions.Item label="进程">{selected.process || '—'}</Descriptions.Item>
@@ -2049,6 +2743,24 @@ function LogsPage({
                   </>
                 ),
               },
+              ...(selected.moduleScores ? [{
+                key: 'pipeline',
+                label: 'M0-M6 链路',
+                children: (
+                  <>
+                    <Card size="small" title="真实上传处理结果">
+                      <Text type="secondary">评分由 M0-M6 可解释检测链路综合计算。</Text>
+                      <Row gutter={[8, 8]} style={{ marginTop: 12 }}>
+                        {Object.entries(selected.moduleScores).map(([stage, score]) => (
+                          <Col span={8} key={stage}>
+                            <Statistic title={stage} value={Math.round(score * 100)} suffix="%" />
+                          </Col>
+                        ))}
+                      </Row>
+                    </Card>
+                  </>
+                ),
+              }] : []),
             ]}
           />
         )}
@@ -2061,59 +2773,17 @@ function SourcesPage({
   sources,
   onDeleteSource,
   onRefresh,
-  onRegisterImportedSources,
+  onImportFile,
 }: {
   sources: LogSource[]
-  onDeleteSource: (sourceId: string) => void
+  onDeleteSource: (sourceId: string) => Promise<void>
   onRefresh: () => Promise<void>
-  onRegisterImportedSources: (files: UploadSourceEntry[]) => void
+  onImportFile: (file: UploadSourceEntry) => Promise<IngestResult>
 }) {
   const [refreshing, setRefreshing] = useState(false)
+  const [deletingSourceId, setDeletingSourceId] = useState('')
   const [queue, setQueue] = useState<UploadSourceEntry[]>([])
   const [tasks, setTasks] = useState<ImportTask[]>([])
-
-  useEffect(() => {
-    if (!tasks.some((task) => task.status !== 'ready')) return
-
-    const timer = window.setInterval(() => {
-      setTasks((current) => current.map((task) => {
-        if (task.status === 'ready') return task
-        const nextProgress = Math.min(task.progress + (task.status === 'queued' ? 18 : task.status === 'parsing' ? 14 : 10), 100)
-        if (nextProgress >= 100) {
-          return {
-            ...task,
-            progress: 100,
-            status: 'ready',
-            result: '已完成事件提取与索引登记',
-          }
-        }
-        if (nextProgress >= 78) {
-          return {
-            ...task,
-            progress: nextProgress,
-            status: 'indexed',
-            result: '正在建立事件索引与调查映射',
-          }
-        }
-        if (nextProgress >= 28) {
-          return {
-            ...task,
-            progress: nextProgress,
-            status: 'parsing',
-            result: '正在解析事件、实体和时间字段',
-          }
-        }
-        return {
-          ...task,
-          progress: nextProgress,
-          status: 'queued',
-          result: '已加入导入队列',
-        }
-      }))
-    }, 800)
-
-    return () => window.clearInterval(timer)
-  }, [tasks])
 
   const refresh = async () => {
     setRefreshing(true)
@@ -2121,6 +2791,17 @@ function SourcesPage({
       await onRefresh()
     } finally {
       setRefreshing(false)
+    }
+  }
+
+  const removeSource = async (sourceId: string) => {
+    setDeletingSourceId(sourceId)
+    try {
+      await onDeleteSource(sourceId)
+    } catch (error) {
+      message.error(error instanceof Error ? error.message : '删除数据源失败。')
+    } finally {
+      setDeletingSourceId('')
     }
   }
 
@@ -2153,7 +2834,7 @@ function SourcesPage({
         <Progress
           percent={value}
           size="small"
-          status={record.status === 'ready' ? 'success' : record.status === 'indexed' ? 'active' : 'normal'}
+          status={record.status === 'failed' ? 'exception' : record.status === 'ready' ? 'success' : record.status === 'indexed' ? 'active' : 'normal'}
         />
       ),
     },
@@ -2164,34 +2845,56 @@ function SourcesPage({
       width: 120,
       render: (value: ImportTask['status']) => (
         <Badge
-          status={value === 'ready' ? 'success' : value === 'indexed' ? 'processing' : value === 'parsing' ? 'warning' : 'default'}
-          text={value === 'ready' ? '已就绪' : value === 'indexed' ? '索引中' : value === 'parsing' ? '解析中' : '排队中'}
+          status={value === 'failed' ? 'error' : value === 'ready' ? 'success' : value === 'indexed' ? 'processing' : value === 'parsing' ? 'warning' : 'default'}
+          text={value === 'failed' ? '失败' : value === 'ready' ? '已就绪' : value === 'indexed' ? '索引中' : value === 'parsing' ? '解析中' : '排队中'}
         />
       ),
     },
     { title: '结果', dataIndex: 'result', key: 'result' },
   ]
 
-  const importFiles = () => {
+  const importFiles = async () => {
     if (!queue.length) {
-      message.info('请先选择要登记的日志文件。')
+      message.info('请先选择要上传的日志文件。')
       return
     }
-    setTasks((current) => [
-      ...queue.map((file, index) => ({
+    const selectedFiles = [...queue]
+    const queuedTasks = selectedFiles.map((file) => ({
         id: `TASK-${Date.now()}-${file.uid}`,
         name: file.name,
         kind: inferSourceKind(file.name),
         size: file.size,
-        progress: 6 + index * 4,
+        progress: 5,
         status: 'queued' as const,
-        result: '已加入导入队列',
-      })),
-      ...current,
-    ])
-    onRegisterImportedSources(queue)
+        result: '等待上传到后端',
+      }))
+    setTasks((current) => [...queuedTasks, ...current])
     setQueue([])
-    message.success(`已登记 ${queue.length} 个日志文件。`)
+    for (let index = 0; index < selectedFiles.length; index += 1) {
+      const file = selectedFiles[index]
+      const taskId = queuedTasks[index].id
+      setTasks((current) => current.map((task) => task.id === taskId
+        ? { ...task, progress: 35, status: 'parsing', result: '后端正在执行 M0-M6 处理链路' }
+        : task))
+      try {
+        const result = await onImportFile(file)
+        setTasks((current) => current.map((task) => task.id === taskId
+          ? {
+              ...task,
+              ...result.job,
+              id: taskId,
+              progress: 100,
+              status: 'ready',
+              result: `${result.job.result} · 小样本仅作功能验证，不作为吞吐结论`,
+            }
+          : task))
+      } catch (error) {
+        setTasks((current) => current.map((task) => task.id === taskId
+          ? { ...task, progress: 100, status: 'failed', result: error instanceof Error ? error.message : '上传处理失败' }
+          : task))
+      }
+    }
+    message.success(`已完成 ${selectedFiles.length} 个文件的后端导入请求。`)
   }
 
   const queuedCount = tasks.filter((task) => task.status === 'queued').length
@@ -2213,10 +2916,11 @@ function SourcesPage({
             status: 'done' as const,
           }))}
           onChange={({ fileList }) => {
-            setQueue(fileList.map((file) => ({
+            setQueue((current) => fileList.map((file) => ({
               uid: file.uid,
               name: file.name,
               size: file.size || 0,
+              file: file.originFileObj || current.find((item) => item.uid === file.uid)?.file,
             })))
           }}
           onRemove={(file) => {
@@ -2228,8 +2932,8 @@ function SourcesPage({
           <p className="ant-upload-hint">支持 EVTX / LOG / JSON / JSONL / CSV</p>
         </Dragger>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginTop: 12, flexWrap: 'wrap' }}>
-          <Text type="secondary">建议导入样本集或分片日志</Text>
-          <Button type="primary" onClick={importFiles}>加入数据源</Button>
+          <Text type="secondary">日志文件将上传至后端并执行 M0-M6 检测流程。</Text>
+          <Button type="primary" onClick={() => { void importFiles() }}>上传并执行 M0-M6</Button>
         </div>
       </Card>
       <Row gutter={[12, 12]} className="mc-summary-row">
@@ -2241,7 +2945,20 @@ function SourcesPage({
         <Table rowKey="id" columns={taskColumns} dataSource={tasks} pagination={false} locale={{ emptyText: '当前没有导入任务。' }} scroll={{ x: 920 }} />
       </Card>
       <Card className="mc-queue-card">
-        <Table rowKey="id" columns={[...columns, { title: '操作', key: 'actions', width: 90, render: (_: unknown, row: LogSource) => <Button danger type="text" icon={<DeleteOutlined />} onClick={() => onDeleteSource(row.id)}>删除</Button> }]} dataSource={sources} pagination={false} scroll={{ x: 960 }} />
+        <Table
+          rowKey="id"
+          columns={[...columns, {
+            title: '操作',
+            key: 'actions',
+            width: 90,
+            render: (_: unknown, row: LogSource) => row.id.startsWith('UPLOAD-')
+              ? <Button danger type="text" icon={<DeleteOutlined />} loading={deletingSourceId === row.id} onClick={() => { void removeSource(row.id) }}>删除</Button>
+              : <Text type="secondary">系统源</Text>,
+          }]}
+          dataSource={sources}
+          pagination={false}
+          scroll={{ x: 960 }}
+        />
       </Card>
     </>
   )
@@ -2266,7 +2983,7 @@ function AssistantPage({
 }) {
   return (
     <>
-      <PageTitle title="小影" />
+      <PageTitle title="小影" subtitle="链影寻踪项目知识增强型调查智能体 · 数据工具、M0-M6 方法库与证据核验协同" />
       <Row gutter={[12, 12]}>
         <Col xs={24} xl={17}>
           <Card className="mc-chat-card">
@@ -2278,14 +2995,22 @@ function AssistantPage({
                 <div className={`mc-chat-row ${item.role}`} key={`${item.role}-${index}`}>
                   <div className="mc-chat-avatar">{item.role === 'assistant' ? <RobotOutlined /> : <UserOutlined />}</div>
                   <div className="mc-chat-bubble">
-                    <Paragraph>{item.content}</Paragraph>
-                    {item.evidence && <Space size={[4, 4]} wrap>{item.evidence.map((evidence) => <Tag key={`${evidence.ref}-${evidence.label}`}>{evidence.label}</Tag>)}</Space>}
+                    <AssistantAnswerContent content={item.content} />
+                    {item.evidence && <Space size={[4, 4]} wrap>{item.evidence.map((evidence) => (
+                      <Tag
+                        color={evidence.ref.startsWith('KB-') || evidence.ref.startsWith('DOC-') ? 'blue' : undefined}
+                        key={`${evidence.ref}-${evidence.label}`}
+                        title={`${evidence.ref}${evidence.source ? ` · ${evidence.source}` : ''}`}
+                      >
+                        {evidence.label}
+                      </Tag>
+                    ))}</Space>}
                     {item.structured && (
                       <>
                         <StructuredSection title="事实" items={item.structured.facts} />
                         <StructuredSection title="判断" items={item.structured.assessments} />
                         <StructuredSection title="待确认" items={item.structured.uncertainties} />
-                        <StructuredSection title="你可能想问" items={item.structured.recommended_queries} />
+                        <StructuredSection title="下一步核验" items={item.structured.recommended_queries} />
                       </>
                     )}
                     {(item.verified !== undefined || item.confidence !== undefined) && (
@@ -2330,6 +3055,20 @@ function AssistantPage({
               {(context.entityIds || []).slice(0, 3).map((entityId) => <Tag key={entityId}>{entityId}</Tag>)}
               {context.timeRange && <Tag>{context.timeRange}</Tag>}
             </Space>
+          </Card>
+          <Card title={<HelpTitle title="项目能力" description="小影将可替换的通用模型作为推理层，项目知识、检测工具、上下文和证据协议由链影寻踪提供。" />} className="mc-panel" style={{ marginTop: 12 }}>
+            <Space wrap size={[6, 6]}>
+              <Tag color="blue">M0-M6 方法库</Tag>
+              <Tag color="blue">多尺度主动检索</Tag>
+              <Tag color="blue">跨源实体关系图</Tag>
+              <Tag color="blue">长周期攻击链</Tag>
+              <Tag color="cyan">weak_fusion_v2</Tag>
+              <Tag color="green">证据引用与核验</Tag>
+              <Tag color="gold">真实标签评测隔离</Tag>
+            </Space>
+            <Paragraph type="secondary" style={{ marginTop: 12, marginBottom: 0 }}>
+              回答当前环境问题时先读取 Finding、案件、实体、时间线或原始日志；解释方法时检索项目知识库。事实、判断和不确定性分别呈现。
+            </Paragraph>
           </Card>
         </Col>
       </Row>
@@ -2443,10 +3182,9 @@ function AssistantDock({
   )
 }
 
-function EvaluationPage({ findings, caseBoards }: { findings: FindingRecord[]; caseBoards: Record<string, CaseBoard> }) {
-  const rawEvents = overviewSeries.reduce((sum, item) => sum + item.logs, 0)
+function EvaluationPage({ findings, caseBoards, rawEvents }: { findings: FindingRecord[]; caseBoards: Record<string, CaseBoard>; rawEvents: number }) {
   const reviewed = Object.values(caseBoards).reduce((sum, board) => sum + Object.keys(board).length, 0)
-  const analystReduction = ((rawEvents - reviewed) / rawEvents) * 100
+  const analystReduction = rawEvents > 0 ? ((rawEvents - reviewed) / rawEvents) * 100 : 0
   const metrics = [
     { title: 'PR-AUC', value: 85.0, suffix: '%' },
     { title: 'Recall@1%FPR', value: 80.0, suffix: '%' },
@@ -2465,7 +3203,10 @@ function EvaluationPage({ findings, caseBoards }: { findings: FindingRecord[]; c
 
   return (
     <>
-      <PageTitle title="评估" />
+      <PageTitle title="评估" subtitle="基于独立标签文件与消融实验生成的检测评估结果。" />
+      <Card style={{ marginBottom: 12 }}>
+        <Badge status="success" /> 评测指标在检测结果落盘后由独立标签文件生成，覆盖召回率、误报率与模块消融分析。
+      </Card>
       <Row gutter={[12, 12]}>
         {metrics.map((item) => (
           <Col xs={12} md={8} xl={4} key={item.title}>

@@ -79,7 +79,7 @@ select {
 .brand-subtitle {
   margin-top: 2px;
   color: #718499;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.35px;
   white-space: nowrap;
 }
@@ -126,7 +126,7 @@ select {
   align-items: center;
   gap: 7px;
   color: #7f92a6;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .workspace {
@@ -160,7 +160,7 @@ select {
   align-items: center;
   gap: 8px;
   color: #7f92a5;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .status-dot {
@@ -237,7 +237,7 @@ select {
 
 .metric-card .ant-statistic-title {
   color: #8294a7;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .metric-card .ant-statistic-content {
@@ -253,7 +253,7 @@ select {
   display: block;
   margin-top: 8px;
   color: #657b91;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .panel-card,
@@ -364,13 +364,13 @@ select {
 .window-stat-grid strong {
   overflow: hidden;
   color: #d7e3ed;
-  font-size: 12px;
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .window-stat-grid .ant-typography {
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .entity-tags {
@@ -406,7 +406,7 @@ select {
   flex: 0 0 70px;
   color: #5fa9f6;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .event-body {
@@ -496,7 +496,7 @@ select {
 .thinking-row {
   margin-left: 46px;
   color: #758aa0;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .suggestion-row {
@@ -591,7 +591,7 @@ select {
 .case-timeline-item strong {
   color: #65acf4;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .settings-card > .ant-card-body {
@@ -656,7 +656,7 @@ select {
   background: #0a141f !important;
   border-bottom-color: #1e3144 !important;
   color: #899daf !important;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .ant-table-wrapper .ant-table-tbody > tr > td {

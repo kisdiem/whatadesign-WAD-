@@ -1,131 +1,51 @@
 [
   {
-    "source_event_id": "SHORT-0001",
-    "target_event_id": "SHORT-0002",
-    "relation_type": "temporal_causal_candidate",
-    "confidence": 0.8,
+    "source_event_id": "SHORT-000003",
+    "target_event_id": "SHORT-000004",
+    "relation_type": "temporal_review_candidate",
+    "confidence": 0.55,
     "evidence": {
-      "reason": "ordered privileged/authentication context",
+      "reason": "按时间排序的高风险人工复核候选",
       "formal_model_relation": false
     }
   },
   {
-    "source_event_id": "SHORT-0002",
-    "target_event_id": "SHORT-0003",
-    "relation_type": "temporal_causal_candidate",
-    "confidence": 0.68,
+    "source_event_id": "SHORT-000004",
+    "target_event_id": "SHORT-000005",
+    "relation_type": "temporal_review_candidate",
+    "confidence": 0.55,
     "evidence": {
-      "reason": "ordered privileged/authentication context",
+      "reason": "按时间排序的高风险人工复核候选",
       "formal_model_relation": false
     }
   },
   {
-    "source_event_id": "SHORT-0003",
-    "target_event_id": "SHORT-0005",
-    "relation_type": "temporal_causal_candidate",
-    "confidence": 0.68,
+    "source_event_id": "SHORT-000005",
+    "target_event_id": "SHORT-000006",
+    "relation_type": "temporal_review_candidate",
+    "confidence": 0.55,
     "evidence": {
-      "reason": "ordered privileged/authentication context",
+      "reason": "按时间排序的高风险人工复核候选",
       "formal_model_relation": false
     }
   },
   {
-    "source_event_id": "SHORT-0005",
-    "target_event_id": "SHORT-0006",
-    "relation_type": "temporal_causal_candidate",
-    "confidence": 0.735,
+    "source_event_id": "SHORT-000006",
+    "target_event_id": "SHORT-000011",
+    "relation_type": "temporal_review_candidate",
+    "confidence": 0.55,
     "evidence": {
-      "reason": "ordered privileged/authentication context",
+      "reason": "按时间排序的高风险人工复核候选",
       "formal_model_relation": false
     }
   },
   {
-    "source_event_id": "SHORT-0006",
-    "target_event_id": "SHORT-0007",
-    "relation_type": "temporal_causal_candidate",
-    "confidence": 0.935,
+    "source_event_id": "SHORT-000011",
+    "target_event_id": "SHORT-000012",
+    "relation_type": "temporal_review_candidate",
+    "confidence": 0.55,
     "evidence": {
-      "reason": "ordered privileged/authentication context",
-      "formal_model_relation": false
-    }
-  },
-  {
-    "source_event_id": "SHORT-0007",
-    "target_event_id": "SHORT-0008",
-    "relation_type": "temporal_causal_candidate",
-    "confidence": 0.95,
-    "evidence": {
-      "reason": "ordered privileged/authentication context",
-      "formal_model_relation": false
-    }
-  },
-  {
-    "source_event_id": "SHORT-0008",
-    "target_event_id": "SHORT-0009",
-    "relation_type": "temporal_causal_candidate",
-    "confidence": 0.88,
-    "evidence": {
-      "reason": "ordered privileged/authentication context",
-      "formal_model_relation": false
-    }
-  },
-  {
-    "source_event_id": "SHORT-0009",
-    "target_event_id": "SHORT-0010",
-    "relation_type": "temporal_causal_candidate",
-    "confidence": 0.945,
-    "evidence": {
-      "reason": "ordered privileged/authentication context",
-      "formal_model_relation": false
-    }
-  },
-  {
-    "source_event_id": "SHORT-0010",
-    "target_event_id": "SHORT-0011",
-    "relation_type": "temporal_causal_candidate",
-    "confidence": 0.945,
-    "evidence": {
-      "reason": "ordered privileged/authentication context",
-      "formal_model_relation": false
-    }
-  },
-  {
-    "source_event_id": "SHORT-0011",
-    "target_event_id": "SHORT-0012",
-    "relation_type": "temporal_causal_candidate",
-    "confidence": 0.88,
-    "evidence": {
-      "reason": "ordered privileged/authentication context",
-      "formal_model_relation": false
-    }
-  },
-  {
-    "source_event_id": "SHORT-0012",
-    "target_event_id": "SHORT-0013",
-    "relation_type": "temporal_causal_candidate",
-    "confidence": 0.88,
-    "evidence": {
-      "reason": "ordered privileged/authentication context",
-      "formal_model_relation": false
-    }
-  },
-  {
-    "source_event_id": "SHORT-0013",
-    "target_event_id": "SHORT-0014",
-    "relation_type": "temporal_causal_candidate",
-    "confidence": 0.88,
-    "evidence": {
-      "reason": "ordered privileged/authentication context",
-      "formal_model_relation": false
-    }
-  },
-  {
-    "source_event_id": "SHORT-0014",
-    "target_event_id": "SHORT-0015",
-    "relation_type": "temporal_causal_candidate",
-    "confidence": 0.88,
-    "evidence": {
-      "reason": "ordered privileged/authentication context",
+      "reason": "按时间排序的高风险人工复核候选",
       "formal_model_relation": false
     }
   }

@@ -5,10 +5,12 @@ export default function EChartsView({
   option,
   style,
   onEvents,
+  onChartReady,
 }: {
   option: unknown
   style?: CSSProperties
-  onEvents?: Record<string, (params: { data?: { id?: string; name?: string } }) => void>
+  onEvents?: Record<string, (...args: any[]) => void>
+  onChartReady?: (instance: any) => void
 }) {
-  return <ReactECharts option={option as never} style={style} onEvents={onEvents} />
+  return <ReactECharts option={option as never} style={style} onEvents={onEvents} onChartReady={onChartReady} />
 }
