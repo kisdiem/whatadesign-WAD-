@@ -36,3 +36,34 @@ def test_missing_timestamp_is_explicitly_marked_as_ingest_fallback(tmp_path) -> 
 
     assert result["events"][0]["timestamp_origin"] == "ingest_fallback"
     assert result["events"][0]["labels_used"] is False
+
+
+def test_delete_source_removes_job_events_windows_and_investigation(tmp_path) -> None:
+    store = IngestionStore(tmp_path / "delete.db")
+    result = store.ingest_bytes(
+        "delete-me.log",
+        (
+            b"2026-08-16T10:00:00Z failed password for user alice from 10.0.0.8\n"
+            b"2026-08-16T10:01:00Z useradd user=bob host=server-1\n"
+        ),
+    )
+
+    deleted = store.delete_source(result["source"]["id"])
+
+    assert deleted is not None
+    assert deleted["name"] == "delete-me.log"
+    assert deleted["deleted"] == {
+        "jobs": 1,
+        "sources": 1,
+        "events": 2,
+        "windows": 2,
+        "investigations": 1,
+    }
+    assert store.snapshot()["manifest"]["counts"] == {
+        "jobs": 0,
+        "sources": 0,
+        "events": 0,
+        "windows": 0,
+        "investigations": 0,
+    }
+    assert store.delete_source(result["source"]["id"]) is None

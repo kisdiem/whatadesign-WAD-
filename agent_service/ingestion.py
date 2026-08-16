@@ -45,6 +45,22 @@ def _clamp(value: float) -> float:
     return round(max(0.0, min(1.0, value)), 4)
 
 
+def _event_stream_labels(value: Any) -> Any:
+    """Present every ingestion source through one neutral event-stream vocabulary."""
+    if isinstance(value, dict):
+        return {key: _event_stream_labels(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_event_stream_labels(item) for item in value]
+    if isinstance(value, str):
+        return (
+            value
+            .replace("实时上传 · M0-M6", "事件流 · M0-M6")
+            .replace("实时上传/", "事件流/")
+            .replace("由实时上传文件经过", "由文件接入事件流经过")
+        )
+    return value
+
+
 def _normalise_timestamp(value: Any, fallback: datetime) -> tuple[str, str]:
     if value is not None:
         text = str(value).strip()
@@ -298,7 +314,7 @@ class IngestionStore:
                 "time": item["timestamp"],
                 "timestamp_origin": item["timestamp_origin"],
                 "source": filename,
-                "source_type": f"实时上传/{filename}",
+                "source_type": f"事件流/{filename}",
                 "source_id": source_id,
                 "source_line": int(row["line"]),
                 "raw_log_ref": f"upload://{source_id}/{filename}:{row['line']}",
@@ -338,7 +354,7 @@ class IngestionStore:
                     "eventCount": 1,
                     "entities": event["entities"],
                     "hosts": values_by_type.get("host", []),
-                    "sourceTypes": [f"实时上传/{filename}"],
+                    "sourceTypes": [f"事件流/{filename}"],
                     "summary": "；".join(event["reasons"]),
                     "events": [event],
                     "moduleScores": module_scores,
@@ -357,7 +373,7 @@ class IngestionStore:
                 "windowIds": [window["id"] for window in windows[:50]],
                 "owner": "m0-m6-ingestion",
                 "createdAt": started.isoformat().replace("+00:00", "Z"),
-                "summary": "由实时上传文件经过 M0-M6 原型链路生成；真实标签未参与检测。",
+                "summary": "由文件接入事件流经过 M0-M6 原型链路生成；真实标签未参与检测。",
                 "source_id": source_id,
             }
 
@@ -367,7 +383,7 @@ class IngestionStore:
             "id": source_id,
             "name": filename,
             "path": f"upload://{source_id}/{filename}",
-            "kind": "实时上传 · M0-M6",
+            "kind": "事件流 · M0-M6",
             "status": "online",
             "size": f"{len(events):,} 条 / {len(content):,} B",
             "lastRead": finished.isoformat().replace("+00:00", "Z"),
@@ -417,7 +433,7 @@ class IngestionStore:
     def _payloads(self, table: str, order_by: str) -> list[dict[str, Any]]:
         with self._connect() as connection:
             rows = connection.execute(f"SELECT payload FROM {table} ORDER BY {order_by}").fetchall()
-        return [json.loads(row["payload"]) for row in rows]
+        return [_event_stream_labels(json.loads(row["payload"])) for row in rows]
 
     def snapshot(self, event_limit: int = 5000) -> dict[str, Any]:
         limit = max(1, min(event_limit, 20_000))
@@ -425,7 +441,7 @@ class IngestionStore:
             event_rows = connection.execute("SELECT payload FROM events ORDER BY timestamp DESC LIMIT ?", (limit,)).fetchall()
             total = connection.execute("SELECT COUNT(*) FROM events").fetchone()[0]
         return {
-            "events": [json.loads(row["payload"]) for row in event_rows],
+            "events": [_event_stream_labels(json.loads(row["payload"])) for row in event_rows],
             "event_count": total,
             "event_limit": limit,
             "windows": self._payloads("windows", "timestamp DESC"),
@@ -433,6 +449,44 @@ class IngestionStore:
             "sources": self._payloads("sources", "created_at DESC"),
             "jobs": self._payloads("jobs", "created_at DESC"),
             "manifest": self.manifest(),
+        }
+
+    def delete_source(self, source_id: str) -> dict[str, Any] | None:
+        target = str(source_id).strip()
+        if not target:
+            raise ValueError("数据源 ID 不能为空。")
+
+        with self._lock, self._connect() as connection:
+            source_row = connection.execute("SELECT payload FROM sources WHERE id = ?", (target,)).fetchone()
+            if source_row is None:
+                return None
+
+            source = json.loads(source_row["payload"])
+            deleted = {
+                "jobs": 0,
+                "sources": 1,
+                "events": connection.execute("SELECT COUNT(*) FROM events WHERE source_id = ?", (target,)).fetchone()[0],
+                "windows": connection.execute("SELECT COUNT(*) FROM windows WHERE source_id = ?", (target,)).fetchone()[0],
+                "investigations": connection.execute("SELECT COUNT(*) FROM investigations WHERE source_id = ?", (target,)).fetchone()[0],
+            }
+            job_ids = []
+            for row in connection.execute("SELECT id, payload FROM jobs").fetchall():
+                payload = json.loads(row["payload"])
+                if str(payload.get("source_id", "")) == target:
+                    job_ids.append(str(row["id"]))
+            deleted["jobs"] = len(job_ids)
+
+            connection.execute("DELETE FROM investigations WHERE source_id = ?", (target,))
+            connection.execute("DELETE FROM windows WHERE source_id = ?", (target,))
+            connection.execute("DELETE FROM events WHERE source_id = ?", (target,))
+            if job_ids:
+                connection.executemany("DELETE FROM jobs WHERE id = ?", [(job_id,) for job_id in job_ids])
+            connection.execute("DELETE FROM sources WHERE id = ?", (target,))
+
+        return {
+            "source_id": target,
+            "name": source.get("name", target),
+            "deleted": deleted,
         }
 
     def manifest(self) -> dict[str, Any]:
@@ -467,7 +521,7 @@ class IngestionStore:
         sources = {value.lower() for value in source_types if value}
         matched: list[dict[str, Any]] = []
         for row in rows:
-            event = json.loads(row["payload"])
+            event = _event_stream_labels(json.loads(row["payload"]))
             text = _json(event).lower()
             if needles and not all(value in text for value in needles):
                 continue

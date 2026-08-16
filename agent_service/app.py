@@ -19,6 +19,7 @@ from pydantic import BaseModel, Field
 
 from .ingestion import ingestion_store
 from .models import AgentQueryRequest, AgentRequestContext
+from .project_knowledge import knowledge_document_catalog, knowledge_manifest
 from .runtime import AgentRuntime, configure_model
 
 logger = logging.getLogger("wad.agent")
@@ -74,6 +75,12 @@ class SecurityLogSearchRequest(BaseModel):
     start_time: str | None = None
     end_time: str | None = None
     limit: int = Field(default=50, ge=1, le=200)
+
+
+class KnowledgeSearchRequest(BaseModel):
+    query: str = Field(min_length=1, max_length=4000)
+    top_k: int = Field(default=5, ge=1, le=10)
+    scope: list[str] = Field(default_factory=lambda: ["project", "security", "organization", "historical_cases"])
 
 
 class IngestFileRequest(BaseModel):
@@ -319,6 +326,7 @@ async def health() -> dict[str, Any]:
         "ingestion_pipeline": ingestion["pipeline"],
         "ingestion_counts": ingestion["counts"],
         "labels_used_for_detection": ingestion["labels_used_for_detection"],
+        "knowledge_base": knowledge_manifest(),
     }
 
 
@@ -346,7 +354,30 @@ async def list_investigations() -> list[dict[str, Any]]:
 
 @app.get("/api/knowledge/documents")
 async def list_knowledge_documents() -> list[dict[str, Any]]:
-    return _load_dashboard_collection("knowledge_documents.json", _demo_knowledge_docs)
+    try:
+        external = _load_dashboard_collection("knowledge_documents.json", _demo_knowledge_docs)
+    except HTTPException as error:
+        if error.status_code != 503:
+            raise
+        external = []
+    project = knowledge_document_catalog()
+    project_ids = {entry["id"] for entry in project}
+    return [*project, *(item for item in external if str(item.get("id", "")) not in project_ids)]
+
+
+@app.post("/api/knowledge/search")
+async def search_knowledge(request: KnowledgeSearchRequest) -> dict[str, Any]:
+    result = await runtime.repository.search_knowledge(request.query, request.top_k, request.scope)
+    if not result.ok:
+        return {"documents": [], "count": 0, "retrieval": "hybrid_lexical_cjk_v1", "message": result.message}
+    data = result.data if isinstance(result.data, dict) else {"documents": []}
+    documents = data.get("documents", [])
+    return {
+        "documents": documents,
+        "count": len(documents),
+        "retrieval": data.get("retrieval", "hybrid_lexical_cjk_v1"),
+        "evidence_refs": result.evidence_refs,
+    }
 
 
 @app.post("/api/settings/log-sources/test")
@@ -432,6 +463,14 @@ async def ingestion_jobs() -> list[dict[str, Any]]:
     return (await asyncio.to_thread(ingestion_store.snapshot, 1))["jobs"]
 
 
+@app.delete("/api/ingest/sources/{source_id}")
+async def delete_ingested_source(source_id: str) -> dict[str, Any]:
+    result = await asyncio.to_thread(ingestion_store.delete_source, source_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="上传数据源不存在或已经删除。")
+    return result
+
+
 @app.get("/api/detection/manifest")
 async def detection_manifest() -> dict[str, Any]:
     return await asyncio.to_thread(ingestion_store.manifest)
@@ -498,7 +537,7 @@ async def evaluation_report() -> dict[str, Any]:
         "formal_evaluation": False,
         "labels_used_for_detection": False,
         "prediction_count": manifest["counts"]["events"],
-        "reason": "实时上传链路不读取真实标签；需在预测冻结后提供独立标签文件才能计算召回率和误报率。",
+        "reason": "文件接入事件流不读取真实标签；需在预测冻结后提供独立标签文件才能计算召回率和误报率。",
         "metrics": None,
     }
 

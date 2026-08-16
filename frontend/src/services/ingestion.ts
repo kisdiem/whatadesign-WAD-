@@ -55,6 +55,18 @@ export type IngestResult = {
   investigation: Investigation | null
 }
 
+export type DeleteIngestedSourceResult = {
+  source_id: string
+  name: string
+  deleted: {
+    jobs: number
+    sources: number
+    events: number
+    windows: number
+    investigations: number
+  }
+}
+
 async function responseError(response: Response, fallback: string) {
   try {
     const body = await response.json() as { detail?: string }
@@ -92,4 +104,10 @@ export async function getIngestionSnapshot(eventLimit = 5000): Promise<Ingestion
   const response = await fetch(`${API_BASE}/ingest/snapshot?event_limit=${eventLimit}`)
   if (!response.ok) throw await responseError(response, `实时导入快照不可用：HTTP ${response.status}`)
   return response.json() as Promise<IngestionSnapshot>
+}
+
+export async function deleteIngestedSource(sourceId: string): Promise<DeleteIngestedSourceResult> {
+  const response = await fetch(`${API_BASE}/ingest/sources/${encodeURIComponent(sourceId)}`, { method: 'DELETE' })
+  if (!response.ok) throw await responseError(response, `删除失败：HTTP ${response.status}`)
+  return response.json() as Promise<DeleteIngestedSourceResult>
 }

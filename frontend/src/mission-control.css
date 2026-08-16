@@ -301,7 +301,6 @@ body,
   font-variant-numeric: tabular-nums;
 }
 
-.mc-risk-score.low { background: #d99b11; }
 .mc-risk-score.medium { background: #ef7d00; }
 .mc-risk-score.high { background: #e5484d; }
 .mc-risk-score.critical { background: #991b1b; }
@@ -408,6 +407,130 @@ body,
   color: #ffffff;
 }
 
+.mc-stage-card .ant-card-body {
+  padding: 16px !important;
+}
+
+.mc-stage-caption {
+  margin: -2px 0 12px;
+  color: #b9c9da;
+  font-size: 12px;
+}
+
+.mc-stage-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+.mc-stage-main .mc-stage-list {
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+}
+
+.mc-stage-candidate .mc-stage-list {
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+}
+
+.mc-stage-item {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #334962;
+  border-radius: 12px;
+  background: #1a283a;
+}
+
+.mc-stage-main .mc-stage-item {
+  border-color: rgba(72, 130, 255, 0.46);
+  background: linear-gradient(135deg, rgba(35, 69, 121, 0.48), rgba(25, 39, 57, 0.96));
+}
+
+.mc-stage-candidate .mc-stage-item {
+  border-color: rgba(245, 158, 11, 0.38);
+}
+
+.mc-stage-excluded .mc-stage-item {
+  opacity: 0.78;
+}
+
+.mc-stage-item-marker {
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(64, 123, 255, 0.16);
+  color: #7fb0ff;
+  font-weight: 700;
+}
+
+.mc-stage-item-marker span {
+  position: absolute;
+  margin-top: 43px;
+  color: #8fa8c2;
+  font-size: 11px;
+}
+
+.mc-stage-candidate .mc-stage-item-marker {
+  background: rgba(245, 158, 11, 0.14);
+  color: #f6b94f;
+}
+
+.mc-stage-excluded .mc-stage-item-marker {
+  background: rgba(148, 163, 184, 0.13);
+  color: #a9b6c6;
+}
+
+.mc-stage-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.mc-stage-item-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mc-stage-item-title {
+  display: block;
+  line-height: 1.45;
+}
+
+.mc-stage-item-summary.ant-typography {
+  margin: 10px 0 !important;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.mc-stage-item-meta {
+  width: 100%;
+}
+
+.mc-stage-item-actions {
+  width: 100%;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.mc-stage-item-actions .ant-btn {
+  padding-inline: 4px;
+}
+
+.mc-stage-empty {
+  min-height: 92px;
+  display: grid;
+  place-items: center;
+  color: #97a9bd;
+  border: 1px dashed #3a506b;
+  border-radius: 12px;
+}
+
 .mc-chat-card .ant-card-body {
   padding: 0;
 }
@@ -507,6 +630,48 @@ body,
   margin-bottom: 0 !important;
 }
 
+.mc-assistant-answer {
+  display: grid;
+  gap: 6px;
+  line-height: 1.65;
+}
+
+.mc-assistant-answer-gap {
+  height: 3px;
+}
+
+.mc-assistant-answer-heading {
+  margin-top: 5px;
+  padding-left: 9px;
+  border-left: 3px solid #1677ff;
+  color: #d7e9ff;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.mc-assistant-answer-step,
+.mc-assistant-answer-bullet {
+  padding: 6px 9px;
+  border-radius: 7px;
+  background: rgba(39, 91, 154, 0.16);
+}
+
+.mc-assistant-answer-bullet {
+  position: relative;
+  padding-left: 22px;
+}
+
+.mc-assistant-answer-bullet::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 14px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #4b9cff;
+}
+
 .mc-chat-composer {
   border-top: 1px solid #2a3b50;
   padding: 11px;
@@ -517,6 +682,17 @@ body,
 
 .mc-chat-actions {
   margin-top: 8px;
+}
+
+.mc-log-event-summary {
+  display: grid;
+  gap: 3px;
+  line-height: 1.45;
+}
+
+.mc-log-event-summary .ant-typography-secondary {
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .mc-assistant-dock {
@@ -797,6 +973,22 @@ body,
 
   .mc-page-title {
     flex-direction: column;
+  }
+
+  .mc-case-head {
+    flex-direction: column;
+  }
+
+  .mc-case-head > .ant-space {
+    align-items: flex-start !important;
+  }
+
+  .mc-stage-main .mc-stage-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mc-stage-candidate .mc-stage-list {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .mc-detail-scoreline {

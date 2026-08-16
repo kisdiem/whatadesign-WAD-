@@ -316,7 +316,7 @@ const baseLogSources: LogSource[] = [
   { id: 'SRC-02', name: 'Linux Audit', path: '/var/log/audit/', kind: 'LOG', status: 'online', size: '4.2 GB', lastRead: '05:27:11' },
   { id: 'SRC-03', name: 'Firewall', path: '/data/firewall/', kind: 'CSV', status: 'online', size: '21.4 GB', lastRead: '05:27:09' },
   { id: 'SRC-04', name: 'EDR Backup', path: '/mnt/edr/', kind: 'JSONL', status: 'warning', size: '8.9 GB', lastRead: '05:19:41' },
-  { id: 'SRC-05', name: 'AIT-ADS Replay Bundle', path: '/datasets/ait-ads/', kind: 'JSONL', status: 'online', size: '2.9 GB', lastRead: '05:28:04' },
+  { id: 'SRC-05', name: 'AIT-ADS Event Stream', path: '/datasets/ait-ads/', kind: '事件流', status: 'online', size: '2.9 GB', lastRead: '05:28:04' },
 ]
 
 const baseKnowledgeDocs: KnowledgeDoc[] = [

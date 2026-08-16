@@ -1,0 +1,58 @@
+{
+  "events": [
+    {
+      "timestamp": "2026-08-16T10:00:00Z",
+      "source": "sshd",
+      "host": "demo-web",
+      "user": "alice",
+      "src_ip": "10.0.0.8",
+      "event_type": "authentication_failure",
+      "message": "failed password for alice from 10.0.0.8"
+    },
+    {
+      "timestamp": "2026-08-16T10:00:12Z",
+      "source": "sshd",
+      "host": "demo-web",
+      "user": "alice",
+      "src_ip": "10.0.0.8",
+      "event_type": "authentication_failure",
+      "message": "failed password for alice from 10.0.0.8"
+    },
+    {
+      "timestamp": "2026-08-16T10:01:03Z",
+      "source": "sudo",
+      "host": "demo-web",
+      "user": "alice",
+      "event_type": "privilege_escalation",
+      "message": "session opened for user root"
+    },
+    {
+      "timestamp": "2026-08-16T10:02:25Z",
+      "source": "audit",
+      "host": "demo-web",
+      "user": "alice",
+      "process": "powershell.exe",
+      "event_type": "process_start",
+      "command": "powershell -enc SQBFAFgA",
+      "message": "encoded PowerShell command executed"
+    },
+    {
+      "timestamp": "2026-08-16T10:03:10Z",
+      "source": "account",
+      "host": "demo-web",
+      "user": "backup_admin",
+      "process": "useradd",
+      "event_type": "account_created",
+      "message": "useradd created backup_admin"
+    },
+    {
+      "timestamp": "2026-08-16T10:04:40Z",
+      "source": "dns",
+      "host": "demo-web",
+      "user": "backup_admin",
+      "dst_ip": "198.51.100.42",
+      "event_type": "outbound_connection",
+      "message": "connect outbound to 198.51.100.42"
+    }
+  ]
+}

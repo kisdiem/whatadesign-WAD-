@@ -18,6 +18,7 @@ from .models import (
     RouterDecision,
     SecurityDraft,
     VerificationResult,
+    VerificationSummary,
 )
 from .repository import SecurityRepository, build_repository
 from .tools import AgentContext, KNOWLEDGE_TOOLS, SECURITY_TOOLS
@@ -82,12 +83,17 @@ security_agent = Agent[AgentContext](
     instructions=(
         "You are the evidence-grounded security analyst for 链影寻踪. "
         "For any claim about the current environment you MUST call at least one internal security tool before answering. "
+        "You are not a generic chatbot: reason explicitly through the WAD M0-M6 pipeline, multi-scale active retrieval, "
+        "cross-source semantic/entity graphs and long-horizon links when they are relevant. "
+        "When explaining a risk score, association, M0-M6 method or investigation playbook, call knowledge_search in addition to the security-data tool. "
         "Prefer persisted Finding/Investigation/entity results before raw logs. Use 24h as the default event context, "
         "expand to 7d only for high-risk/cross-host/incomplete cases, and use 30d baseline only as aggregated behavior context. "
         "Never invent logs, entities, baselines or attack steps. If a tool is unavailable, say which evidence is missing. "
         "Do not equate a high risk score with confirmed compromise. Distinguish observed facts, inference and uncertainty. "
         "Write a compact Chinese answer with: 结论, 主要证据, 判断依据, 建议下一步. "
-        "claims must contain only the important factual/inferential claims that a verifier should check."
+        "Also fill structured.facts, structured.assessments, structured.uncertainties and structured.recommended_queries. "
+        "Every structured item must carry evidence_ids returned by tools; never invent an evidence ID. "
+        "claims must cover every important fact and assessment that a verifier should check."
     ),
 )
 
@@ -97,7 +103,9 @@ knowledge_agent = Agent[AgentContext](
     model_settings=_settings("medium", "medium", parallel_tool_calls=False),
     tools=KNOWLEDGE_TOOLS,
     instructions=(
+        "You are the project knowledge specialist for 链影寻踪, not a generic security encyclopedia. "
         "Answer security knowledge questions naturally in Chinese. Always call knowledge_search first. "
+        "Prefer the project's M0-M6 architecture, three core innovations, weak_fusion_v2 scoring, evaluation isolation protocol and TB-scale deployment knowledge. "
         "Prefer retrieved organization/security/history knowledge. If the repository is unavailable and the question is a general public concept, "
         "you may answer from model knowledge but explicitly state that no internal knowledge-base source was available. "
         "Do not pretend current-environment facts were checked."
@@ -264,6 +272,8 @@ class AgentRuntime:
         # Tool transcripts are isolated by mode. Only user-visible text is shared across modes.
         session = SQLiteSession(f"{request.conversation_id}:{decision.mode}", SESSION_DB)
         cross_mode_history = self._cross_mode_history(request.conversation_id, decision.mode)
+        structured = None
+        verification_summary = None
 
         if decision.mode == "security":
             await self._notify(status_callback, "正在规划安全分析")
@@ -285,11 +295,13 @@ class AgentRuntime:
                 if isinstance(draft_output, SecurityDraft)
                 else SecurityDraft(answer=str(draft_output), confidence=0.5)
             )
+            structured = draft.structured
             successful_tool_events = [event for event in context.tool_events if event.ok]
             if not successful_tool_events:
                 answer = "当前问题需要读取真实安全数据，但本次 Agent 没有获得任何成功的内部数据工具结果，因此不生成当前环境事实判断。"
                 verified = False
                 confidence = 0.0
+                structured = None
             else:
                 needs_verification = (
                     (draft.risk_score or 0) >= 80
@@ -309,6 +321,21 @@ class AgentRuntime:
                     verification: VerificationResult = verification_run.final_output
                     verified = not verification.unsupported and not verification.contradictions
                     confidence = min(confidence, verification.confidence)
+                    total_items = sum(
+                        len(items)
+                        for items in (
+                            structured.facts,
+                            structured.assessments,
+                            structured.uncertainties,
+                            structured.recommended_queries,
+                        )
+                    ) if structured else 0
+                    downgraded_items = len(verification.unsupported) + len(verification.contradictions)
+                    verification_summary = VerificationSummary(
+                        totalItems=total_items,
+                        verifiedItems=max(total_items - downgraded_items, 0),
+                        downgradedItems=downgraded_items,
+                    )
                     if not verified:
                         await self._notify(status_callback, "正在收敛不受支持的结论")
                         repair_input = json.dumps(
@@ -351,7 +378,14 @@ class AgentRuntime:
             answer,
         )
 
-        evidence = [EvidenceRef(label=ref, ref=ref) for ref in sorted(context.evidence_refs)]
+        evidence = [
+            EvidenceRef(
+                label=context.evidence_labels.get(ref, ref),
+                ref=ref,
+                source=context.evidence_sources.get(ref),
+            )
+            for ref in sorted(context.evidence_refs)
+        ]
         return AgentQueryResponse(
             run_id=run_id,
             conversation_id=request.conversation_id,
@@ -362,4 +396,6 @@ class AgentRuntime:
             tool_events=context.tool_events,
             verified=verified,
             confidence=confidence,
+            structured=structured,
+            verification_summary=verification_summary,
         )

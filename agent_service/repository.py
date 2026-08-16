@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from .models import RepositoryResult
+from .project_knowledge import search_project_knowledge
 
 
 class SecurityRepository(ABC):
@@ -47,7 +48,15 @@ class UnavailableRepository(SecurityRepository):
     async def get_baseline(self, entity_id: str, time_range: str) -> RepositoryResult: return self._fail()
     async def get_attack_timeline(self, **kwargs: Any) -> RepositoryResult: return self._fail()
     async def get_investigation(self, investigation_id: str) -> RepositoryResult: return self._fail()
-    async def search_knowledge(self, query: str, top_k: int, scope: list[str]) -> RepositoryResult: return self._fail()
+    async def search_knowledge(self, query: str, top_k: int, scope: list[str]) -> RepositoryResult:
+        selected = search_project_knowledge(query, top_k=top_k, scope=scope)
+        refs = [str(document.get("document_id", "")) for document in selected]
+        return RepositoryResult(
+            ok=bool(selected),
+            data={"documents": selected, "retrieval": "hybrid_lexical_cjk_v1"},
+            message="ok" if selected else "项目知识库中未检索到相关内容。",
+            evidence_refs=[ref for ref in refs if ref],
+        )
 
 
 class JsonDirectoryRepository(SecurityRepository):
@@ -227,19 +236,20 @@ class JsonDirectoryRepository(SecurityRepository):
 
     async def search_knowledge(self, query: str, top_k: int, scope: list[str]) -> RepositoryResult:
         docs = self._json("knowledge.json", [])
-        tokens = [token.lower() for token in query.split() if token.strip()]
-        scored: list[tuple[int, dict[str, Any]]] = []
-        for doc in docs if isinstance(docs, list) else []:
-            if scope and str(doc.get("scope", "security")) not in scope:
-                continue
-            text = json.dumps(doc, ensure_ascii=False).lower()
-            score = sum(1 for token in tokens if token in text)
-            if score or not tokens:
-                scored.append((score, doc))
-        scored.sort(key=lambda pair: pair[0], reverse=True)
-        selected = [doc for _, doc in scored[: max(1, min(top_k, 10))]]
+        external = docs if isinstance(docs, list) else []
+        selected = search_project_knowledge(
+            query,
+            top_k=top_k,
+            scope=scope,
+            external=external,
+        )
         refs = [str(doc.get("document_id", doc.get("id", ""))) for doc in selected]
-        return RepositoryResult(ok=True, data={"documents": selected}, evidence_refs=[ref for ref in refs if ref])
+        return RepositoryResult(
+            ok=bool(selected),
+            data={"documents": selected, "retrieval": "hybrid_lexical_cjk_v1"},
+            message="ok" if selected else "知识库中未检索到相关内容。",
+            evidence_refs=[ref for ref in refs if ref],
+        )
 
 
 class DemoRepository(JsonDirectoryRepository):
@@ -287,8 +297,7 @@ class DemoRepository(JsonDirectoryRepository):
         return RepositoryResult(ok=True, data={"investigation_id": investigation_id, "finding_ids": [self.finding["finding_id"]]}, evidence_refs=[investigation_id, self.finding["finding_id"]])
 
     async def search_knowledge(self, query: str, top_k: int, scope: list[str]) -> RepositoryResult:
-        doc = {"document_id": "KB-DEMO-ATTACK", "title": "Security knowledge", "chunk": "横向移动和数据外传必须结合实际实体、时间线与网络证据判断。"}
-        return RepositoryResult(ok=True, data={"documents": [doc]}, evidence_refs=[doc["document_id"]])
+        return await super().search_knowledge(query, top_k, scope)
 
 
 def build_repository() -> SecurityRepository:

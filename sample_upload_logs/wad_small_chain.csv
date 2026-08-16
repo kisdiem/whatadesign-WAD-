@@ -1,0 +1,7 @@
+timestamp,source,host,user,src_ip,dst_ip,process,event_type,command,message
+2026-08-16T10:00:00Z,sshd,demo-web,alice,10.0.0.8,,,authentication_failure,,failed password for alice from 10.0.0.8
+2026-08-16T10:00:12Z,sshd,demo-web,alice,10.0.0.8,,,authentication_failure,,failed password for alice from 10.0.0.8
+2026-08-16T10:01:03Z,sudo,demo-web,alice,,,,privilege_escalation,,session opened for user root
+2026-08-16T10:02:25Z,audit,demo-web,alice,,,powershell.exe,process_start,powershell -enc SQBFAFgA,encoded PowerShell command executed
+2026-08-16T10:03:10Z,account,demo-web,backup_admin,,,useradd,account_created,useradd,useradd created backup_admin
+2026-08-16T10:04:40Z,dns,demo-web,backup_admin,,198.51.100.42,,outbound_connection,,connect outbound to 198.51.100.42

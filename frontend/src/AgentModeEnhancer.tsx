@@ -158,6 +158,9 @@ export default function AgentModeEnhancer() {
                 </Tag>
               )}
               {lastResult?.verified && <Tag color="success">证据已核验</Tag>}
+              {health?.knowledge_base && (
+                <Tag color="blue">项目知识库 {health.knowledge_base.project_documents} 篇</Tag>
+              )}
             </Space>
             {liveStatus && <div className="agent-live-status"><Badge status="processing" /> {liveStatus}</div>}
           </div>
@@ -166,7 +169,7 @@ export default function AgentModeEnhancer() {
               <>
                 <Badge
                   status={health.openai_configured ? 'success' : 'warning'}
-                  text={health.openai_configured ? '在线' : '未配置'}
+                  text={health.openai_configured ? '推理服务在线' : '知识检索在线'}
                 />
                 <Button size="small" icon={<KeyOutlined />} onClick={() => setProviderOpen(true)}>
                   模型配置
@@ -192,7 +195,7 @@ export default function AgentModeEnhancer() {
         okText="加载到后端"
         cancelText="取消"
         confirmLoading={savingKey}
-        destroyOnClose
+        destroyOnHidden
       >
         <Text type="secondary">仅当前后端进程有效</Text>
         <Select

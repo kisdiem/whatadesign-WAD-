@@ -125,10 +125,107 @@ function intersect(a: string[], b: string[]) {
   return a.filter((item) => b.includes(item))
 }
 
+type LinkEvidenceScore = {
+  candidate: AnomalyWindow
+  score: number
+  anchor: string
+  anchorStrength: 'Strong' | 'Medium' | 'Weak'
+  entityRarity: number
+  actionCompatibility: number
+  graphSimilarity: number
+  timeGapMinutes: number
+}
+
+const RISK_SCORING_VERSION = 'weak_fusion_v2'
+const RISK_FUSION_WEIGHTS = { event: 0.36, local: 0.29, long: 0.35 } as const
+
+function actionFamily(value?: string) {
+  const action = (value || '').toUpperCase()
+  if (/LOGIN|LOGON|AUTH|PASSWORD|SESSION/.test(action)) return 'authentication'
+  if (/PROCESS|EXEC|COMMAND|SHELL|SUDO|SU\b/.test(action)) return 'execution'
+  if (/NETWORK|DNS|CONNECT|PORT|HTTP|TLS/.test(action)) return 'network'
+  if (/FILE|ARCHIVE|WRITE|READ|UPLOAD/.test(action)) return 'file'
+  if (/USERADD|GROUP|ACCOUNT|PRIVILEGE|TOKEN/.test(action)) return 'identity'
+  return 'other'
+}
+
+function anchorWeight(entity: string) {
+  const type = inferEntityType(entity)
+  if (type === 'User' || type === 'Process') return 1
+  if (type === 'Host') return 0.5
+  if (type === 'Asset') return 0.35
+  return 0
+}
+
+function multiscaleTimeDecay(deltaMinutes: number) {
+  const hours = Math.max(deltaMinutes, 0) / 60
+  const horizons = [1, 24, 168, 720]
+  return horizons.reduce((sum, horizon) => sum + Math.exp(-hours / horizon), 0) / horizons.length
+}
+
+function entityFrequency(windows: AnomalyWindow[]) {
+  const frequencies = new Map<string, number>()
+  windows.forEach((window) => {
+    new Set(window.entities).forEach((entity) => frequencies.set(entity, (frequencies.get(entity) || 0) + 1))
+  })
+  return frequencies
+}
+
+function entityRarity(entity: string, frequencies: Map<string, number>, total: number) {
+  if (!entity || total <= 1) return 0
+  const frequency = frequencies.get(entity) || 0
+  return clamp(Math.log((total + 1) / (frequency + 1)) / Math.log(total + 1), 0, 1)
+}
+
+function scoreWindowLink(
+  current: AnomalyWindow,
+  candidate: AnomalyWindow,
+  frequencies: Map<string, number>,
+  total: number,
+): LinkEvidenceScore {
+  const shared = intersect(current.entities, candidate.entities)
+  const rankedAnchors = shared
+    .map((entity) => ({ entity, weight: anchorWeight(entity), rarity: entityRarity(entity, frequencies, total) }))
+    .sort((left, right) => (right.weight * right.rarity) - (left.weight * left.rarity))
+  const bestAnchor = rankedAnchors[0]
+  const weightedAnchorEvidence = rankedAnchors.reduce((sum, item) => sum + item.weight * item.rarity, 0)
+  const anchorEvidence = 1 - Math.exp(-weightedAnchorEvidence)
+  const timeGapMinutes = Math.abs(timeToMinutes(current.start) - timeToMinutes(candidate.start))
+  const timeEvidence = multiscaleTimeDecay(timeGapMinutes)
+  const currentFamily = actionFamily(anchorEvent(current).action)
+  const candidateFamily = actionFamily(anchorEvent(candidate).action)
+  const actionCompatibility = currentFamily === candidateFamily ? 1 : currentFamily === 'other' || candidateFamily === 'other' ? 0.2 : 0
+  const unionSources = new Set([...current.sourceTypes, ...candidate.sourceTypes])
+  const crossSourceEvidence = unionSources.size >= 2 ? 1 : 0.15
+  const unionEntities = new Set([...current.entities, ...candidate.entities])
+  const graphSimilarity = unionEntities.size ? shared.length / unionEntities.size : 0
+  const evidenceQuality = Math.min(1, Math.log2(2 + current.events.length + candidate.events.length) / 4)
+  const score = clamp(
+    anchorEvidence * 0.4
+      + timeEvidence * 0.2
+      + actionCompatibility * 0.15
+      + crossSourceEvidence * 0.15
+      + evidenceQuality * 0.1,
+    0,
+    1,
+  )
+  const type = bestAnchor ? inferEntityType(bestAnchor.entity) : 'IP'
+  return {
+    candidate,
+    score,
+    anchor: bestAnchor?.entity || shared[0] || '—',
+    anchorStrength: type === 'User' || type === 'Process' ? 'Strong' : type === 'Host' ? 'Medium' : 'Weak',
+    entityRarity: bestAnchor?.rarity || 0,
+    actionCompatibility,
+    graphSimilarity,
+    timeGapMinutes,
+  }
+}
+
 export function inferEntityType(entity: string): EntityKind {
   if (/^\d{1,3}(\.\d{1,3}){3}$/.test(entity)) return 'IP'
   if (/host|srv|ws-|fs-|app-/i.test(entity)) return 'Host'
-  if (/\.(exe|dat)$/i.test(entity)) return 'Process'
+  if (/\.(exe|dat)$/i.test(entity) || /^(sudo|su|useradd|sshd|systemd|kernel|metricbeat|auditd|python\d*|bash|sh|powershell|cmd)$/i.test(entity)) return 'Process'
   if (/[\\/]/.test(entity)) return 'Asset'
   return 'User'
 }
@@ -171,26 +268,44 @@ export function buildFindings(
   windows: AnomalyWindow[] = anomalyWindows,
   cases: Investigation[] = investigations,
 ) {
+  const frequencies = entityFrequency(windows)
   return windows.map<FindingRecord>((window) => {
     const peers = windows.filter((item) => item.id !== window.id && intersect(item.entities, window.entities).length > 0)
-    const sharedCount = peers.length
-    const eventScore = clamp(window.score * 0.68 + (window.events.length >= 2 ? 0.16 : 0.08), 0.38, 0.96)
-    const localScore = clamp(window.score * 0.54 + window.sourceTypes.length * 0.08 + (window.eventCount > 30 ? 0.08 : 0.02), 0.34, 0.95)
-    const longScore = clamp(window.score * 0.42 + sharedCount * 0.14 + (window.events.some((event) => Boolean(event.actor)) ? 0.12 : 0.04), 0.21, 0.97)
-    const risk = Math.round((eventScore * 0.32 + localScore * 0.28 + longScore * 0.4) * 100)
     const anchor = anchorEvent(window)
     const primary = primaryEntity(window)
+    const linkEvidence = peers
+      .map((candidate) => scoreWindowLink(window, candidate, frequencies, windows.length))
+      .sort((left, right) => right.score - left.score)
+    const bestLink = linkEvidence[0]
+    const topLinks = linkEvidence.slice(0, 3)
+    const linkWeights = [0.55, 0.3, 0.15]
+    const linkWeightTotal = topLinks.reduce((sum, _item, index) => sum + linkWeights[index], 0) || 1
+    const linkAggregate = topLinks.reduce((sum, item, index) => sum + item.score * linkWeights[index], 0) / linkWeightTotal
+    const baseScore = clamp(window.score, 0, 1)
+    const fieldCoverage = [
+      window.events.some((event) => Boolean(event.actor)),
+      window.events.some((event) => Boolean(event.process || event.ip)),
+      window.entities.length >= 2,
+      window.events.every((event) => Boolean(event.raw)),
+    ].filter(Boolean).length / 4
+    const eventScore = clamp(baseScore * 0.82 + fieldCoverage * 0.18, 0.03, 0.98)
+    const contextDensity = 1 - Math.exp(-Math.max(window.eventCount, window.events.length) / 6)
+    const sourceDiversity = Math.min(1, window.sourceTypes.length / 2)
+    const entityDiversity = Math.min(1, new Set(window.entities.map(inferEntityType)).size / 4)
+    const localScore = clamp(baseScore * 0.46 + contextDensity * 0.2 + sourceDiversity * 0.18 + entityDiversity * 0.16, 0.03, 0.96)
+    const primaryRarity = entityRarity(primary, frequencies, windows.length)
+    const longScore = clamp(baseScore * 0.28 + linkAggregate * 0.57 + primaryRarity * 0.15, 0.02, 0.96)
+    const risk = Math.round((
+      eventScore * RISK_FUSION_WEIGHTS.event
+      + localScore * RISK_FUSION_WEIGHTS.local
+      + longScore * RISK_FUSION_WEIGHTS.long
+    ) * 100)
     const caseId = cases.find((item) => item.windowIds.includes(window.id))?.id
-    const rarity = clamp(0.58 + (sharedCount <= 1 ? 0.24 : 0.12) + (window.sourceTypes.length >= 3 ? 0.08 : 0), 0.4, 0.97)
-    const compatibility = clamp(0.56 + (window.events.length >= 2 ? 0.16 : 0.08) + (/LOGIN|FILE|DB_EXPORT/.test(anchor.action) ? 0.08 : 0), 0.42, 0.95)
-    const graphSimilarity = clamp(0.48 + sharedCount * 0.1 + (window.sourceTypes.length >= 2 ? 0.08 : 0), 0.35, 0.92)
-    const closestPeer = peers[0]
-    const timeGap = closestPeer ? formatGap(Math.abs(timeToMinutes(window.start) - timeToMinutes(closestPeer.start))) : '24h+'
-    const strength = inferEntityType(primary) === 'User' || inferEntityType(primary) === 'Process'
-      ? 'Strong'
-      : inferEntityType(primary) === 'Host'
-        ? 'Medium'
-        : 'Weak'
+    const rarity = bestLink?.entityRarity ?? primaryRarity
+    const compatibility = bestLink?.actionCompatibility ?? 0
+    const graphSimilarity = bestLink?.graphSimilarity ?? 0
+    const timeGap = bestLink ? formatGap(bestLink.timeGapMinutes) : '无可用关联'
+    const strength = bestLink?.anchorStrength || 'Weak'
 
     return {
       id: window.id,
@@ -202,7 +317,7 @@ export function buildFindings(
       eventScore: toPercent(eventScore),
       localScore: toPercent(localScore),
       longScore: toPercent(longScore),
-      reasons: deriveReasons(window, sharedCount),
+      reasons: deriveReasons(window, linkEvidence.filter((item) => item.score >= 0.5).length),
       entity: primary,
       entityType: inferEntityType(primary),
       host: window.hosts[0] || anchor.host || 'Unknown',
@@ -214,24 +329,24 @@ export function buildFindings(
       events: window.events,
       entities: window.entities,
       anchorEvent: anchor,
-      relatedCandidates: peers.slice(0, 4).map((item) => ({
-        id: item.id,
-        title: item.title,
-        time: item.start,
-        reasons: linkReasons(window, item),
+      relatedCandidates: linkEvidence.slice(0, 4).map((item) => ({
+        id: item.candidate.id,
+        title: item.candidate.title,
+        time: item.candidate.start,
+        reasons: linkReasons(window, item.candidate),
       })),
       association: {
-        confidence: clamp(risk / 100 - (strength === 'Weak' ? 0.18 : 0), 0.22, 0.95),
-        sharedAnchor: primary,
+        confidence: bestLink?.score || 0,
+        sharedAnchor: bestLink?.anchor || primary,
         anchorStrength: strength,
         entityRarity: rarity,
         actionCompatibility: compatibility,
         graphSimilarity,
         timeGap,
         summary: [
-          `${primary} 在跨窗口中重复出现，作为 ${strength === 'Strong' ? '强' : strength === 'Medium' ? '中' : '弱'}锚点参与关联。`,
-          `当前关系在近 30 天画像中偏离基线，稀有度 ${toPercent(rarity)}。`,
-          `行为兼容度 ${toPercent(compatibility)}，图相似度 ${toPercent(graphSimilarity)}。`,
+          `${bestLink?.anchor || primary} 作为${strength === 'Strong' ? '强' : strength === 'Medium' ? '中' : '弱'}锚点参与关联；高频公共实体已通过 IDF 稀有度降权。`,
+          `多尺度时间衰减同时考察 1h、24h、7d、30d，当前最佳关联间隔 ${timeGap}。`,
+          `评分版本 ${RISK_SCORING_VERSION}：实体稀有度 ${toPercent(rarity)}，行为兼容度 ${toPercent(compatibility)}，图相似度 ${toPercent(graphSimilarity)}。`,
         ],
       },
     }
@@ -260,46 +375,71 @@ export function buildEvidence(findings: FindingRecord[]) {
   }, {})
 }
 
-export function buildEntityProfiles(findings: FindingRecord[]) {
-  const entities = Array.from(new Set(findings.flatMap((finding) => finding.entities)))
+export function buildEntityProfiles(findings: FindingRecord[], events: SecurityEvent[] = []) {
+  const eventEntities = events.flatMap((event) => [event.actor, event.host, event.process, event.ip])
+    .filter((value): value is string => Boolean(value))
+  const entities = Array.from(new Set([...findings.flatMap((finding) => finding.entities), ...eventEntities]))
   return entities
     .map<EntityProfile>((entity) => {
       const linked = findings.filter((finding) => finding.entities.includes(entity))
       const ordered = [...linked].sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start))
-      const hosts = linked.flatMap((finding) => finding.events.map((event) => event.host).filter(Boolean) as string[])
+      const linkedEvents = events
+        .filter((event) => [event.actor, event.host, event.process, event.ip].includes(entity))
+        .sort((left, right) => timeToMinutes(left.time) - timeToMinutes(right.time))
+      const hosts = [
+        ...linked.flatMap((finding) => finding.events.map((event) => event.host).filter(Boolean) as string[]),
+        ...linkedEvents.map((event) => event.host).filter((value): value is string => Boolean(value)),
+      ]
       const uniqueHosts = Array.from(new Set(hosts))
       const hostHistory = uniqueHosts.map((host, index) => ({
         host,
-        count: linked.filter((finding) => finding.host === host).reduce((sum, finding) => sum + finding.events.length, 0) * 8 + 4,
+        count: Math.max(
+          linkedEvents.filter((event) => event.host === host).length,
+          linked.filter((finding) => finding.host === host).reduce((sum, finding) => sum + finding.events.length, 0) * 8 + 4,
+        ),
         isNew: index >= 1,
       })).sort((a, b) => b.count - a.count)
       const latest = ordered[ordered.length - 1]
+      const latestEvent = linkedEvents[linkedEvents.length - 1]
+      const firstSeen = [ordered[0]?.start, linkedEvents[0]?.time].filter(Boolean).sort()[0] || '—'
+      const lastSeen = [latest?.end, latestEvent?.time].filter(Boolean).sort().slice(-1)[0] || '—'
       const dominantHost = hostHistory[0]?.host || '—'
-      const currentHost = latest?.host || '—'
-      const latestAction = latest?.anchorEvent.action || '—'
+      const currentHost = latest?.host || latestEvent?.host || '—'
+      const latestAction = latest?.anchorEvent.action || latestEvent?.action || '—'
+      const observedType: EntityKind = events.some((event) => event.ip === entity)
+        ? 'IP'
+        : events.some((event) => event.host === entity)
+          ? 'Host'
+          : events.some((event) => event.process === entity)
+            ? 'Process'
+            : inferEntityType(entity)
 
       return {
         id: entity,
-        type: inferEntityType(entity),
-        firstSeen: ordered[0]?.start || '—',
-        lastSeen: latest?.end || '—',
-        thirtyDayEvents: linked.reduce((sum, finding) => sum + finding.events.length * 12, 0),
+        type: observedType,
+        firstSeen,
+        lastSeen,
+        thirtyDayEvents: Math.max(linkedEvents.length, linked.reduce((sum, finding) => sum + finding.events.length * 12, 0)),
         normalLoginHosts: Math.max(hostHistory.length - 1, 1),
         currentLoginHosts: hostHistory.length || 1,
         newHostRelations: Math.max(hostHistory.filter((item) => item.isNew).length, 0),
         rareRelations: linked.filter((finding) => finding.longScore >= 75).length,
         usualLogin: entity.toLowerCase().includes('svc') ? '08:00-18:00' : '09:00-19:00',
-        currentActivity: latest?.start || '—',
+        currentActivity: latest?.start || latestEvent?.time || '—',
         hostHistory,
         baseline: [
           { feature: '登录主机', current: currentHost, baseline: dominantHost, deviation: currentHost === dominantHost ? 0.28 : 0.91 },
-          { feature: '活动时间', current: latest?.start || '—', baseline: entity.toLowerCase().includes('svc') ? '08:00-18:00' : '09:00-19:00', deviation: timeToMinutes(latest?.start || '09:00:00') < 6 * 60 ? 0.88 : 0.42 },
+          { feature: '活动时间', current: latest?.start || latestEvent?.time || '—', baseline: entity.toLowerCase().includes('svc') ? '08:00-18:00' : '09:00-19:00', deviation: timeToMinutes(latest?.start || latestEvent?.time || '09:00:00') < 6 * 60 ? 0.88 : 0.42 },
           { feature: '关键行为', current: latestAction, baseline: linked[0]?.anchorEvent.action || 'LOGIN', deviation: latestAction === linked[0]?.anchorEvent.action ? 0.34 : 0.79 },
           { feature: 'User→Host', current: `${entity} → ${currentHost}`, baseline: `${entity} → ${dominantHost}`, deviation: currentHost === dominantHost ? 0.31 : 0.93 },
         ],
         findingIds: linked.map((finding) => finding.id),
       }
     })
+    .filter((profile) => profile.findingIds.length > 0
+      || profile.type === 'Host'
+      || profile.type === 'IP'
+      || profile.thirtyDayEvents >= 8)
     .sort((a, b) => b.rareRelations - a.rareRelations)
 }
 
@@ -307,6 +447,15 @@ export function initialCaseBoards(cases: Investigation[] = investigations) {
   return cases.reduce<Record<string, CaseBoard>>((result, investigation) => {
     result[investigation.id] = {}
     investigation.windowIds.forEach((findingId, index) => {
+      if (investigation.id === 'CASE-XLOG-30D-001') {
+        // The current event and the oldest recovered anchor form the two
+        // verified endpoints; intermediate stages remain candidates until an
+        // analyst promotes or excludes them.
+        result[investigation.id][findingId] = index === 0 || index === investigation.windowIds.length - 1
+          ? 'main'
+          : 'candidate'
+        return
+      }
       result[investigation.id][findingId] = index < 2 ? 'main' : index < 4 ? 'candidate' : 'excluded'
     })
     return result
