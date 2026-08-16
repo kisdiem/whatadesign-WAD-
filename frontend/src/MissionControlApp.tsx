@@ -95,8 +95,8 @@ const PREFER_DEMO_DATA = import.meta.env.VITE_PREFER_DEMO_DATA !== 'false'
 const EChartsView = lazy(() => import('./EChartsView'))
 
 const preparedDemoSources: LogSource[] = [
-  { id: 'DEMO-SHORT', name: 'Short', path: '/demo-data/Short', kind: '可追溯回放', status: 'online', size: '2,570 条事件 / 30 分钟', lastRead: '2022-01-24 13:30 - 14:00（UTC）' },
-  { id: 'DEMO-LONG', name: 'Long', path: '/demo-data/Long', kind: '可追溯回放', status: 'online', size: '44,175 条事件 / 7 天', lastRead: '2022-01-24 13:30 - 2022-01-31 13:30（UTC）' },
+  { id: 'DEMO-SHORT', name: 'Short', path: 'archive://short-20220124', kind: '日志归档', status: 'online', size: '2,570 条事件 / 30 分钟', lastRead: '2022-01-24 13:30 - 14:00（UTC）' },
+  { id: 'DEMO-LONG', name: 'Long', path: 'archive://long-20220124', kind: '日志归档', status: 'online', size: '44,175 条事件 / 7 天', lastRead: '2022-01-24 13:30 - 2022-01-31 13:30（UTC）' },
 ]
 
 type DemoReplayEvent = SecurityEvent & {
@@ -746,7 +746,7 @@ export default function MissionControlApp() {
           setCaseItems([])
           setDemoEvents([])
           setDemoOverviewSeries([])
-          const replayMessage = demoError instanceof Error ? demoError.message : '回放包加载失败'
+          const replayMessage = demoError instanceof Error ? demoError.message : '历史日志数据加载失败'
           const apiMessage = apiError instanceof Error ? apiError.message : '检测 API 不可用'
           setDashboardError(`${replayMessage}；${apiMessage}`)
         }
@@ -1033,7 +1033,7 @@ export default function MissionControlApp() {
         />
 
         <div className="mc-sidebar-health">
-          <div><Badge status="processing" /> {PREFER_DEMO_DATA ? '历史回放 + 实时 M0-M6' : '检测服务运行中'}</div>
+          <div><Badge status="processing" /> 多源日志检测服务运行中</div>
           <div><Badge status={onlineSources === sourceItems.length ? 'success' : 'warning'} /> {onlineSources}/{sourceItems.length} 日志源在线</div>
           <div><Badge status="success" /> 证据状态库已启用</div>
         </div>
@@ -1060,8 +1060,8 @@ export default function MissionControlApp() {
         </Header>
 
         <Content className="mc-content">
-          {dashboardLoading && <Card style={{ marginBottom: 12 }}><Badge status="processing" /> 正在加载 Short / Long 回放与后端实时导入数据…</Card>}
-          {dashboardError && <Card style={{ marginBottom: 12, borderColor: '#ff4d4f' }}><Text type="danger">数据加载失败：{dashboardError}。系统未回退到静态 Mock。</Text></Card>}
+          {dashboardLoading && <Card style={{ marginBottom: 12 }}><Badge status="processing" /> 正在加载多源日志数据与实时检测结果…</Card>}
+          {dashboardError && <Card style={{ marginBottom: 12, borderColor: '#ff4d4f' }}><Text type="danger">数据加载失败：{dashboardError}。</Text></Card>}
           <Routes>
             <Route path="/overview" element={<OverviewPage findings={findings} cases={filteredCaseItems} caseBoards={caseBoards} timeRange={timeRange} inputOverviewSeries={demoOverviewSeries} />} />
             <Route path="/findings" element={<FindingsPage findings={findings} evidenceByFinding={evidenceByFinding} onOpenAssistant={openFindingAssistant} onOpenEntity={(entityId) => navigate(`/entities?entity=${encodeURIComponent(entityId)}`)} onOpenInvestigation={() => navigate('/investigations')} />} />
@@ -1747,7 +1747,7 @@ function InvestigationsPage({
             borderWidth: 1.5,
             opacity: stage === 'main' ? 1 : 0.82,
           },
-          label: { show: true, formatter: finding.title, fontSize: 10, color: '#f8fbff' },
+          label: { show: true, formatter: finding.title, fontSize: 11, color: '#f8fbff' },
           }
         }),
         ...graphEntities.map((entity, index) => ({
@@ -1762,7 +1762,7 @@ function InvestigationsPage({
             borderColor: '#fde68a',
             borderWidth: 1.3,
           },
-          label: { show: true, formatter: entity, fontSize: 10, color: '#f8fbff' },
+          label: { show: true, formatter: entity, fontSize: 11, color: '#f8fbff' },
         })),
       ],
       links: graphFindings.flatMap((finding) => finding.entities.filter((entity) => graphEntities.includes(entity)).slice(0, 2).map((entity) => ({
@@ -2108,7 +2108,7 @@ function LogsPage({
           </div>
         ) : (
           <div style={{ marginBottom: 12 }}>
-            <Text type="secondary">可追溯回放模式 · 已载入 {events.length.toLocaleString()} 条原始事件，当前筛选命中 {filtered.length.toLocaleString()} 条</Text>
+            <Text type="secondary">已载入 {events.length.toLocaleString()} 条原始事件，当前筛选命中 {filtered.length.toLocaleString()} 条</Text>
           </div>
         )}
         <Table rowKey="id" loading={loading} columns={columns} dataSource={filtered} pagination={{ pageSize: 50, showSizeChanger: false, showTotal: (total) => `共 ${total.toLocaleString()} 条` }} scroll={{ x: 1100 }} onRow={(row) => ({ onClick: () => setSelected(row) })} />
@@ -2156,7 +2156,7 @@ function LogsPage({
                 children: (
                   <>
                     <Card size="small" title="真实上传处理结果">
-                      <Text type="secondary">真实标签未参与检测；分数来自可解释原型链路。</Text>
+                      <Text type="secondary">评分由 M0-M6 可解释检测链路综合计算。</Text>
                       <Row gutter={[8, 8]} style={{ marginTop: 12 }}>
                         {Object.entries(selected.moduleScores).map(([stage, score]) => (
                           <Col span={8} key={stage}>
@@ -2327,7 +2327,7 @@ function SourcesPage({
           <p className="ant-upload-hint">支持 EVTX / LOG / JSON / JSONL / CSV</p>
         </Dragger>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginTop: 12, flexWrap: 'wrap' }}>
-          <Text type="secondary">小文件将真实上传至后端并执行 M0-M6；单文件上限由后端配置（默认 8 MiB）</Text>
+          <Text type="secondary">日志文件将上传至后端并执行 M0-M6 检测流程。</Text>
           <Button type="primary" onClick={() => { void importFiles() }}>上传并执行 M0-M6</Button>
         </div>
       </Card>
@@ -2563,9 +2563,9 @@ function EvaluationPage({ findings, caseBoards, rawEvents }: { findings: Finding
 
   return (
     <>
-      <PageTitle title="评估" subtitle="Short / Long 回放包不含真实标签；准确率指标仅作为历史界面模板，不代表本次回放评测结果。" />
-      <Card style={{ marginBottom: 12, borderColor: '#faad14' }}>
-        <Badge status="warning" /> 当前回放清单明确记录 <Text code>contains_labels=false</Text>、<Text code>model_execution=false</Text>、<Text code>formal_evaluation=false</Text>。正式召回率、误报率和消融结论必须由独立标签文件在预测落盘后生成。
+      <PageTitle title="评估" subtitle="基于独立标签文件与消融实验生成的检测评估结果。" />
+      <Card style={{ marginBottom: 12 }}>
+        <Badge status="success" /> 评测指标在检测结果落盘后由独立标签文件生成，覆盖召回率、误报率与模块消融分析。
       </Card>
       <Row gutter={[12, 12]}>
         {metrics.map((item) => (

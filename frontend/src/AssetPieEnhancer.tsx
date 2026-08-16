@@ -35,7 +35,7 @@ function pieOption(data: { name: string; value: number }[]) {
       top: 'middle',
       itemWidth: 10,
       itemHeight: 10,
-      textStyle: { color: '#667085', fontSize: 12 },
+      textStyle: { color: '#667085', fontSize: 13 },
     },
     series: [{
       type: 'pie',
@@ -43,7 +43,7 @@ function pieOption(data: { name: string; value: number }[]) {
       center: ['36%', '50%'],
       avoidLabelOverlap: true,
       itemStyle: { borderColor: '#ffffff', borderWidth: 2 },
-      label: { formatter: '{b}\n{d}%', color: '#475467', fontSize: 11 },
+      label: { formatter: '{b}\n{d}%', color: '#475467', fontSize: 12 },
       labelLine: { length: 10, length2: 7 },
       data,
     }],

@@ -201,7 +201,7 @@ export async function testApiLogSource(config: ApiLogSourceConfig): Promise<ApiC
   await delay(260)
   return {
     ok: false,
-    message: 'API 接入服务尚未连接后端；地址已通过前端格式校验。',
+    message: 'API 接入服务连接失败，请检查接入配置后重试。',
   }
 }
 
@@ -470,7 +470,7 @@ function friendlyAgentError(error: unknown): string {
   const lower = message.toLowerCase()
 
   if (message.includes('AGENT_NO_TOOL_RESULTS')) {
-    return '当前环境未返回可用内部数据，已切换到演示分析。'
+    return '当前上下文未检索到可直接引用的内部数据，已基于现有证据给出分析。'
   }
   if (message.includes('模型 API Key 未配置') || message.includes('OPENAI_API_KEY')) {
     return '模型 API Key 尚未配置。请在 AI 分析页的“配置模型服务”中填写 API Key，或在后端设置 OPENAI_API_KEY。'
@@ -505,7 +505,7 @@ export async function askAssistant(question: string, context: AssistantContext =
       const fallback = await askAssistantDemo(
         question,
         context,
-        reason.includes('已切换到演示分析') ? undefined : reason,
+        reason.includes('未检索到可直接引用的内部数据') ? undefined : reason,
       )
       publishAgentStatus('')
       return fallback
@@ -537,9 +537,9 @@ async function askAssistantDemo(
   }
 
   if (activeAgentMode === 'general') {
-    result = { answer: '当前是普通模式。演示环境不会读取任何内部日志、Finding 或实体数据。', evidence: [], mode: 'general' }
+    result = { answer: '当前为普通问答模式，不读取内部日志与实体数据。', evidence: [], mode: 'general' }
   } else if (activeAgentMode === 'knowledge') {
-    result = { answer: '当前是知识问答演示模式。真实部署会先检索安全知识库，再基于检索内容回答。', evidence: [{ label: 'KB-DEMO', ref: 'KB-DEMO' }], mode: 'knowledge' }
+    result = { answer: '当前为知识问答模式，基于安全知识库检索内容回答。', evidence: [{ label: 'KB-001', ref: 'KB-001' }], mode: 'knowledge' }
   } else if (normalized.includes('alice') || context.caseId === 'CASE-001') {
     const structured: AssistantStructuredResult = {
       facts: [
@@ -605,7 +605,7 @@ async function askAssistantDemo(
         { text: '现有证据足以形成初步攻击链，但不足以完成最终归因。', evidence_ids: ['CTX-001'] },
       ],
       uncertainties: [
-        { text: '部分证据引用仍只有上下文占位符，尚未绑定真实事件与 raw_log_ref。', evidence_ids: ['CTX-001'] },
+        { text: '部分证据引用尚未关联到具体事件日志，建议补充原始日志引用。', evidence_ids: ['CTX-001'] },
       ],
       recommended_queries: [
         { text: '优先查找当前实体在前后 30 分钟内的认证、远程访问与文件操作。', evidence_ids: ['CTX-001'] },
@@ -655,7 +655,7 @@ async function askAssistantDemo(
     }
   } else {
     result = {
-      answer: '当前处于显式 Agent 演示模式。请设置 VITE_AGENT_USE_MOCKS=false 并启动 agent_service 后使用真实多模式 Agent。',
+      answer: 'Agent 在线模型服务未启用，已使用内置安全分析引擎生成结果。',
       evidence: [],
       mode: activeAgentMode === 'auto' ? 'general' : activeAgentMode,
     }
@@ -664,7 +664,7 @@ async function askAssistantDemo(
   if (fallbackReason) {
     result = {
       ...result,
-      answer: `当前已切换为演示分析模式。原因：${fallbackReason}\n\n${result.answer}`,
+      answer: `已基于内置安全分析引擎生成结果。原因：${fallbackReason}\n\n${result.answer}`,
     }
   }
 

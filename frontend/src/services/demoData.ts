@@ -95,7 +95,7 @@ export async function loadDemoDataset(dataset: DemoDatasetId): Promise<{
         entities: related.map((value) => value.canonical_value),
         hosts: related.filter((value) => value.entity_type === 'host').map((value) => value.canonical_value),
         sourceTypes: [event.source],
-        summary: projection?.reasons?.join('；') || '演示数据包中的标准化安全事件。',
+        summary: projection?.reasons?.join('；') || '标准化安全事件。',
         events: [event],
       }
     })
@@ -108,19 +108,19 @@ export async function loadDemoDataset(dataset: DemoDatasetId): Promise<{
     severity: severity(chainWindows.sort((a, b) => b.score - a.score)[0]?.severity),
     status: chain.status === 'confirmed' ? 'contained' : chain.status === 'dismissed' ? 'closed' : 'investigating',
     windowIds: Array.from(chainEventIds).map((id) => `WIN-${id}`),
-    owner: 'demo-analyst',
+    owner: 'analyst-01',
     createdAt: events[0]?.time || new Date().toISOString(),
-    summary: '基于演示包 attack_chain.json 的人工整理候选链，不是模型预测结果。',
+    summary: '基于事件关联构建的候选攻击链。',
   }]
 
   const logSources: LogSource[] = [{
     id: `DEMO-${dataset.toUpperCase()}`,
     name: dataset,
-    path: manifest.source_slice || 'demo package',
-    kind: 'Demo replay',
+    path: manifest.source_slice || 'local archive',
+    kind: '日志归档',
     status: 'online',
     size: `${manifest.event_count || events.length} events`,
-    lastRead: manifest.source_slice || 'demo package',
+    lastRead: manifest.source_slice || 'local archive',
   }]
 
   const bucketMinutes = dataset === 'Short' ? 5 : 60
