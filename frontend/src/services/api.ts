@@ -552,26 +552,29 @@ function buildSubmittedCaseAnalysis(
   }
 }
 
-interface ProjectKnowledgeDocument {
+export interface ProjectKnowledgeDocument {
   document_id: string
   title: string
   content?: string
   chunk?: string
   knowledge_version?: string
+  tags?: string[]
+  scope?: string
+  retrieval_score?: number
 }
 
-interface ProjectKnowledgeSearchResult {
+export interface ProjectKnowledgeSearchResult {
   documents: ProjectKnowledgeDocument[]
   count: number
   retrieval: string
 }
 
-async function searchProjectKnowledge(query: string): Promise<ProjectKnowledgeSearchResult> {
+export async function searchProjectKnowledge(query: string): Promise<ProjectKnowledgeSearchResult> {
   return request<ProjectKnowledgeSearchResult>('/knowledge/search', {
     method: 'POST',
     body: JSON.stringify({
       query,
-      top_k: 3,
+      top_k: 5,
       scope: ['project', 'security', 'organization', 'historical_cases'],
     }),
   })

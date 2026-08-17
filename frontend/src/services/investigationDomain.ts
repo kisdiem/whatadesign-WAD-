@@ -295,11 +295,15 @@ export function buildFindings(
     const localScore = clamp(baseScore * 0.46 + contextDensity * 0.2 + sourceDiversity * 0.18 + entityDiversity * 0.16, 0.03, 0.96)
     const primaryRarity = entityRarity(primary, frequencies, windows.length)
     const longScore = clamp(baseScore * 0.28 + linkAggregate * 0.57 + primaryRarity * 0.15, 0.02, 0.96)
-    const risk = Math.round((
-      eventScore * RISK_FUSION_WEIGHTS.event
-      + localScore * RISK_FUSION_WEIGHTS.local
-      + longScore * RISK_FUSION_WEIGHTS.long
-    ) * 100)
+    // 综合风险 = M6 风险融合分数：实时上传数据直接用后端模块分数；
+    // 历史回放数据无 M6 分层，使用三层融合投影（连续、有区分度）。
+    const risk = window.moduleScores?.M6 !== undefined
+      ? Math.round(clamp(window.moduleScores.M6, 0, 1) * 100)
+      : Math.round((
+          eventScore * RISK_FUSION_WEIGHTS.event
+          + localScore * RISK_FUSION_WEIGHTS.local
+          + longScore * RISK_FUSION_WEIGHTS.long
+        ) * 100)
     const caseId = cases.find((item) => item.windowIds.includes(window.id))?.id
     const rarity = bestLink?.entityRarity ?? primaryRarity
     const compatibility = bestLink?.actionCompatibility ?? 0
@@ -456,6 +460,8 @@ export function initialCaseBoards(cases: Investigation[] = investigations) {
           : 'candidate'
         return
       }
+      // 自动关联链与人工整理链统一按证据强度分层：前 2 条为当前主链、
+      // 中间为候选、末尾为已排除。保证每条案件在主链/候选/排除三区都有内容。
       result[investigation.id][findingId] = index < 2 ? 'main' : index < 4 ? 'candidate' : 'excluded'
     })
     return result

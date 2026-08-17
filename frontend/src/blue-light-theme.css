@@ -168,6 +168,11 @@ body,
   color: var(--wad-text-secondary) !important;
 }
 
+.mc-workspace .ant-list-item,
+.mc-panel .ant-list-item {
+  color: #334155 !important;
+}
+
 .mc-summary-card .ant-statistic-content,
 .mc-workspace .ant-statistic-content,
 .mc-workspace .ant-progress-text,

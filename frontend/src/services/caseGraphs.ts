@@ -10,6 +10,9 @@ export type CaseGraphNode = {
   description?: string
   originalName?: string
   details?: string[]
+  tactic?: string
+  x?: number
+  y?: number
 }
 
 type AttackTechnique = {
@@ -46,6 +49,7 @@ const STORAGE_KEY = 'wad-demo-m3-graph-snapshots-v1'
 export const GRAPH_EXPLANATION_PROMPT = '解释安全图中的实体和事件关系：说清原始日志表示什么、关键字段如何拆解、关联实体扮演什么角色、边依据什么事实建立，以及哪些结论仍需核验；只使用给定日志事实，不把关联直接表述为已确认攻击。'
 
 function eventName(event: SecurityEvent) {
+  const raw = String(event.raw || event.action || '未归一化事件')
   const value = String(event.action || event.raw || '未归一化事件').replace(/^\S+\s+\S+\s+\S+\s+/, '').trim()
   if (/add .*shadow group/i.test(value)) return '加入 shadow 组'
   if (/useradd|new user|account create/i.test(value)) return '创建用户账户'
@@ -53,8 +57,31 @@ function eventName(event: SecurityEvent) {
   if (/session closed|logout/i.test(value)) return '登录会话结束'
   if (/failed password|authentication failure|login failed/i.test(value)) return '登录失败'
   if (/sudo|privilege/i.test(value)) return '权限使用或提升'
+  if (/starting\s+network\s+service/i.test(raw)) return '启动网络服务'
+  if (/reached target/i.test(raw)) return '系统服务目标就绪'
+  if (/metricbeat.*system\.network/i.test(raw)) return '采集网络指标'
+  if (/nodev after polling|after polling detection/i.test(raw)) return '设备轮询未发现'
+  if (/dns (query|request|lookup)|query.*dns/i.test(raw)) return 'DNS 查询'
+  if (/network[_ ]?(connect|connection)|outbound connection/i.test(raw)) return '建立网络连接'
+  if (/file (access|open|read)|sensitive file/i.test(raw)) return '访问文件'
+  if (/waf|request blocked|malicious request/i.test(raw)) return '拦截可疑请求'
   if (/command|exec|process/i.test(value)) return '执行命令或进程'
   return value.length > 34 ? `${value.slice(0, 34)}…` : value
+}
+
+function eventNodeName(event: SecurityEvent) {
+  const action = eventName(event)
+  const raw = String(event.raw || event.action || '')
+  const actor = event.actor
+    || raw.match(/(?:for user|user=|user\s+)([\w.@-]+)/i)?.[1]
+    || raw.match(/sudo:\s+([\w.@-]+)/i)?.[1]
+  const command = raw.match(/COMMAND=([^\s]+(?:\s+[^;|]+)?)/i)?.[1]?.trim()
+  const commandName = command?.split(/[\\/]/).pop()?.split(/\s+/)[0]
+  const participant = actor || commandName || event.process || event.ip
+  const label = participant && !action.toLowerCase().includes(participant.toLowerCase())
+    ? `${action} · ${participant}`
+    : action
+  return label.length > 28 ? `${label.slice(0, 28)}…` : label
 }
 
 function eventDescription(event: SecurityEvent) {
@@ -110,29 +137,9 @@ export function limitGraphExplanation(value: string) {
   return value
 }
 
-function base26(index: number) {
-  let value = Math.max(0, index)
-  let result = ''
-  do {
-    result = String.fromCharCode(65 + (value % 26)) + result
-    value = Math.floor(value / 26) - 1
-  } while (value >= 0)
-  return result
-}
-
-function monthOf(value: string) {
-  const match = value.match(/(\d{4})[-/](\d{1,2})/)
-  return match ? `${match[1]}-${match[2].padStart(2, '0')}` : 'unknown-month'
-}
-
 function compactEventNodeName(value: string) {
   const text = value.replace(/^\d+\.\s*/, '')
-  if (/add .*shadow group/i.test(text)) return '加入 shadow 组'
-  if (/useradd|new user|account create/i.test(text)) return '创建用户账户'
-  if (/session opened|login success|accepted password/i.test(text)) return '登录成功'
-  if (/session closed|logout/i.test(text)) return '登录会话结束'
-  if (/failed password|authentication failure|login failed/i.test(text)) return '登录失败'
-  return text.length > 34 ? `${text.slice(0, 34)}…` : text
+  return eventNodeName({ id: '', time: '', action: text, raw: text } as SecurityEvent)
 }
 
 function eventRelevanceScore(event: SecurityEvent, anchor: SecurityEvent, anchorTime: number) {
@@ -163,7 +170,7 @@ export function buildM3GraphSnapshot(finding: FindingRecord): M3GraphSnapshot {
   currentEvent.sort((left, right) => Date.parse(left.time) - Date.parse(right.time))
   const eventNodes: CaseGraphNode[] = currentEvent.map((event, index) => ({
     id: `${finding.id}:event:${event.id}`,
-    name: `${index + 1}. ${eventName(event)}`,
+    name: `${index + 1}. ${eventNodeName(event)}`,
     category: 0,
     kind: 'event',
     timestamp: event.time,
@@ -171,16 +178,14 @@ export function buildM3GraphSnapshot(finding: FindingRecord): M3GraphSnapshot {
     details: [`事件含义：${eventMeaning(event)}`, `事件时间：${event.time}`, `关联筛选分：${eventRelevanceScore(event, anchor || event, anchorTime).toFixed(2)}`, `原始日志：${event.raw || event.action || '暂无'}`],
   }))
   const entityNames = Array.from(new Set(currentEvent.flatMap((event) => [event.actor, event.host, event.process, event.ip].filter(Boolean) as string[])))
-  const month = monthOf(finding.start)
-  const nodeAlias = new Map([...currentEvent.map((event) => `${finding.id}:event:${event.id}`), ...entityNames.map((entity) => `${finding.id}:entity:${entity}`)].map((id, index) => [id, `${month}-${base26(index)}`]))
   const entityNodes: CaseGraphNode[] = entityNames.map((entity) => ({
     id: `${finding.id}:entity:${entity}`,
-    name: nodeAlias.get(`${finding.id}:entity:${entity}`) || entity,
+    name: entity,
     category: 1,
     kind: 'entity',
     originalName: entity,
-    description: `原始实体：${entity}。节点别名按 ${month} + 26 进制序号生成。`,
-    details: [`实体类型：安全事件参与者`, `出现月份：${month}`, `原始名称：${entity}`],
+    description: `安全事件中解析出的实体：${entity}。`,
+    details: ['实体类型：安全事件参与者', `原始名称：${entity}`],
   }))
   const links: CaseGraphLink[] = []
   currentEvent.forEach((event, index) => {
@@ -231,32 +236,29 @@ export function buildM3GraphSnapshot(finding: FindingRecord): M3GraphSnapshot {
       })
     }
   })
-  const normalizedEventNodes: CaseGraphNode[] = eventNodes.map((node) => ({ ...node, name: nodeAlias.get(node.id) || node.name, description: `${node.description || ''} 原始事件：${node.name}` }))
   return {
     findingId: finding.id,
     findingTitle: finding.title,
     start: finding.start,
     end: finding.end,
     windowLabel: `当前事件前后 30 分钟事实窗口 · ${finding.start}`,
-    nodes: normalizedEventNodes.concat(entityNodes),
+    nodes: eventNodes.concat(entityNodes),
     links: links.map((link) => link.explanation ? { ...link, explanation: limitGraphExplanation(link.explanation) } : link),
     savedAt: new Date().toISOString(),
   }
 }
 
 export function normalizeM3GraphSnapshot(snapshot: M3GraphSnapshot): M3GraphSnapshot {
-  const month = monthOf(snapshot.start)
-  const entities = snapshot.nodes.filter((node) => node.kind === 'entity')
-  const namedNodes = snapshot.nodes.filter((node) => node.kind === 'event' || node.kind === 'entity')
-  const aliases = new Map(namedNodes.map((node, index) => [node.id, `${month}-${base26(index)}`]))
   const nodes = snapshot.nodes.map((node) => {
     if (node.kind === 'event') {
       const rawDetail = node.details?.find((item) => item.startsWith('原始日志：') || item.startsWith('原始事件：'))
       const rawEvent = rawDetail?.replace(/^(原始日志|原始事件)：/, '') || compactEventNodeName(node.name)
       const meaning = node.details?.find((item) => item.startsWith('事件含义：')) || `事件含义：${eventMeaning({ id: node.id, time: node.timestamp || '', action: rawEvent, raw: rawEvent } as SecurityEvent)}`
+      const semanticName = eventNodeName({ id: node.id, time: node.timestamp || '', action: rawEvent, raw: rawEvent } as SecurityEvent)
       return {
         ...node,
-        name: aliases.get(node.id) || node.name,
+        name: semanticName,
+        description: node.description?.replace(/\s*原始事件：.*$/, '') || `事件摘要：${semanticName}`,
         details: [meaning, `事件时间：${node.timestamp || '未知'}`, rawDetail || `原始日志：${rawEvent}`],
       }
     }
@@ -264,10 +266,10 @@ export function normalizeM3GraphSnapshot(snapshot: M3GraphSnapshot): M3GraphSnap
     const original = node.description?.match(/^原始实体：([^。]+)/)?.[1] || node.name
     return {
       ...node,
-      name: aliases.get(node.id) || node.name,
+      name: original,
       originalName: original,
-      description: `原始实体：${original}。节点别名按 ${month} + 26 进制序号生成。`,
-      details: node.details || [`实体类型：安全事件参与者`, `出现月份：${month}`, `原始名称：${original}`],
+      description: `安全事件中解析出的实体：${original}。`,
+      details: [`实体类型：安全事件参与者`, `原始名称：${original}`],
     }
   })
   const nodeById = new Map(nodes.map((node) => [node.id, node]))
@@ -395,16 +397,20 @@ function attackEventDetails(finding: FindingRecord, event: SecurityEvent, techni
 }
 
 /**
- * ATT&CK 图只表达 24 小时内可由事实串联的技术证据。
+ * ATT&CK 图只表达指定窗口（默认 24 小时）内可由事实串联的技术证据。
+ * 窗口由数据集语义决定：Short 短时突发用 24 小时、Long 长程关联覆盖 7 天，
+ * 使长程链包含更多阶段技术、链路自然更长。
  * M3 仍然负责单个当前事件之前 30 分钟的事实图；这里不再把窗口伪装成技术节点。
  */
-export function buildAttackChainGraph(findings: FindingRecord[]): { nodes: CaseGraphNode[]; links: CaseGraphLink[] } {
+export function buildAttackChainGraph(findings: FindingRecord[], options?: { windowHours?: number }): { nodes: CaseGraphNode[]; links: CaseGraphLink[] } {
   const allEvents = findings.flatMap((finding) => (Array.isArray(finding.events) ? finding.events.map((event) => ({ finding, event })) : []))
   const uniqueEvents = Array.from(new Map(allEvents.map((item) => [`${item.finding.id}:${item.event.id}`, item])).values())
   const timestamps = uniqueEvents.map(({ event }) => Date.parse(event.time)).filter(Number.isFinite)
   if (!timestamps.length) return { nodes: [], links: [] }
+  const windowHours = options?.windowHours ?? 24
+  const windowLabel = windowHours >= 168 ? '7天' : windowHours >= 72 ? '3天' : '24小时'
   const endTime = Math.max(...timestamps)
-  const startTime = endTime - 24 * 60 * 60 * 1000
+  const startTime = endTime - windowHours * 60 * 60 * 1000
   const scoped = uniqueEvents
     .filter(({ event }) => {
       const time = Date.parse(event.time)
@@ -430,6 +436,7 @@ export function buildAttackChainGraph(findings: FindingRecord[]): { nodes: CaseG
       name: `${first.technique.id} ${first.technique.name}`,
       category: index === 0 ? 0 : 1,
       kind: 'technique',
+      tactic: first.technique.tactic,
       timestamp: first.event.time,
       description: `${first.technique.tactic} · 24小时内 ${items.length} 条证据 · ${times[0]} 至 ${times[times.length - 1]}`,
       details: [
@@ -447,6 +454,8 @@ export function buildAttackChainGraph(findings: FindingRecord[]): { nodes: CaseG
   const orderedTechniques = Array.from(techniqueEvents.entries())
     .map(([id, items]) => ({ id, items, firstTime: Math.min(...items.map((item) => Date.parse(item.event.time))) }))
     .sort((left, right) => left.firstTime - right.firstTime)
+  // 通用进程名不算有区分度的共享实体，避免解释出现 "sudo、bash" 这类噪音。
+  const ENTITY_NOISE = /^(sudo|bash|sh|zsh|nologin|sshd|systemd)$/i
   for (let index = 1; index < orderedTechniques.length; index += 1) {
     const previous = orderedTechniques[index - 1]
     const current = orderedTechniques[index]
@@ -454,20 +463,127 @@ export function buildAttackChainGraph(findings: FindingRecord[]): { nodes: CaseG
     const currentEvent = current.items[0]
     const shared = Array.from(new Set([
       previousEvent.event.actor, previousEvent.event.host, previousEvent.event.process, previousEvent.event.ip,
-    ].filter(Boolean))).filter((entity) => [currentEvent.event.actor, currentEvent.event.host, currentEvent.event.process, currentEvent.event.ip].includes(entity))
-    const gap = Math.max(0, Date.parse(currentEvent.event.time) - Date.parse(previousEvent.event.time)) / 1000
+    ].filter((entity): entity is string => Boolean(entity)))).filter((entity) => [currentEvent.event.actor, currentEvent.event.host, currentEvent.event.process, currentEvent.event.ip].includes(entity) && !ENTITY_NOISE.test(entity))
+    const gap = (Date.parse(currentEvent.event.time) - Date.parse(previousEvent.event.time)) / 1000
+    const overlap = gap < 0
+    const gapMinutes = Math.round(Math.abs(gap) / 60)
+    const gapText = overlap ? '时间重叠'
+      : gapMinutes >= 1440 ? `${Math.round(gapMinutes / 1440)}d`
+      : gapMinutes >= 60 ? `${Math.round(gapMinutes / 60)}h`
+      : `${gapMinutes}m`
     const sourceName = `${previousEvent.technique.id} ${previousEvent.technique.name}`
     const targetName = `${currentEvent.technique.id} ${currentEvent.technique.name}`
+    const sharedEntity = shared[0] || ''
+    const entityType = /^(\d{1,3}\.){3}\d{1,3}$/.test(sharedEntity) ? 'IP'
+      : /server|host|workstation|desktop/i.test(sharedEntity) ? '主机'
+      : '账号'
+    const prevTime = formatEvidenceTime(previousEvent.event.time)
+    const currTime = formatEvidenceTime(currentEvent.event.time)
+    const gapInfo = overlap ? '技术时间范围重叠' : `时间间隔 ${gapText}`
     links.push({
       source: `attack-technique:${previous.id}`,
       target: `attack-technique:${current.id}`,
-      relation: shared.length ? '共享实体的技术先后关系' : '24小时内技术先后关系',
-      label: shared.length ? '实体支撑' : '时间顺序',
+      relation: shared.length ? '共享实体的技术先后关系' : `${windowLabel}内技术先后关系`,
+      label: shared.length ? `同一${entityType} · ${sharedEntity}` : (overlap ? '时间重叠' : `间隔 · ${gapText}`),
       weight: shared.length ? 1 : 0.72,
-      evidence: `${previousEvent.event.time} ${sourceName}；${currentEvent.event.time} ${targetName}；时间间隔 ${Math.round(gap / 60)} 分钟${shared.length ? `；共享实体：${shared.join('、')}` : ''}`,
-      explanation: `前序技术“${sourceName}”在 ${previousEvent.event.time} 出现，后续技术“${targetName}”在 ${currentEvent.event.time} 出现。${shared.length ? `两者共享实体 ${shared.join('、')}，因此具备更强的事件连续性。` : '两者仅依据 24 小时内的时间顺序连接，仍需核对实体和原始日志。'}该边表示 ATT&CK 技术证据的可能发展顺序，不代表已经确认攻击链。`,
+      evidence: `${prevTime} ${sourceName}；${currTime} ${targetName}；${gapInfo}${shared.length ? `；共享实体：${shared.join('、')}` : ''}`,
+      explanation: `前序技术“${sourceName}”在 ${prevTime} 出现，后续技术“${targetName}”在 ${currTime} 出现，${gapInfo.toLowerCase() === '时间重叠' ? '两者时间范围有重叠' : `两者相隔 ${gapText}`}。${shared.length ? `两者共享实体 ${shared.join('、')}，因此具备更强的事件连续性。` : `两者仅依据 ${windowLabel} 内的时间顺序连接，仍需核对实体和原始日志。`}该边表示 ATT&CK 技术证据的可能发展顺序，不代表已经确认攻击链。`,
       boundary: '技术映射来自日志行为规则和当前演示数据；必须结合原始日志、实体上下文和授权情况进行人工确认。',
     })
   }
   return { nodes, links }
+}
+
+function formatEvidenceTime(value: string) {
+  const date = new Date(value)
+  if (!Number.isFinite(date.getTime())) return value
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+}
+
+/**
+ * ATT&CK 攻击链图布局：采用轻量力导向模拟让节点自然散开——
+ * 相邻技术按时间顺序被边牵引，无直接关联的节点互相排斥，
+ * 保留"时间从左到右推进"的流向感，同时避免整齐的行列排布。
+ * 返回的坐标作为默认布局，用户拖拽后的位置会覆盖默认值。
+ */
+const LAYOUT_WIDTH = 1000
+const LAYOUT_HEIGHT = 640
+const LAYOUT_ITERATIONS = 260
+const REST_LENGTH = 200
+const REPULSION_STRENGTH = 5200
+const INITIAL_JITTER = 360
+const CENTER_Y = LAYOUT_HEIGHT / 2
+
+function layoutHash(value: string) {
+  return value.split('').reduce((sum, ch) => (sum * 31 + ch.charCodeAt(0)) % 100000, 0)
+}
+
+export function layoutAttackChainByTactic(
+  nodes: CaseGraphNode[],
+  links: CaseGraphLink[],
+): { nodes: Array<CaseGraphNode & { x: number; y: number }>; links: CaseGraphLink[] } {
+  if (!nodes.length) return { nodes: [], links }
+  const sorted = [...nodes].sort((left, right) => Date.parse(left.timestamp || '') - Date.parse(right.timestamp || ''))
+  const positions = new Map<string, { x: number; y: number; vx: number; vy: number }>()
+  sorted.forEach((node, index) => {
+    const x = 90 + ((LAYOUT_WIDTH - 180) * index) / Math.max(1, sorted.length - 1)
+    const jitter = (((layoutHash(node.id) % 1000) / 1000) - 0.5) * INITIAL_JITTER
+    positions.set(node.id, { x, y: CENTER_Y + jitter, vx: 0, vy: 0 })
+  })
+
+  for (let iteration = 0; iteration < LAYOUT_ITERATIONS; iteration += 1) {
+    const items = Array.from(positions.entries())
+    // 排斥力：无关联节点互相推开，形成自然散布
+    for (let i = 0; i < items.length; i += 1) {
+      const [, p] = items[i]
+      for (let j = i + 1; j < items.length; j += 1) {
+        const [, p2] = items[j]
+        const dx = p.x - p2.x
+        const dy = p.y - p2.y
+        const squared = dx * dx + dy * dy + 1
+        const distance = Math.sqrt(squared)
+        const force = REPULSION_STRENGTH / squared
+        p.vx += (dx / distance) * force
+        p.vy += (dy / distance) * force
+        p2.vx -= (dx / distance) * force
+        p2.vy -= (dy / distance) * force
+      }
+    }
+    // 弹簧力：相邻技术被边牵引，维持时间先后次序
+    for (const link of links) {
+      const a = positions.get(String(link.source))
+      const b = positions.get(String(link.target))
+      if (!a || !b) continue
+      const dx = b.x - a.x
+      const dy = b.y - a.y
+      const distance = Math.sqrt(dx * dx + dy * dy) || 1
+      const force = (distance - REST_LENGTH) * 0.045
+      a.vx += (dx / distance) * force
+      a.vy += (dy / distance) * force
+      b.vx -= (dx / distance) * force
+      b.vy -= (dy / distance) * force
+    }
+    // 热扰动：前期引入随机摆动，避免节点收敛成一条直线，随迭代逐渐冷却
+    const heat = 1 - iteration / LAYOUT_ITERATIONS
+    for (const p of positions.values()) {
+      p.vx += (Math.random() - 0.5) * 18 * heat
+      p.vy += (Math.random() - 0.5) * 18 * heat
+    }
+    // 位置更新与边界约束
+    for (const p of positions.values()) {
+      p.x += p.vx * 0.4
+      p.y += p.vy * 0.4
+      p.x = Math.max(46, Math.min(LAYOUT_WIDTH - 46, p.x))
+      p.y = Math.max(46, Math.min(LAYOUT_HEIGHT - 46, p.y))
+      p.vx *= 0.86
+      p.vy *= 0.86
+    }
+  }
+
+  const laidOut: Array<CaseGraphNode & { x: number; y: number }> = sorted.map((node) => {
+    const position = positions.get(node.id)!
+    return { ...node, x: Math.round(position.x), y: Math.round(position.y) }
+  })
+  return { nodes: laidOut, links }
 }

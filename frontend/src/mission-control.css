@@ -410,6 +410,21 @@ body,
   cursor: pointer;
 }
 
+.mc-investigation-list .ant-list-item-meta {
+  min-width: 0;
+}
+
+.mc-investigation-list .ant-list-item-meta-title {
+  white-space: normal;
+  line-height: 1.4;
+  margin-bottom: 3px;
+}
+
+.mc-investigation-list .ant-segmented-item-label {
+  white-space: normal;
+  line-height: 1.3;
+}
+
 .mc-investigation-list .ant-list-item:hover,
 .mc-investigation-list .ant-list-item.active {
   background: rgba(64, 123, 255, 0.12);
@@ -654,6 +669,18 @@ body,
 
 .mc-chat-bubble .ant-typography {
   margin-bottom: 0 !important;
+}
+
+.mc-kb-card {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid #27384d;
+  border-radius: 8px;
+  background: #1a2738;
+}
+
+.mc-kb-card .ant-typography {
+  color: #b9c9da;
 }
 
 .mc-assistant-answer {
@@ -1029,32 +1056,27 @@ body,
   display: block;
   width: 100%;
   max-width: 100%;
-  height: clamp(320px, 42vw, 520px) !important;
   border-radius: 8px;
   user-select: none;
   touch-action: none;
 }
 
 @media (max-width: 768px) {
-  .mc-content {
-    padding: 12px 10px 24px;
-  }
+    .mc-content {
+      padding: 12px 10px 24px;
+    }
 
-  .mc-sidebar {
-    position: fixed !important;
-    z-index: 40;
-  }
+    .mc-sidebar {
+      position: fixed !important;
+      z-index: 40;
+    }
 
-  .mc-topbar {
-    height: auto;
-    min-height: 56px;
-    padding-block: 8px;
+    .mc-topbar {
+      height: auto;
+      min-height: 56px;
+      padding-block: 8px;
+    }
   }
-
-  .mc-interactive-case-graph {
-    height: clamp(300px, 78vw, 420px) !important;
-  }
-}
 
 .mc-interactive-case-graph-wrap {
   position: relative;
@@ -1093,4 +1115,40 @@ body,
 
 .mc-interactive-case-graph text {
   pointer-events: none;
+}
+
+.mc-graph-edge-tip {
+  position: fixed;
+  z-index: 30;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.14);
+  color: #334155;
+  font-size: 12px;
+  line-height: 1.5;
+  pointer-events: none;
+}
+
+.mc-graph-edge-tip strong {
+  color: #1e293b;
+  font-size: 12px;
+}
+
+.mc-help-trigger {
+  border: none;
+  background: transparent;
+  padding: 2px;
+  line-height: 1;
+  color: #a7b7cc;
+  cursor: pointer;
+}
+
+.mc-help-trigger:hover {
+  color: #77a6e8;
 }

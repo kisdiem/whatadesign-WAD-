@@ -21,6 +21,7 @@ export interface AnomalyWindow {
   title: string
   severity: Severity
   score: number
+  moduleScores?: Partial<Record<'M0' | 'M1' | 'M2' | 'M3' | 'M4' | 'M5' | 'M6', number>>
   start: string
   end: string
   status: WindowStatus
@@ -37,6 +38,11 @@ export interface Investigation {
   title: string
   severity: Severity
   status: 'investigating' | 'contained' | 'closed'
+  queueStatus?: 'auto_observe' | 'manual_review' | 'resolved' | 'suppressed' | 'merged'
+  escalationScore?: number
+  escalationReasons?: string[]
+  decisionSource?: 'system' | 'analyst'
+  decisionAt?: string
   windowIds: string[]
   owner: string
   createdAt: string
