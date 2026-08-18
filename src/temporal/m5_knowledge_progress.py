@@ -15,6 +15,7 @@ class M5KnowledgeConfig:
     vocab_size: int = 32768
     max_seq_len: int = 192
     d_model: int = 128
+    semantic_input_dim: int | None = None
     num_heads: int = 4
     encoder_layers: int = 2
     feedforward_dim: int = 256
@@ -144,6 +145,11 @@ class M5KnowledgeProgressTransformer(nn.Module):
         self.config = config or M5KnowledgeConfig()
         c = self.config
         self.token_embedding = nn.Embedding(c.vocab_size, c.d_model)
+        self.semantic_projection = (
+            nn.Linear(c.semantic_input_dim, c.d_model)
+            if c.semantic_input_dim is not None and c.semantic_input_dim != c.d_model
+            else nn.Identity()
+        )
         self.position_embedding = nn.Embedding(c.max_seq_len, c.d_model)
         layer = nn.TransformerEncoderLayer(
             d_model=c.d_model,
@@ -175,19 +181,33 @@ class M5KnowledgeProgressTransformer(nn.Module):
         weights = mask.to(values.dtype).unsqueeze(-1)
         return (values * weights).sum(dim=1) / weights.sum(dim=1).clamp_min(1.0)
 
-    def encode_log_tokens(self, token_ids: Tensor, attention_mask: Tensor) -> tuple[Tensor, Tensor]:
+    def encode_log_tokens(
+        self,
+        token_ids: Tensor,
+        attention_mask: Tensor,
+        semantic_token_states: Tensor | None = None,
+    ) -> tuple[Tensor, Tensor]:
         if token_ids.ndim != 2 or attention_mask.shape != token_ids.shape:
             raise ValueError("token_ids and attention_mask must have shape [batch, seq_len]")
         batch, seq_len = token_ids.shape
         if seq_len == 0 or seq_len > self.config.max_seq_len:
             raise ValueError("seq_len must be between 1 and max_seq_len")
-        if torch.any((token_ids < 0) | (token_ids >= self.config.vocab_size)):
+        if semantic_token_states is None and torch.any((token_ids < 0) | (token_ids >= self.config.vocab_size)):
             raise ValueError("token_ids contain values outside configured vocabulary")
         mask = attention_mask.bool()
         if not torch.all(mask.any(dim=1)):
             raise ValueError("every log must contain at least one unmasked token")
         positions = torch.arange(seq_len, device=token_ids.device).unsqueeze(0).expand(batch, -1)
-        hidden = self.token_embedding(token_ids) + self.position_embedding(positions)
+        if semantic_token_states is None:
+            hidden = self.token_embedding(token_ids)
+        else:
+            expected_dim = self.config.semantic_input_dim or self.config.d_model
+            if semantic_token_states.shape != (batch, seq_len, expected_dim):
+                raise ValueError(
+                    "semantic_token_states must have shape [batch, seq_len, semantic_input_dim]"
+                )
+            hidden = self.semantic_projection(semantic_token_states.to(dtype=self.position_embedding.weight.dtype))
+        hidden = hidden + self.position_embedding(positions)
         hidden = self.self_encoder(hidden, src_key_padding_mask=~mask)
         return hidden, self._masked_mean(hidden, mask)
 
@@ -236,9 +256,12 @@ class M5KnowledgeProgressTransformer(nn.Module):
         knowledge: AttackKnowledgeIndex,
         *,
         allowed_knowledge_mask: Tensor | None = None,
+        semantic_token_states: Tensor | None = None,
     ) -> dict[str, Tensor]:
         c = self.config
-        token_hidden, token_pool = self.encode_log_tokens(token_ids, attention_mask)
+        token_hidden, token_pool = self.encode_log_tokens(
+            token_ids, attention_mask, semantic_token_states=semantic_token_states
+        )
         retrieved_scores, retrieved_indices = self._retrieve(token_pool, knowledge, allowed_knowledge_mask)
 
         knowledge_embeddings = knowledge.embeddings.to(device=token_hidden.device, dtype=token_hidden.dtype)
