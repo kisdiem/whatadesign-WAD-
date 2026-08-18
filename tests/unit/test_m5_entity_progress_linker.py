@@ -38,11 +38,15 @@ def _event(
 
 
 def _linker(**kwargs) -> M5EntityProgressLinker:
-    return M5EntityProgressLinker(M5LongHorizonProgressConfig(
-        embedding_dim=8,
-        link_threshold=0.55,
-        **kwargs,
-    ))
+    return M5EntityProgressLinker(
+        M5LongHorizonProgressConfig(
+            embedding_dim=8,
+            num_positions=6,
+            local_window_minutes=15,
+            link_threshold=0.55,
+            **kwargs,
+        )
+    )
 
 
 def test_entity_memory_retrieves_only_shared_historical_candidates():
@@ -79,6 +83,20 @@ def test_progress_order_is_soft_not_hard():
     assert 0.0 < large["progress"] < 0.1
 
 
+def test_attack_transition_is_distribution_compatibility_not_expected_position():
+    memory = PersistentEntityMemory()
+    linker = _linker()
+    source = _event("source", 1, progress=0.4, position=3)
+    forward = _event("forward", 2, progress=0.5, position=4)
+    reverse = _event("reverse", 2, progress=0.5, position=0)
+
+    forward_evidence, _ = linker.evidence(source, forward, memory)
+    reverse_evidence, _ = linker.evidence(source, reverse, memory)
+
+    assert forward_evidence["transition"] > reverse_evidence["transition"]
+    assert reverse_evidence["transition"] > 0.0
+
+
 def test_ip_only_match_is_not_enough_to_create_long_horizon_edge():
     memory = PersistentEntityMemory()
     linker = _linker()
@@ -113,3 +131,29 @@ def test_low_relevance_event_is_not_linked_even_with_shared_entities():
     target = _event("target", 2, progress=0.5, relevance=0.1)
 
     assert linker.score_pair(source, target, memory) is None
+
+
+def test_supervised_link_loss_updates_learned_scorer_and_transition_matrix():
+    torch.manual_seed(3)
+    memory = PersistentEntityMemory()
+    linker = _linker(link_threshold=0.50)
+    source = _event("source", 1, progress=0.2, position=1)
+    positive = _event("positive", 3, progress=0.5, position=2)
+    negative = _event("negative", 4, progress=0.1, position=5)
+    memory.add(source)
+
+    optimizer = torch.optim.AdamW(linker.parameters(), lr=1e-2)
+    before_weights = linker.scorer.feature_logits.detach().clone()
+    before_transition = linker.transition_model.transition_logits.detach().clone()
+    loss = linker.supervised_link_loss(
+        [(source, positive), (source, negative)],
+        torch.tensor([1.0, 0.0]),
+        memory,
+    )
+    optimizer.zero_grad(set_to_none=True)
+    loss.backward()
+    optimizer.step()
+
+    assert torch.isfinite(loss)
+    assert not torch.equal(before_weights, linker.scorer.feature_logits.detach())
+    assert not torch.equal(before_transition, linker.transition_model.transition_logits.detach())
