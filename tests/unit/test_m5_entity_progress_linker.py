@@ -136,7 +136,7 @@ def test_low_relevance_event_is_not_linked_even_with_shared_entities():
 def test_supervised_link_loss_updates_learned_scorer_and_transition_matrix():
     torch.manual_seed(3)
     memory = PersistentEntityMemory()
-    linker = _linker(link_threshold=0.50)
+    linker = _linker()
     source = _event("source", 1, progress=0.2, position=1)
     positive = _event("positive", 3, progress=0.5, position=2)
     negative = _event("negative", 4, progress=0.1, position=5)
