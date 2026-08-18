@@ -19,30 +19,23 @@ def _knowledge(count=32, d_model=16, num_positions=6):
         positions[index, index % num_positions] = 1.0
         if index % 5 == 0:
             positions[index, (index + 1) % num_positions] = 1.0
-    return AttackKnowledgeIndex(
-        embeddings,
-        positions,
-        progress,
-        tuple(f"k{index}" for index in range(count)),
-    )
+    return AttackKnowledgeIndex(embeddings, positions, progress, tuple(f"k{index}" for index in range(count)))
 
 
 def _model(top_k=8):
-    return M5KnowledgeProgressTransformer(
-        M5KnowledgeConfig(
-            vocab_size=128,
-            max_seq_len=16,
-            d_model=16,
-            num_heads=4,
-            encoder_layers=1,
-            feedforward_dim=32,
-            dropout=0.0,
-            num_positions=6,
-            knowledge_top_k=top_k,
-            knowledge_candidate_cap=64,
-            broad_attack_threshold=0.35,
-        )
-    )
+    return M5KnowledgeProgressTransformer(M5KnowledgeConfig(
+        vocab_size=128,
+        max_seq_len=16,
+        d_model=16,
+        num_heads=4,
+        encoder_layers=1,
+        feedforward_dim=32,
+        dropout=0.0,
+        num_positions=6,
+        knowledge_top_k=top_k,
+        knowledge_candidate_cap=64,
+        broad_attack_threshold=0.35,
+    ))
 
 
 def test_m5_outputs_joint_relevance_positions_and_progress():
@@ -60,11 +53,7 @@ def test_m5_outputs_joint_relevance_positions_and_progress():
 
 def test_m5_retrieval_caps_cross_attention_to_top_k():
     model = _model(top_k=4)
-    output = model(
-        torch.tensor([[1, 2, 3]]),
-        torch.ones(1, 3, dtype=torch.long),
-        _knowledge(count=50),
-    )
+    output = model(torch.tensor([[1, 2, 3]]), torch.ones(1, 3, dtype=torch.long), _knowledge(count=50))
     assert output["retrieved_indices"].shape == (1, 4)
     assert output["retrieved_scores"].shape == (1, 4)
 
@@ -74,12 +63,7 @@ def test_m5_allowed_mask_can_exclude_target_scenario_knowledge():
     knowledge = _knowledge(count=12)
     allowed = torch.ones(1, 12, dtype=torch.bool)
     allowed[:, :7] = False
-    output = model(
-        torch.tensor([[1, 2, 3]]),
-        torch.ones(1, 3, dtype=torch.long),
-        knowledge,
-        allowed_knowledge_mask=allowed,
-    )
+    output = model(torch.tensor([[1, 2, 3]]), torch.ones(1, 3, dtype=torch.long), knowledge, allowed_knowledge_mask=allowed)
     assert torch.all(output["retrieved_indices"] >= 7)
 
 
@@ -98,13 +82,11 @@ def test_m5_train_step_smoke_has_finite_loss_and_updates_parameters():
         token_ids=torch.tensor([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 0]]),
         attention_mask=torch.tensor([[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 0]]),
         attack_targets=torch.tensor([1.0, 1.0, 0.0]),
-        position_targets=torch.stack(
-            [
-                multilabel_position_target([1, 2], 6),
-                multilabel_position_target([3, 4], 6),
-                multilabel_position_target([], 6),
-            ]
-        ),
+        position_targets=torch.stack([
+            multilabel_position_target([1, 2], 6),
+            multilabel_position_target([3, 4], 6),
+            multilabel_position_target([], 6),
+        ]),
         progress_targets=torch.tensor([0.25, 0.75, 0.0]),
         progress_mask=torch.tensor([True, True, False]),
         ranking_pairs=torch.tensor([[0, 1]]),
@@ -122,12 +104,21 @@ def test_m5_rejects_unbounded_full_database_input():
     model = _model(top_k=8)
     too_large = _knowledge(count=65)
     try:
-        model(
-            torch.tensor([[1, 2, 3]]),
-            torch.ones(1, 3, dtype=torch.long),
-            too_large,
-        )
+        model(torch.tensor([[1, 2, 3]]), torch.ones(1, 3, dtype=torch.long), too_large)
     except ValueError as exc:
         assert "prefilter" in str(exc)
     else:
         raise AssertionError("M5 must require external candidate prefiltering")
+
+
+def test_m5_accepts_pretrained_word_level_semantic_states():
+    model = M5KnowledgeProgressTransformer(M5KnowledgeConfig(
+        vocab_size=128, max_seq_len=8, d_model=16, semantic_input_dim=24,
+        num_heads=4, encoder_layers=1, feedforward_dim=32, dropout=0.0,
+        num_positions=6, knowledge_top_k=4, knowledge_candidate_cap=64,
+    ))
+    token_ids = torch.tensor([[1, 2, 3, 0]])
+    mask = torch.tensor([[1, 1, 1, 0]])
+    semantic_states = torch.randn(1, 4, 24)
+    output = model(token_ids, mask, _knowledge(count=8), semantic_token_states=semantic_states)
+    assert output["progress_score"].shape == (1,)
