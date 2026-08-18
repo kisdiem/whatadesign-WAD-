@@ -130,14 +130,18 @@ class M5LossConfig:
 
 
 class M5KnowledgeProgressTransformer(nn.Module):
-    """Single-log semantic Transformer with external-knowledge cross attention.
+    """Local semantic/progress estimator with external-knowledge cross attention.
 
     Self-attention runs over word/subword token states of the current log only.
     External ATT&CK/attack-chain knowledge is first Top-K retrieved, then used as
     K/V in cross attention. The model jointly outputs:
       1) broad attack relevance probability;
       2) multi-label attack-chain position probabilities;
-      3) continuous progress score in [0, 1].
+      3) continuous progress score in [0, 1];
+      4) fused semantic embedding for the long-horizon entity-memory linker.
+
+    This module does not itself solve multi-hour/day linking. Long-range recall is
+    handled by PersistentEntityMemory and M5EntityProgressLinker.
     """
 
     def __init__(self, config: M5KnowledgeConfig | None = None) -> None:
@@ -292,6 +296,7 @@ class M5KnowledgeProgressTransformer(nn.Module):
         position_probabilities = torch.sigmoid(position_logits)
 
         return {
+            "semantic_embedding": fused_pool,
             "relevance_logit": relevance_logit,
             "relevance_probability": relevance_probability,
             "attack_candidate": relevance_probability >= c.broad_attack_threshold,
