@@ -18,10 +18,10 @@ export default function EvaluationPage({ findings, cases, caseBoards, rawEvents 
 
   return (
     <>
-      <PageTitle title="评估" subtitle="基于独立标签文件与消融实验生成的检测评估结果。" />
+      <PageTitle title="评估" subtitle="基于独立标签文件生成的检测评估结果。" />
       <Card style={{ marginBottom: 12 }}>
         <Space direction="vertical" size={6} style={{ width: '100%' }}>
-          <Space size={6}><Badge status="success" /> 评测指标在检测结果落盘后由独立标签文件生成，覆盖召回率、误报率与模块消融分析。</Space>
+          <Space size={6}><Badge status="success" /> 评测指标在检测结果落盘后由独立标签文件生成，覆盖召回率与误报率。</Space>
           <Text type="secondary">真实攻击标签不进入检测主流程：系统先独立生成预测、发现与攻击链，结果落盘后评测程序才读取真实标签计算指标，从而避免标签泄漏。</Text>
         </Space>
       </Card>
@@ -33,29 +33,7 @@ export default function EvaluationPage({ findings, cases, caseBoards, rawEvents 
         ))}
       </Row>
       <Row gutter={[12, 12]} style={{ marginTop: 4 }}>
-        <Col xs={24} xl={16}>
-          <Card title={<HelpTitle title="消融实验" description="逐模块移除后对比指标下降，量化三项核心创新各自的贡献：实体关系联合建模、长周期攻击链关联、多尺度上下文检索。" />} className="mc-panel">
-            <Table
-              rowKey="variant"
-              size="small"
-              pagination={false}
-              columns={[
-                { title: '版本', dataIndex: 'variant', key: 'variant' },
-                { title: 'Recall@1%FPR', dataIndex: 'recall', key: 'recall' },
-                { title: 'Link F1', dataIndex: 'linkF1', key: 'linkF1' },
-                { title: '3-day Chain Recovery', dataIndex: 'chainRecovery', key: 'chainRecovery' },
-              ]}
-              dataSource={[
-                { variant: 'Full System', recall: '81.0%', linkF1: '78.8%', chainRecovery: '72.6%' },
-                { variant: 'w/o Entity Resolution', recall: '76.3%', linkF1: '61.9%', chainRecovery: '54.8%' },
-                { variant: 'w/o M4 Q-Former', recall: '79.1%', linkF1: '70.4%', chainRecovery: '60.7%' },
-                { variant: 'w/o M5 Long-term', recall: '80.4%', linkF1: '58.3%', chainRecovery: '41.2%' },
-                { variant: 'w/o Baseline / Rarity', recall: '78.6%', linkF1: '64.1%', chainRecovery: '55.9%' },
-              ]}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} xl={8}>
+        <Col xs={24} xl={24}>
           <Card title={<HelpTitle title="错误案例分析" description="系统会解释误报来源，避免把稀有性和异常性直接等同于恶意。" />} className="mc-panel">
             <Text type="secondary">典型误报：稀有账号在非工作时间访问文件服务器确实异常，但存在已批准维护工单时，就应由人工排除。</Text>
             <Space size={[4, 6]} wrap style={{ marginTop: 10 }}>

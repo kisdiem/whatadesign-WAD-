@@ -8,10 +8,16 @@
     "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.syslog.log"
   ],
   "source_slice": "2022-01-24T13:30:00Z/2022-01-24T14:00:00Z",
-  "event_count": 2570,
+  "event_count": 2749,
   "sha256_events_log": "01efaf2b3aaeada88045c3d2391acd18598da76e0b093aaeb770c786561c7f04",
   "contains_labels": false,
   "contains_facts_json": false,
   "preserves_real_source_timestamps": true,
-  "generated_at": "2026-08-15T19:38:38.319022Z"
+  "generated_at": "2026-08-15T19:38:38.319022Z",
+  "diversified": true,
+  "injected_high_signal_events": 16,
+  "diversified_windows": 281,
+  "diversified_at": "2026-08-18T06:17:58.031118Z",
+  "cross_source_injected": true,
+  "cross_source_injected_at": "2026-08-18"
 }

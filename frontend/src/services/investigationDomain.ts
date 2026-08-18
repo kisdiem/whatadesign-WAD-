@@ -264,10 +264,12 @@ function deriveReasons(window: AnomalyWindow, sharedCount: number) {
   return Array.from(new Set(reasons))
 }
 
-export function buildFindings(
+// 计算除案件归属（caseId）外的全部证据字段：实体稀有度、三层分数、M5 关联依据、
+// 远程候选等。这部分只依赖窗口数据，是 O(n²) 的关联分析；案件编辑（插入/排除节点）
+// 不会改变这些字段，因此应由调用方独立缓存，避免每次拖拽节点都全量重算。
+export function buildFindingEvidence(
   windows: AnomalyWindow[] = anomalyWindows,
-  cases: Investigation[] = investigations,
-) {
+): FindingRecord[] {
   const frequencies = entityFrequency(windows)
   return windows.map<FindingRecord>((window) => {
     const peers = windows.filter((item) => item.id !== window.id && intersect(item.entities, window.entities).length > 0)
@@ -304,7 +306,6 @@ export function buildFindings(
           + localScore * RISK_FUSION_WEIGHTS.local
           + longScore * RISK_FUSION_WEIGHTS.long
         ) * 100)
-    const caseId = cases.find((item) => item.windowIds.includes(window.id))?.id
     const rarity = bestLink?.entityRarity ?? primaryRarity
     const compatibility = bestLink?.actionCompatibility ?? 0
     const graphSimilarity = bestLink?.graphSimilarity ?? 0
@@ -313,7 +314,7 @@ export function buildFindings(
 
     return {
       id: window.id,
-      caseId,
+      caseId: undefined,
       title: window.title,
       severity: window.severity,
       status: window.status,
@@ -355,6 +356,26 @@ export function buildFindings(
       },
     }
   })
+}
+
+// 轻量地为每条 finding 补上案件归属（caseId）：O(n·m)，只随案件列表变化而重算。
+// 与 buildFindingEvidence 拆分，使重计算（关联证据）与轻计算（归属）解耦。
+export function attachCaseIds(
+  findings: FindingRecord[],
+  cases: Investigation[] = investigations,
+): FindingRecord[] {
+  return findings.map((finding) => ({
+    ...finding,
+    caseId: cases.find((item) => item.windowIds.includes(finding.id))?.id,
+  }))
+}
+
+// 兼容旧调用：证据计算 + 归属补齐。新代码请分别使用 buildFindingEvidence 与 attachCaseIds。
+export function buildFindings(
+  windows: AnomalyWindow[] = anomalyWindows,
+  cases: Investigation[] = investigations,
+): FindingRecord[] {
+  return attachCaseIds(buildFindingEvidence(windows), cases)
 }
 
 export function buildEvidence(findings: FindingRecord[]) {
@@ -450,6 +471,13 @@ export function buildEntityProfiles(findings: FindingRecord[], events: SecurityE
 export function initialCaseBoards(cases: Investigation[] = investigations) {
   return cases.reduce<Record<string, CaseBoard>>((result, investigation) => {
     result[investigation.id] = {}
+    // 待人工研判案件：windowIds 是已确认的骨架段，全部归入主链；缺失环节由 gapEvidenceIds 单独呈现。
+    if (investigation.gapEvidenceIds?.length) {
+      investigation.windowIds.forEach((findingId) => {
+        result[investigation.id][findingId] = 'main'
+      })
+      return result
+    }
     investigation.windowIds.forEach((findingId, index) => {
       if (investigation.id === 'CASE-XLOG-30D-001') {
         // The current event and the oldest recovered anchor form the two

@@ -683,13 +683,8 @@ async function agentStreamRequest(question: string, context: AssistantContext): 
 async function askRealAgent(question: string, context: AssistantContext): Promise<AssistantAnswer> {
   publishAgentStatus('正在接收问题')
   const response = await agentStreamRequest(question, context)
-  if (
-    response.answer.includes('没有获得任何成功的内部数据工具结果')
-    || response.answer.includes('不生成当前环境事实判断')
-    || ((response.confidence ?? 0) === 0 && !response.evidence.length && response.mode === 'security')
-  ) {
-    throw new Error('AGENT_NO_TOOL_RESULTS')
-  }
+  // 模型在线并正常返回时直接采纳其回答；即使内部数据工具暂无结果，模型回答
+  // 已自带 facts/assessments/uncertainties 与 recommended_queries，无需降级。
   const result: AssistantAnswer = {
     answer: response.answer,
     evidence: response.evidence,
@@ -709,9 +704,6 @@ function friendlyAgentError(error: unknown): string {
   const message = error instanceof Error ? error.message : '未知错误'
   const lower = message.toLowerCase()
 
-  if (message.includes('AGENT_NO_TOOL_RESULTS')) {
-    return '当前上下文未检索到可直接引用的内部数据，已基于现有证据给出分析。'
-  }
   if (message.includes('模型 API Key 未配置') || message.includes('OPENAI_API_KEY')) {
     return '模型 API Key 尚未配置。请在 AI 分析页的“配置模型服务”中填写 API Key，或在后端设置 OPENAI_API_KEY。'
   }
@@ -742,11 +734,7 @@ export async function askAssistant(question: string, context: AssistantContext =
     } catch (error) {
       const reason = friendlyAgentError(error)
       publishAgentStatus(reason)
-      const fallback = await askAssistantDemo(
-        question,
-        context,
-        reason.includes('未检索到可直接引用的内部数据') ? undefined : reason,
-      )
+      const fallback = await askAssistantDemo(question, context, reason)
       publishAgentStatus('')
       return fallback
     }
@@ -918,7 +906,10 @@ async function askAssistantDemo(
     }
   }
 
-  void fallbackReason
+  // 真实 Agent 失败降级时，把失败原因透出给用户，避免“有问必答”但不知为何没走在线服务。
+  if (fallbackReason) {
+    result = { ...result, answer: `【在线小影未生效：${fallbackReason}】\n\n${result.answer}` }
+  }
 
   publishAgentResult(result)
   return result

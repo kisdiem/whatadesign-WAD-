@@ -15,7 +15,7 @@ export type CaseGraphNode = {
   y?: number
 }
 
-type AttackTechnique = {
+export type AttackTechnique = {
   id: string
   name: string
   tactic: string
@@ -197,7 +197,7 @@ export function buildM3GraphSnapshot(finding: FindingRecord): M3GraphSnapshot {
         source: eventId,
         target: `${finding.id}:entity:${entity}`,
         relation: '事件涉及实体',
-        label: '涉及',
+        label: '',
         weight: relevanceScore,
         evidence: `日志事实：${event.time}，行为为“${eventName(event)}”，其中出现实体“${entity}”。因此建立事件与实体的直接关系。`,
         explanation: eventFactExplanation(event, entity),
@@ -213,7 +213,7 @@ export function buildM3GraphSnapshot(finding: FindingRecord): M3GraphSnapshot {
           source: `${finding.id}:entity:${first}`,
           target: `${finding.id}:entity:${second}`,
           relation: '同一事件共同参与',
-          label: '共同参与',
+          label: '',
           weight: relevanceScore,
           evidence: `日志事实：${event.time} 的“${eventName(event)}”同时出现实体“${first}”和“${second}”，因此建立共同参与关系。`,
           explanation: entityPairExplanation(event, first, second),
@@ -222,13 +222,17 @@ export function buildM3GraphSnapshot(finding: FindingRecord): M3GraphSnapshot {
       }
     }
     if (index > 0) {
-      const previous = events[index - 1]
+      const previous = currentEvent[index - 1]
       if (!previous) return
+      const gapMs = Math.abs(Date.parse(event.time) - Date.parse(previous.time))
+      const gapLabel = Number.isFinite(gapMs)
+        ? (gapMs >= 3600000 ? `${Math.round(gapMs / 3600000)}h` : `${Math.max(1, Math.round(gapMs / 60000))}m`)
+        : ''
       links.push({
         source: `${finding.id}:event:${previous.id}`,
         target: eventId,
         relation: '时间先后',
-        label: '先于',
+        label: gapLabel ? `间隔 · ${gapLabel}` : '',
         weight: Math.max(relevanceScore, eventRelevanceScore(previous, anchor || previous, anchorTime)),
         evidence: `日志事实：前一事件在 ${previous.time}，行为为“${eventName(previous)}”；后一事件在 ${event.time}，行为为“${eventName(event)}”。因此按时间顺序建立先后关系。`,
         explanation: eventSequenceExplanation(previous, event),
@@ -304,14 +308,22 @@ export function normalizeM3GraphSnapshot(snapshot: M3GraphSnapshot): M3GraphSnap
         const first = entityIds[firstIndex]
         const second = entityIds[secondIndex]
         if (!first || !second || existingPairs.has(`${first}|${second}`)) continue
-        addedPairs.push({ source: first, target: second, relation: '同一事件共同参与', label: '共同参与', weight: 0.75, evidence: `同一事件${event?.timestamp || ''}同时出现两个实体，原始日志：${eventRaw}`, explanation: limitGraphExplanation(`原始日志记录同一事件同时出现两个实体，说明它们在该事件中存在角色联系。若该事件属于未经授权的提权、账户变更或异常命令执行，可能成为恶意行为链的一环，但当前证据不能单独确认攻击。`), boundary: '共同出现不等于同一攻击者。' })
+        addedPairs.push({ source: first, target: second, relation: '同一事件共同参与', label: '', weight: 0.75, evidence: `同一事件${event?.timestamp || ''}同时出现两个实体，原始日志：${eventRaw}`, explanation: limitGraphExplanation(`原始日志记录同一事件同时出现两个实体，说明它们在该事件中存在角色联系。若该事件属于未经授权的提权、账户变更或异常命令执行，可能成为恶意行为链的一环，但当前证据不能单独确认攻击。`), boundary: '共同出现不等于同一攻击者。' })
       }
     }
   })
+  // 历史快照仍可能带有"涉及/先于/共同参与"通用标签，线型+图例已说明含义，这里统一清空；
+  // 同时丢弃指向不存在节点的坏边（旧版本曾用全量事件数组生成"时间先后"边，端点可能不在图中）。
+  const cleanedLinks = normalizedLinks
+    .filter((link) => nodeById.has(link.source) && nodeById.has(link.target))
+    .map((link) => ({
+      ...link,
+      label: link.label === '涉及' || link.label === '先于' || link.label === '共同参与' ? '' : link.label,
+    }))
   return {
     ...snapshot,
     nodes,
-    links: normalizedLinks.concat(addedPairs),
+    links: [...cleanedLinks, ...addedPairs],
   }
 }
 
@@ -342,7 +354,7 @@ export function removeM3GraphSnapshot(findingId: string) {
   return next
 }
 
-function attackTechniqueForEvent(event: SecurityEvent): AttackTechnique[] {
+export function attackTechniqueForEvent(event: SecurityEvent): AttackTechnique[] {
   const text = `${event.action || ''} ${event.raw || ''}`
   const techniques: AttackTechnique[] = []
   const add = (id: string, name: string, tactic: string, reason: string) => techniques.push({ id, name, tactic, reason })
@@ -502,10 +514,9 @@ function formatEvidenceTime(value: string) {
 }
 
 /**
- * ATT&CK 攻击链图布局：采用轻量力导向模拟让节点自然散开——
- * 相邻技术按时间顺序被边牵引，无直接关联的节点互相排斥，
- * 保留"时间从左到右推进"的流向感，同时避免整齐的行列排布。
- * 返回的坐标作为默认布局，用户拖拽后的位置会覆盖默认值。
+ * 通用力导向散开布局：节点按时间从左到右初始化，再经斥力、弹簧力与
+ * 热扰动迭代自然散开，避免整齐的行列排布。ATT&CK 攻击链图与 M3 事件
+ * 关联图共用。返回的坐标作为默认布局，用户拖拽后的位置会覆盖默认值。
  */
 const LAYOUT_WIDTH = 1000
 const LAYOUT_HEIGHT = 640
@@ -519,12 +530,19 @@ function layoutHash(value: string) {
   return value.split('').reduce((sum, ch) => (sum * 31 + ch.charCodeAt(0)) % 100000, 0)
 }
 
-export function layoutAttackChainByTactic(
+export function layoutForceDirected(
   nodes: CaseGraphNode[],
   links: CaseGraphLink[],
 ): { nodes: Array<CaseGraphNode & { x: number; y: number }>; links: CaseGraphLink[] } {
   if (!nodes.length) return { nodes: [], links }
-  const sorted = [...nodes].sort((left, right) => Date.parse(left.timestamp || '') - Date.parse(right.timestamp || ''))
+  const sorted = [...nodes].sort((left, right) => {
+    const leftTime = Date.parse(left.timestamp || '')
+    const rightTime = Date.parse(right.timestamp || '')
+    if (!Number.isFinite(leftTime) && !Number.isFinite(rightTime)) return 0
+    if (!Number.isFinite(leftTime)) return 1
+    if (!Number.isFinite(rightTime)) return -1
+    return leftTime - rightTime
+  })
   const positions = new Map<string, { x: number; y: number; vx: number; vy: number }>()
   sorted.forEach((node, index) => {
     const x = 90 + ((LAYOUT_WIDTH - 180) * index) / Math.max(1, sorted.length - 1)

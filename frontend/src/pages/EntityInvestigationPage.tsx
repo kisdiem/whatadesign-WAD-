@@ -111,7 +111,6 @@ export default function EntityInvestigationPage({
   profiles,
   findings,
   timeRange,
-  onOpenAssistant,
   onSubmitBatch,
   onExplain,
   onOpenFinding,
@@ -119,7 +118,6 @@ export default function EntityInvestigationPage({
   profiles: EntityProfile[]
   findings: FindingRecord[]
   timeRange: string
-  onOpenAssistant: (entity: EntityProfile) => void
   onSubmitBatch: (prompt: string, context: AssistantContext) => void
   onExplain: (excerpt: string, context: AssistantContext) => void
   onOpenFinding: () => void
@@ -236,7 +234,7 @@ export default function EntityInvestigationPage({
 
   return (
     <>
-      <PageTitle title="实体调查" subtitle={`完整 30 天实体资产画像 · 当前关联发现聚焦 ${timeRange}`} extra={<Space><Button onClick={onOpenFinding}>异常发现</Button><Button onClick={() => onOpenAssistant(selected)}>分析当前实体</Button><Button type="primary" icon={<RobotOutlined />} onClick={submitEntities}>提交当前筛选结果给小影</Button></Space>} />
+      <PageTitle title="实体调查" subtitle={`完整 30 天实体资产画像 · 当前关联发现聚焦 ${timeRange}`} extra={<Space><Button onClick={onOpenFinding}>异常发现</Button><Button type="primary" icon={<RobotOutlined />} onClick={submitEntities}>小影</Button></Space>} />
       <Row gutter={[12, 12]}>
         <Col xs={24} xl={7}>
           <Card title={`实体列表 · ${filtered.length}/${availableProfiles.length}`} className="mc-investigation-list">

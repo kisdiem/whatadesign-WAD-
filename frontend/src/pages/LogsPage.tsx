@@ -407,7 +407,7 @@ export default function LogsPage({
 
   return (
     <>
-      <PageTitle title="日志检索" extra={<Button type="primary" icon={<RobotOutlined />} onClick={submitLogs}>提交当前检索结果给小影</Button>} />
+      <PageTitle title="日志检索" extra={<Button type="primary" icon={<RobotOutlined />} onClick={submitLogs}>小影</Button>} />
       <Card className="mc-queue-card">
         <div className="mc-filterbar">
           <Input prefix={<SearchOutlined />} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索用户 / Host / IP / Process / 原始日志" className="mc-search" />

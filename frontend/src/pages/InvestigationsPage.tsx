@@ -5,13 +5,16 @@ import { CheckCircleFilled, ClockCircleOutlined, DeleteOutlined, RobotOutlined }
 import type { Investigation } from '../mocks/data'
 import type { AssistantContext } from '../services/api'
 import {
-  buildAttackChainGraph,
-  layoutAttackChainByTactic,
+  buildM3GraphSnapshot,
+  layoutForceDirected,
   limitGraphExplanation,
+  type CaseGraphLink,
+  type CaseGraphNode,
   type M3GraphSnapshot,
 } from '../services/caseGraphs'
+import { extractAutoAttackChain, type ModuleScoresMap } from '../services/autoAttackChain'
 import { inferEntityType, type CaseBoard, type EvidenceRecord, type FindingRecord, type FindingStage } from '../services/investigationDomain'
-import InteractiveCaseGraph from '../InteractiveCaseGraph'
+import InteractiveCaseGraph, { type CaseGraphLegendItem, type CaseGraphNodeLegendItem } from '../InteractiveCaseGraph'
 import {
   ChartFallback,
   ExplainableText,
@@ -20,7 +23,6 @@ import {
   RiskBadge,
   investigationQueueMeta,
   investigationQueueStatus,
-  isManualInvestigation,
   readableAction,
   readableEntityType,
   readableStage,
@@ -29,11 +31,18 @@ import {
 
 const { Text, Title, Paragraph } = Typography
 
-function caseDataset(item: Investigation): 'short' | 'long' | 'other' {
+function caseDataset(item: Investigation): 'short' | 'long' | 'apt' | 'other' {
+  // 保存 M3 关联图会新建 CASE-WIN-<数据集> 案件；其 id 也携带数据集前缀，需一并识别。
+  if (item.id.startsWith('CASE-WIN-SHORT-')) return 'short'
+  if (item.id.startsWith('CASE-WIN-LONG-')) return 'long'
+  if (item.id.startsWith('CASE-WIN-APT-')) return 'apt'
+  if (item.id.startsWith('APT-')) return 'apt'
   if (item.windowIds.some((id) => id.startsWith('WIN-SHORT-'))) return 'short'
   if (item.windowIds.some((id) => id.startsWith('WIN-LONG-'))) return 'long'
+  if (item.windowIds.some((id) => id.startsWith('WIN-APT-'))) return 'apt'
   if (item.title.startsWith('Short')) return 'short'
   if (item.title.startsWith('Long')) return 'long'
+  if (item.title.startsWith('APT')) return 'apt'
   return 'other'
 }
 
@@ -45,14 +54,16 @@ export default function InvestigationsPage({
   activeFindingIds,
   timeRange,
   onSetFindingStage,
-  onOpenAssistant,
+  onInsertEvidence,
+  onExcludeEvidence,
   onSubmitBatch,
-  onGenerateReport,
   onExplain,
   onOpenEntity,
   m3GraphSnapshots,
+  moduleScoresByEvent,
   onDeleteCase,
-  onEscalateCase,
+  onCompleteCase,
+  onReopenCase,
 }: {
   cases: Investigation[]
   findings: FindingRecord[]
@@ -61,19 +72,21 @@ export default function InvestigationsPage({
   activeFindingIds: Set<string>
   timeRange: string
   onSetFindingStage: (caseId: string, findingId: string, stage: FindingStage) => void
-  onOpenAssistant: (investigation: Investigation) => void
+  onInsertEvidence: (caseId: string, findingId: string, afterId: string) => void
+  onExcludeEvidence: (caseId: string, findingId: string) => void
   onSubmitBatch: (prompt: string, context: AssistantContext) => void
-  onGenerateReport: (prompt: string, context: AssistantContext, report: { caseId: string; caseTitle: string }) => void
   onExplain: (excerpt: string, context: AssistantContext) => void
   onOpenEntity: (entityId: string) => void
   m3GraphSnapshots: Record<string, M3GraphSnapshot>
+  moduleScoresByEvent?: ModuleScoresMap
   onDeleteCase: (caseId: string) => void
-  onEscalateCase: (caseId: string) => void
+  onCompleteCase: (caseId: string) => void
+  onReopenCase: (caseId: string) => void
 }) {
   const location = useLocation()
   const [selectedId, setSelectedId] = useState(cases[0]?.id || '')
-  const [queueFilter, setQueueFilter] = useState<'manual' | 'auto' | 'resolved' | 'all'>('manual')
-  const [datasetFilter, setDatasetFilter] = useState<'all' | 'short' | 'long'>('all')
+  const [queueFilter, setQueueFilter] = useState<'manual' | 'resolved' | 'all'>('manual')
+  const [datasetFilter, setDatasetFilter] = useState<'all' | 'short' | 'long' | 'apt' | 'other'>('all')
   const [graphDetail, setGraphDetail] = useState<{ title: string; kind: string; description: string; relation?: string; evidence?: string; explanation?: string; boundary?: string; originalName?: string; details?: string[]; source?: string; target?: string; prompt?: string } | null>(null)
   const [graphPositions, setGraphPositions] = useState<Record<string, Record<string, { x: number; y: number }>>>(() => {
     try {
@@ -89,29 +102,33 @@ export default function InvestigationsPage({
   const casesByDataset = useMemo(() => cases.filter((item) => {
     if (datasetFilter === 'short' && caseDataset(item) !== 'short') return false
     if (datasetFilter === 'long' && caseDataset(item) !== 'long') return false
+    if (datasetFilter === 'apt' && caseDataset(item) !== 'apt') return false
+    if (datasetFilter === 'other' && caseDataset(item) !== 'other') return false
     return true
   }), [cases, datasetFilter])
   const visibleCases = useMemo(() => casesByDataset.filter((item) => {
     const queue = investigationQueueStatus(item)
-    if (queueFilter === 'manual') return queue === 'manual_review'
-    if (queueFilter === 'auto') return queue === 'auto_observe' || queue === 'suppressed' || queue === 'merged'
+    if (queueFilter === 'manual') return ['manual_review', 'auto_observe', 'suppressed', 'merged'].includes(queue)
     if (queueFilter === 'resolved') return queue === 'resolved'
     return true
   }), [casesByDataset, queueFilter])
   const datasetCounts = useMemo(() => ({
     short: cases.filter((item) => caseDataset(item) === 'short').length,
     long: cases.filter((item) => caseDataset(item) === 'long').length,
+    apt: cases.filter((item) => caseDataset(item) === 'apt').length,
+    other: cases.filter((item) => caseDataset(item) === 'other').length,
   }), [cases])
   const queueCounts = useMemo(() => ({
-    manual: casesByDataset.filter((item) => investigationQueueStatus(item) === 'manual_review').length,
-    auto: casesByDataset.filter((item) => ['auto_observe', 'suppressed', 'merged'].includes(investigationQueueStatus(item))).length,
+    manual: casesByDataset.filter((item) => ['manual_review', 'auto_observe', 'suppressed', 'merged'].includes(investigationQueueStatus(item))).length,
     resolved: casesByDataset.filter((item) => investigationQueueStatus(item) === 'resolved').length,
   }), [casesByDataset])
   useEffect(() => {
     if (requestedCase) {
       setSelectedId(requestedCase)
       const requested = cases.find((item) => item.id === requestedCase)
-      if (requested) setQueueFilter(isManualInvestigation(requested) ? (investigationQueueStatus(requested) === 'resolved' ? 'resolved' : 'manual') : 'auto')
+      if (requested) {
+        setQueueFilter(investigationQueueStatus(requested) === 'resolved' ? 'resolved' : 'manual')
+      }
     }
   }, [cases, requestedCase])
   useEffect(() => {
@@ -127,18 +144,80 @@ export default function InvestigationsPage({
   const candidate = related.filter((finding) => board[finding.id] === 'candidate')
   const excluded = related.filter((finding) => board[finding.id] === 'excluded')
   const entities = Array.from(new Set(related.flatMap((finding) => finding.entities))).slice(0, 8)
+  // 证据缺口：待补全的真证据 + 干扰项混合，已补入主链的从中移除。
+  const gapCandidateIds = selected
+    ? [...(selected.gapEvidenceIds || []), ...(selected.gapDistractorIds || [])].filter((id) => !selected.windowIds.includes(id))
+    : []
+  const gapFindings = findings.filter((finding) => gapCandidateIds.includes(finding.id))
+  // 证据链研判图：主链按 windowIds 顺序构成单向链，水平单行排列、超出画布自动换行；
+  // 候选证据（真证据 + 干扰项混合）作为独立灰色节点在下方自由池待研判。
+  const mainOrdered = selected
+    ? selected.windowIds.map((id) => findings.find((finding) => finding.id === id)).filter((finding): finding is FindingRecord => Boolean(finding))
+    : []
+  const candidateIdSet = new Set(gapFindings.map((finding) => finding.id))
+  const CHAIN_ORIGIN_X = 110
+  const CHAIN_ORIGIN_Y = 90
+  const CHAIN_STEP_X = 160
+  const CHAIN_STEP_Y = 115
+  const CHAIN_MAX_X = 960
+  const chainPositions = new Map<string, { x: number; y: number }>()
+  let chainX = CHAIN_ORIGIN_X
+  let chainY = CHAIN_ORIGIN_Y
+  mainOrdered.forEach((finding) => {
+    if (chainX + CHAIN_STEP_X > CHAIN_MAX_X) { chainX = CHAIN_ORIGIN_X; chainY += CHAIN_STEP_Y }
+    chainPositions.set(finding.id, { x: chainX, y: chainY })
+    chainX += CHAIN_STEP_X
+  })
+  const candidateOriginY = chainY + CHAIN_STEP_Y + 34
+  const assemblyNodes: CaseGraphNode[] = [
+    ...mainOrdered.map((finding) => {
+      const pos = chainPositions.get(finding.id)!
+      return {
+        id: finding.id,
+        name: finding.title.length > 18 ? `${finding.title.slice(0, 18)}…` : finding.title,
+        category: 0,
+        kind: 'window' as const,
+        timestamp: finding.start,
+        description: finding.summary,
+        x: pos.x,
+        y: pos.y,
+      }
+    }),
+    ...gapFindings.map((finding, index) => {
+      const row = Math.floor(index / 5)
+      const col = index % 5
+      return {
+        id: finding.id,
+        name: finding.title.length > 18 ? `${finding.title.slice(0, 18)}…` : finding.title,
+        category: 2,
+        kind: 'window' as const,
+        timestamp: finding.start,
+        description: finding.summary,
+        x: CHAIN_ORIGIN_X + col * CHAIN_STEP_X,
+        y: candidateOriginY + row * CHAIN_STEP_Y,
+      }
+    }),
+  ]
+  // 主链边：windowIds 相邻节点依次连接，构成单向链。
+  const assemblyLinks: CaseGraphLink[] = []
+  for (let index = 0; index < mainOrdered.length - 1; index += 1) {
+    assemblyLinks.push({ source: mainOrdered[index].id, target: mainOrdered[index + 1].id, relation: '时间先后', label: '' })
+  }
   const graphFindings = related.filter((finding) => board[finding.id] !== 'excluded')
-  const datasetName = selected ? (caseDataset(selected) === 'short' ? 'Short' : caseDataset(selected) === 'long' ? 'Long' : '') : ''
+  const datasetName = selected ? (caseDataset(selected) === 'short' ? 'Short' : caseDataset(selected) === 'long' ? 'Long' : caseDataset(selected) === 'apt' ? 'APT' : '') : ''
   // 攻击链图以当前案件时间窗口为核心，聚合同一数据集内同时段的相关发现，
-  // 使图包含更多技术节点。Short 短时突发只取其时间邻域；Long 覆盖整条
+  // 使图包含更多技术节点。Short 短时突发只聚焦案件窗口本身；Long 覆盖整条
   // 7 天战役范围，保证长程链呈现完整攻击链、链路显著长于短程。
   const attackGraphFindings = useMemo(() => {
     if (!datasetName) return graphFindings
+    // Short 短时突发只聚焦当前案件窗口本身（不向四周扩展背景事件）；
+    // Long 长程关联扩展全 7 天，恢复完整攻击链，使长程链明显长于短程。
+    if (datasetName === 'Short') return graphFindings
     const relatedTimes = related.flatMap((finding) => finding.events.map((event) => Date.parse(event.time))).filter(Number.isFinite)
     if (!relatedTimes.length) return graphFindings
     const minT = Math.min(...relatedTimes)
     const maxT = Math.max(...relatedTimes)
-    const pad = datasetName === 'Short' ? 10 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000
+    const pad = 7 * 24 * 60 * 60 * 1000
     return findings.filter((finding) =>
       finding.sourceTypes.includes(datasetName)
       && finding.events.some((event) => {
@@ -149,14 +228,33 @@ export default function InvestigationsPage({
   }, [datasetName, findings, graphFindings, related])
   const graphEntities = Array.from(new Set(graphFindings.flatMap((finding) => finding.entities))).slice(0, 8)
   const savedM3Graphs = related.flatMap((finding) => m3GraphSnapshots[finding.id] ? [m3GraphSnapshots[finding.id]] : [])
-  const attackChainGraph = useMemo(() => {
-    // 窗口随数据集语义变化：Short 覆盖 24 小时、Long 覆盖 7 天，长程链因此包含更多阶段技术。
-    const windowHours = datasetName === 'Long' ? 7 * 24 : 24
-    const chain = buildAttackChainGraph(attackGraphFindings, { windowHours })
-    // 力导向散开布局：节点按时间流向自然散布，边牵引相邻技术，突出攻击演进路径。
-    return layoutAttackChainByTactic(chain.nodes, chain.links)
-  }, [attackGraphFindings, datasetName])
-  const activeM3Graph = savedM3Graphs[0]
+  // 自动攻击链提取：与链图同源（attackGraphFindings），额外输出阶段覆盖与链级罕见度。
+  const autoChain = useMemo(
+    () => extractAutoAttackChain(attackGraphFindings, moduleScoresByEvent),
+    [attackGraphFindings, moduleScoresByEvent],
+  )
+  // 优先展示已保存的 M3 快照；没有时用案件窗口内第一条 finding 就地构建一张，
+  // 保证待研判/已定案案件打开即有 M3 关联图，而不是空面板。
+  const activeM3Graph = useMemo(() => {
+    if (savedM3Graphs[0]) return savedM3Graphs[0]
+    const first = related[0]
+    return first ? buildM3GraphSnapshot(first) : undefined
+  }, [savedM3Graphs, related])
+  // 无坐标的 M3 快照（旧数据）在会话内补一次力导向布局；新保存的快照已带布局坐标。
+  const m3GraphLayout = useMemo(() => {
+    if (!activeM3Graph) return null
+    const hasLayout = activeM3Graph.nodes.some((node) => node.x !== undefined && node.y !== undefined)
+    return hasLayout ? { nodes: activeM3Graph.nodes, links: activeM3Graph.links } : layoutForceDirected(activeM3Graph.nodes, activeM3Graph.links)
+  }, [activeM3Graph])
+  const m3Legend: CaseGraphLegendItem[] = [
+    { style: 'solid', color: '#b91c1c', label: '涉及：事件包含该实体' },
+    { style: 'dashed', color: '#2563eb', label: '先于：按日志时间先后' },
+    { style: 'dotted', color: '#94a3b8', label: '共同参与：同一事件实体' },
+  ]
+  const m3NodeLegend: CaseGraphNodeLegendItem[] = [
+    { color: '#2563eb', label: '事件节点：30 分钟内日志事实' },
+    { color: '#65a30d', label: '实体节点：用户/主机/进程/IP' },
+  ]
   const saveInteractiveGraphPositions = (graphId: string, positions: Record<string, { x: number; y: number }>) => {
     setGraphPositions((current) => {
       const next = { ...current, [graphId]: positions }
@@ -232,22 +330,26 @@ export default function InvestigationsPage({
     }
   })
 
-  const submitCase = (asReport = false) => {
+  const submitCase = () => {
     const snapshot = related.map((finding) => {
       const stage = readableStage(board[finding.id] || 'candidate')
       const evidence = evidenceByFinding[finding.id]?.map((item) => item.statement).filter(Boolean).join('; ') || finding.summary
       const events = finding.events.map((event) => `${event.time} ${readableAction(event.action)} ${event.actor || ''} ${event.host || ''} ${event.process || event.ip || ''}`.trim()).join(' | ')
       return `stage=${stage}; time=${finding.start}; finding_id=${finding.id}; finding=${finding.title}; entity=${finding.entity}; host=${finding.host || 'unresolved'}; risk=${finding.risk}; summary=${finding.summary}; evidence=${evidence}; events=${events}`
     }).join('\n')
-    const task = asReport
-      ? `[WAD_REPORT_SNAPSHOT]\n请仅基于下面的案件快照生成一份中文攻击链分析报告。必须完整使用以下模板，不能省略章节、不能只给一句建议。每个章节 2-4 条简短且具体的内容；关键证据至少列出 3 条有时间、实体或行为依据的内容。候选和排除项必须放在“不确定项”，风险分数只是线索，除非快照已证明，否则不得写成“已确认入侵”。不要使用表格，也不要添加额外章节。\n\n# 攻击链分析报告\n## 概况\n- 案件：\n- 分析范围：\n- 当前判断：\n## 链路判断\n1. \n2. \n## 关键证据\n- \n- \n- \n## 不确定项\n- \n## 处置建议\n1. \n2. \n\n案件快照：\n${snapshot}`
-      : `This is the complete attack-chain investigation snapshot for case ${selected.id} (${selected.title}). It includes main-chain evidence, candidates, excluded items, evidence statements, and normalized events. Explain in concise Chinese: what the current chain is, which steps have evidence support, what remains only a candidate, and the next verification point. Do not call it a confirmed attack unless the supplied evidence proves it.\n\n${snapshot}`
-    const context = { caseId: selected.id, windowIds: selected.windowIds, entityIds: entities, timeRange: '7d' }
-    if (asReport) {
-      onGenerateReport(task, context, { caseId: selected.id, caseTitle: selected.title })
-      return
-    }
-    onSubmitBatch(task, context)
+    const task = `This is the complete attack-chain investigation snapshot for case ${selected.id} (${selected.title}). It includes main-chain evidence, candidates, excluded items, evidence statements, and normalized events. Explain in concise Chinese: what the current chain is, which steps have evidence support, what remains only a candidate, and the next verification point. Do not call it a confirmed attack unless the supplied evidence proves it.\n\n${snapshot}`
+    onSubmitBatch(task, { caseId: selected.id, windowIds: selected.windowIds, entityIds: entities, timeRange: '7d' })
+  }
+
+  const sendChainReconstruction = () => {
+    const mainSnapshot = mainOrdered.map((finding, index) =>
+      `${index + 1}. ${finding.title}（${finding.id}）[实体:${finding.entity}][风险:${finding.risk}][${finding.start}] ${finding.summary}`,
+    ).join('\n')
+    const candidateSnapshot = gapFindings.map((finding, index) =>
+      `候选${index + 1}. ${finding.title}（${finding.id}）[实体:${finding.entity}][风险:${finding.risk}][${finding.start}] ${finding.summary}`,
+    ).join('\n')
+    const prompt = `请基于当前攻击链路研判图，辅助判断如何还原完整攻击链。\n\n当前已确认主链（按时间先后）：\n${mainSnapshot || '（空）'}\n\n候选证据池（尚未纳入主链）：\n${candidateSnapshot || '（空）'}\n\n请给出：1）最可能的完整攻击链顺序——列出应纳入主链的候选及其插入位置（插到哪个已确认节点之前/之后）；2）每条建议的依据（时间先后、实体、行为）；3）建议排除的候选及原因。用简洁中文分点回答，除非证据已证明，否则不要写成“已确认入侵”。`
+    onSubmitBatch(prompt, { caseId: selected.id, windowIds: selected.windowIds, entityIds: entities, timeRange })
   }
 
   const graphOption = useMemo(() => ({
@@ -372,7 +474,7 @@ export default function InvestigationsPage({
 
   return (
     <>
-      <PageTitle title="链路与案件调查" subtitle="M5 长程关联将相关异常窗口聚类为攻击候选链，由分析员逐条核验主链证据并完成研判处置。" extra={<Space>{selectedQueue === 'auto_observe' && <Button type="primary" onClick={() => { setQueueFilter('manual'); onEscalateCase(selected.id) }}>升级人工案件</Button>}<Button onClick={() => onOpenAssistant(selected)}>分析当前链路</Button><Button icon={<RobotOutlined />} onClick={() => submitCase(false)}>提交给小影</Button><Button type="primary" icon={<RobotOutlined />} onClick={() => submitCase(true)}>生成分析报告</Button><Button danger icon={<DeleteOutlined />} onClick={() => onDeleteCase(selected.id)}>删除</Button></Space>} />
+      <PageTitle title="链路与案件调查" subtitle="M5 长程关联将相关异常窗口聚类为攻击候选链，由分析员逐条核验主链证据并完成研判处置。" extra={<Space>{(selectedQueue === 'resolved' ? <Button onClick={() => { setQueueFilter('manual'); onReopenCase(selected.id) }}>移回待研判</Button> : <Button type="primary" onClick={() => { setQueueFilter('resolved'); onCompleteCase(selected.id) }}>完成研判</Button>)}<Button type="primary" icon={<RobotOutlined />} onClick={submitCase}>小影</Button><Button danger icon={<DeleteOutlined />} onClick={() => onDeleteCase(selected.id)}>删除</Button></Space>} />
       <Row gutter={[12, 12]}>
         <Col xs={24} xl={6}>
           <Card title="链路队列" className="mc-investigation-list">
@@ -384,6 +486,8 @@ export default function InvestigationsPage({
                 { value: 'all', label: `全部 ${cases.length}` },
                 { value: 'short', label: `Short ${datasetCounts.short}` },
                 { value: 'long', label: `Long ${datasetCounts.long}` },
+                ...(datasetCounts.apt > 0 ? [{ value: 'apt' as const, label: `APT ${datasetCounts.apt}` }] : []),
+                ...(datasetCounts.other > 0 ? [{ value: 'other' as const, label: `其他 ${datasetCounts.other}` }] : []),
               ]}
               style={{ marginBottom: 8 }}
             />
@@ -392,7 +496,7 @@ export default function InvestigationsPage({
               value={queueFilter}
               onChange={(value) => setQueueFilter(value as typeof queueFilter)}
               options={[
-                ...[{ value: 'manual', label: `待研判 ${queueCounts.manual}` }, { value: 'auto', label: `自动 ${queueCounts.auto}` }, { value: 'resolved', label: `完成 ${queueCounts.resolved}` }]
+                ...[{ value: 'manual', label: `待研判 ${queueCounts.manual}` }, { value: 'resolved', label: `已定案 ${queueCounts.resolved}` }]
                   .filter((option) => queueCounts[option.value as keyof typeof queueCounts] > 0),
                 { value: 'all', label: `全部 ${casesByDataset.length}` },
               ]}
@@ -432,41 +536,68 @@ export default function InvestigationsPage({
 
           <Row gutter={[12, 12]}>
             <Col span={24}>
-              {datasetName && <Card title={<HelpTitle title={`${datasetName} · ${datasetName === 'Long' ? '7天' : '24小时'} ATT&CK 攻击链路`} description={`展示该日志最新事件向前 ${datasetName === 'Long' ? '7天' : '24小时'} 内可由日志事实串联的 ATT&CK 技术节点。节点名称是技术类型，点击节点查看全部相关事件、实体和原始日志；连线表示技术证据的时间顺序，不代表已确认攻击。${datasetName === 'Long' ? '长程窗口覆盖整条攻击链各阶段，链路通常比短程更长。' : ''}`} />} className="mc-panel">
+              {datasetName && <Card title={<HelpTitle title={`${datasetName} · 攻击链路研判`} description={`上方红色为已确认的主链证据窗口，按 windowIds 顺序从左到右构成单向链（超出自动换行），相邻窗口以端口连线衔接。下方灰色虚线为候选证据自由池。拖拽候选到主链任意节点前后即可插入（绿色「＋」指示落点），拖到右上角「拖到此处排除」区排除。${datasetName === 'Long' ? 'Long 长程窗口主链更长、候选更多，体现长周期关联能召回短窗口看不到的早期阶段。' : ''}`} />} extra={<Button type="primary" icon={<RobotOutlined />} size="small" onClick={sendChainReconstruction}>小影</Button>} className="mc-panel">
+                {autoChain && (
+                  <div style={{ marginBottom: 12 }}>
+                    <Space wrap size={6}>
+                      <Tag color="green">系统自动提取</Tag>
+                      <Text strong>链罕见度 {Math.round(autoChain.rarity * 100)}% · {autoChain.rarityLabel}</Text>
+                      <Text type="secondary">{autoChain.eventsCount} 条证据 · 覆盖 {autoChain.coverage} 个战术阶段 · 跨度 {autoChain.spanHours >= 24 ? `${(autoChain.spanHours / 24).toFixed(1)} 天` : autoChain.spanHours >= 1 ? `${autoChain.spanHours.toFixed(1)} 小时` : `${Math.max(1, Math.round(autoChain.spanHours * 60))} 分钟`}</Text>
+                      <Text type="secondary">案件基准链 {related.length} 阶段</Text>
+                    </Space>
+                    <div style={{ display: 'flex', gap: 8, overflowX: 'auto', marginTop: 10, paddingBottom: 4 }}>
+                      {autoChain.stages.map((stage, index) => (
+                        <div key={stage.tactic} style={{ flex: '0 0 auto', minWidth: 168, padding: '8px 12px', border: '1px solid #dbe4ee', borderRadius: 8, background: index % 2 === 0 ? '#f8fafc' : '#ffffff' }}>
+                          <div style={{ fontSize: 11, color: '#64748b' }}>{index + 1} · {stage.tactic}</div>
+                          <div style={{ fontWeight: 600, fontSize: 13, margin: '2px 0' }}>{stage.techniqueIds.join(' / ') || '—'}</div>
+                          <div style={{ fontSize: 11, color: '#94a3b8' }}>{stage.events.length} 条证据 · {stage.events[0]?.time.slice(5, 16).replace('T', ' ') || '—'}</div>
+                        </div>
+                      ))}
+                    </div>
+                    <Paragraph type="secondary" style={{ margin: '8px 0 0', fontSize: 12 }}>
+                      {autoChain.summary} {autoChain.extractionNote}
+                    </Paragraph>
+                  </div>
+                )}
                 <InteractiveCaseGraph
-                  key={`attack:${selected.id}`}
-                  nodes={attackChainGraph.nodes}
-                  links={attackChainGraph.links}
-                  height={Math.max(420, Math.min(760, (Math.max(0, ...attackChainGraph.nodes.map((node) => node.y || 0)) + 150)))}
-                  positions={graphPositions[`attack:${selected.id}`] || {}}
-                  onPositionsChange={(positions) => saveInteractiveGraphPositions(`attack:${selected.id}`, positions)}
+                  key={`chain:${selected.id}`}
+                  nodes={assemblyNodes}
+                  links={assemblyLinks}
+                  height={420}
+                  positions={graphPositions[`chain:${selected.id}`] || {}}
+                  onPositionsChange={(positions) => saveInteractiveGraphPositions(`chain:${selected.id}`, positions)}
+                  candidateIds={candidateIdSet}
+                  onInsertAtGap={(sourceId, afterId) => onInsertEvidence(selected.id, sourceId, afterId)}
+                  onExcludeNode={(nodeId) => onExcludeEvidence(selected.id, nodeId)}
+                  nodeLegend={[
+                    { color: '#dc2626', label: '已确认主链' },
+                    { color: '#94a3b8', label: '候选证据（待研判）' },
+                  ]}
                   onNodeClick={(node) => {
-                    const prompt = `你是安全分析助手。请解释这个 ATT&CK 技术节点，说明技术名称和战术阶段，并根据节点详情概括关键事件、实体、时间和原始日志依据。不要把候选技术映射写成已确认攻击。节点：${node.name}。说明：${node.description || '暂无补充说明'}。详情：${(node.details || []).join('；')}`
-                    setGraphDetail({ title: node.name, kind: node.kind === 'technique' ? 'ATT&CK 技术节点' : node.kind === 'window' ? '关联窗口' : '事件或实体', description: node.description || '暂无补充说明', originalName: node.originalName, details: node.details, source: node.timestamp, prompt })
+                    setGraphDetail({ title: node.name, kind: candidateIdSet.has(node.id) ? '候选证据' : '主链证据窗口', description: node.description || '暂无补充说明', details: node.details, source: node.timestamp })
                   }}
                   onEdgeClick={(edge) => {
-                    const sourceNode = attackChainGraph.nodes.find((node) => node.id === edge.source)
-                    const targetNode = attackChainGraph.nodes.find((node) => node.id === edge.target)
-                    const sourceName = sourceNode?.name || String(edge.source || '')
-                    const targetName = targetNode?.name || String(edge.target || '')
-                    const explanation = edge.explanation || `技术“${sourceName}”与“${targetName}”按日志时间顺序建立关联。建边依据：${edge.evidence || '暂无'}。`
-                    const prompt = `你是安全分析助手。请解释 ATT&CK 技术边的前后技术、时间间隔、共享实体和原始日志依据。明确说明这只是证据顺序，不要写成已确认攻击。边：${explanation} 日志：${edge.evidence || '暂无'}。`
-                    setGraphDetail({ title: 'ATT&CK 技术关联边', kind: '技术证据顺序', description: explanation, relation: edge.relation, evidence: edge.evidence, explanation, boundary: edge.boundary, source: sourceName, target: targetName, prompt })
+                    const sourceNode = assemblyNodes.find((node) => node.id === edge.source)
+                    const targetNode = assemblyNodes.find((node) => node.id === edge.target)
+                    setGraphDetail({ title: '证据先后', kind: '时间先后', description: `“${sourceNode?.name || edge.source}”按日志时间先于“${targetNode?.name || edge.target}”发生，用于还原攻击演进顺序，不代表因果关系。`, source: sourceNode?.name, target: targetNode?.name })
                   }}
                 />
               </Card>}
-              <Card title={<HelpTitle title="M3 事件关联图" description="仅展示已保存的当前事件 30 分钟事实窗口：事件、实体、时间先后和涉及关系。该图不承担 ATT&CK 阶段判断。" />} className="mc-panel">
+              <Card title={<HelpTitle title="M3 事件关联图" description="展示当前案件的 30 分钟事实窗口：事件、实体、时间先后和涉及关系。优先使用已保存快照；未保存时按案件窗口自动构建。该图不承担 ATT&CK 阶段判断。" />} className="mc-panel">
                 <Space wrap>
-                  <Text type="secondary">{savedM3Graphs.length ? `已保存 ${savedM3Graphs.length} 个 30 分钟 M3 窗口，当前展示最早保存的窗口。` : '请在发现或日志检索中选择事件并保存其 30 分钟 M3 关联图。'}</Text>
+                  <Text type="secondary">{savedM3Graphs.length ? `已保存 ${savedM3Graphs.length} 个 30 分钟 M3 窗口，当前展示最早保存的窗口。` : `当前为按案件窗口自动构建的 M3 关联图（锚点 ${related[0]?.id || '—'}）；可在发现或日志检索中选择事件并保存固定快照。`}</Text>
                 </Space>
-                {activeM3Graph ? (
+                {activeM3Graph && m3GraphLayout ? (
                   <InteractiveCaseGraph
                     key={`m3:${activeM3Graph.findingId}`}
-                    nodes={activeM3Graph.nodes}
-                    links={activeM3Graph.links}
+                    nodes={m3GraphLayout.nodes}
+                    links={m3GraphLayout.links}
                     height={420}
                     positions={graphPositions[`m3:${activeM3Graph.findingId}`] || {}}
                     onPositionsChange={(positions) => saveInteractiveGraphPositions(`m3:${activeM3Graph.findingId}`, positions)}
+                    legend={m3Legend}
+                    nodeLegend={m3NodeLegend}
+                    staticView
                     onNodeClick={(node) => {
                       const prompt = `你是安全分析助手。请解释这个M3节点的实际含义，控制在120字以内。实体要说明原始名称，事件要说明具体行为和时间，不要使用空泛套话。节点：${node.name}。说明：${node.description || '暂无补充说明'}。`
                       setGraphDetail({ title: node.name, kind: node.kind === 'entity' ? '实体节点' : '事件节点', description: node.description || '暂无补充说明', originalName: node.originalName, details: node.details, source: node.timestamp, prompt })

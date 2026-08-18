@@ -29,10 +29,16 @@
     "gather/monitoring/logs/logstash/intranet-server/2022-01-31-system.syslog.log"
   ],
   "source_slice": "2022-01-24T13:30:00Z/2022-01-31T13:30:00Z",
-  "event_count": 44175,
+  "event_count": 44775,
   "sha256_events_log": "e03c41e61e00f7c96a34be8fa59abb9e4c1b11b1a53256f63eb60cee69dbc2fb",
   "contains_labels": false,
   "contains_facts_json": false,
   "preserves_real_source_timestamps": true,
-  "generated_at": "2026-08-15T19:38:38.175335Z"
+  "generated_at": "2026-08-15T19:38:38.175335Z",
+  "diversified": true,
+  "injected_high_signal_events": 32,
+  "diversified_windows": 306,
+  "diversified_at": "2026-08-18T06:17:59.193179Z",
+  "cross_source_injected": true,
+  "cross_source_injected_at": "2026-08-18"
 }

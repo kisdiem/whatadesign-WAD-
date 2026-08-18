@@ -44,6 +44,34 @@
       "evidence_event_ids": [
         "LONG-000012"
       ]
+    },
+    {
+      "sequence": 7,
+      "label": "T1098.007 附加本地或域组：加入 shadow/cdrom",
+      "evidence_event_ids": [
+        "LONG-000013"
+      ]
+    },
+    {
+      "sequence": 8,
+      "label": "T1098.007 附加本地或域组：加入 shadow/sudo（提权）",
+      "evidence_event_ids": [
+        "LONG-000015"
+      ]
+    },
+    {
+      "sequence": 9,
+      "label": "T1098.007 附加本地或域组：加入 shadow/lxd",
+      "evidence_event_ids": [
+        "LONG-000041"
+      ]
+    },
+    {
+      "sequence": 10,
+      "label": "T1098.007 附加本地或域组：加入 shadow/netdev",
+      "evidence_event_ids": [
+        "LONG-000042"
+      ]
     }
   ],
   "limitations": [

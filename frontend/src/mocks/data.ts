@@ -47,6 +47,9 @@ export interface Investigation {
   owner: string
   createdAt: string
   summary: string
+  // 待人工研判案件的证据缺口：被截断的真实证据（应补入主链）与干扰项（应排除）。
+  gapEvidenceIds?: string[]
+  gapDistractorIds?: string[]
 }
 
 export interface LogSource {

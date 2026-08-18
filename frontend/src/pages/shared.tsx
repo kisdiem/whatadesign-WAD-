@@ -61,10 +61,16 @@ export function isManualInvestigation(item: Investigation) {
   return status === 'manual_review' || status === 'resolved'
 }
 
+// 系统自动处置链：系统判定并已完成研判（resolved 且决策来源为 system），与人工完成的
+// 基准链（resolved + analyst）区分开，分别落入案件队列的“自动处置 / 完成”分类。
+export function isSystemResolved(item: Investigation) {
+  return investigationQueueStatus(item) === 'resolved' && item.decisionSource === 'system'
+}
+
 export const investigationQueueMeta: Record<InvestigationQueueStatus, { label: string; color: string }> = {
   auto_observe: { label: '自动观察', color: 'cyan' },
   manual_review: { label: '待人工研判', color: 'orange' },
-  resolved: { label: '已完成研判', color: 'green' },
+  resolved: { label: '已定案', color: 'green' },
   suppressed: { label: '自动抑制', color: 'default' },
   merged: { label: '已归并', color: 'blue' },
 }

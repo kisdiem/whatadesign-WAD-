@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Card, Col, Descriptions, Divider, Drawer, Input, List, Progress, Row, Select, Space, Statistic, Table, Typography } from 'antd'
-import { LinkOutlined, RobotOutlined, SearchOutlined } from '@ant-design/icons'
+import { RobotOutlined, SearchOutlined } from '@ant-design/icons'
 import type { EvidenceRecord, FindingRecord } from '../services/investigationDomain'
+import { buildM3GraphSnapshot, layoutForceDirected } from '../services/caseGraphs'
+import InteractiveCaseGraph from '../InteractiveCaseGraph'
 import {
   HelpTitle,
   PageTitle,
@@ -23,14 +25,12 @@ export default function FindingsPage({
   onOpenAssistant,
   onOpenEntity,
   onOpenInvestigation,
-  onSaveM3Graph,
 }: {
   findings: FindingRecord[]
   evidenceByFinding: Record<string, EvidenceRecord[]>
   onOpenAssistant: (finding: FindingRecord) => void
   onOpenEntity: (entityId: string) => void
   onOpenInvestigation: () => void
-  onSaveM3Graph: (finding: FindingRecord) => void
 }) {
   const [selected, setSelected] = useState<FindingRecord | null>(null)
   const [query, setQuery] = useState('')
@@ -52,6 +52,13 @@ export default function FindingsPage({
       return right.risk - left.risk || right.longScore - left.longScore || right.eventScore - left.eventScore
     })
   }, [findings, query, severity, sortMode, source])
+
+  const m3Snapshot = useMemo(() => (selected ? buildM3GraphSnapshot(selected) : null), [selected])
+  const m3Layout = useMemo(() => {
+    if (!m3Snapshot) return null
+    const hasLayout = m3Snapshot.nodes.some((node) => node.x !== undefined && node.y !== undefined)
+    return hasLayout ? { nodes: m3Snapshot.nodes, links: m3Snapshot.links } : layoutForceDirected(m3Snapshot.nodes, m3Snapshot.links)
+  }, [m3Snapshot])
 
   useEffect(() => {
     if (!filtered.length) {
@@ -103,6 +110,22 @@ export default function FindingsPage({
       <Drawer open={Boolean(selected)} onClose={() => setSelected(null)} width={680} title={selected?.title} extra={selected && <RiskBadge value={selected.risk} />}>
         {selected && (
           <div className="mc-detail-drawer">
+            <Card size="small" title={<HelpTitle title="M3 事件关联图" description="当前异常发现的 30 分钟事实窗口：事件、实体、时间先后与涉及关系，随所选发现即时构建，无需保存。" />} className="mc-drawer-card" styles={{ body: { padding: 0 } }}>
+              {m3Layout ? (
+                <InteractiveCaseGraph
+                  key={`m3:${selected.id}`}
+                  nodes={m3Layout.nodes}
+                  links={m3Layout.links}
+                  height={440}
+                  positions={{}}
+                  onPositionsChange={() => {}}
+                  onNodeClick={() => {}}
+                  onEdgeClick={() => {}}
+                  staticView
+                />
+              ) : <Text type="secondary">暂无可用事件构建 M3 关联图。</Text>}
+            </Card>
+
             <Card size="small" title={<HelpTitle title="调查锚点" description="当前异常发现的核心对象、主机和时间范围，是开始复核的切入点。" />} className="mc-drawer-card">
               <Descriptions bordered size="small" column={2}>
                 <Descriptions.Item label="异常发现">{selected.id}</Descriptions.Item>
@@ -164,7 +187,6 @@ export default function FindingsPage({
             </Card>
 
             <Space wrap>
-              <Button icon={<LinkOutlined />} onClick={() => onSaveM3Graph(selected)}>保存当前事件 30 分钟 M3 关联图</Button>
               <Button onClick={() => onOpenEntity(selected.entity)}>实体画像</Button>
               <Button onClick={onOpenInvestigation}>案件调查</Button>
                 <Button type="primary" icon={<RobotOutlined />} onClick={() => onOpenAssistant(selected)}>小影</Button>

@@ -9,7 +9,8 @@ import {
   RiskBadge,
   SeverityTag,
   filterRowsBySourceTimeRange,
-  isManualInvestigation,
+  investigationQueueStatus,
+  isSystemResolved,
 } from './shared'
 
 const { Text } = Typography
@@ -44,7 +45,7 @@ export default function OverviewPage({
   cases: Investigation[]
   caseBoards: Record<string, CaseBoard>
   timeRange: string
-  inputOverviewSeries: Array<{ time: string; logs: number; anomalies: number; source?: string }>
+  inputOverviewSeries: Array<{ time: string; logs: number; anomalies: number; source?: string; kinds?: Record<string, number> }>
 }) {
   const [source, setSource] = useState('all')
   const findings = useMemo(
@@ -78,12 +79,17 @@ export default function OverviewPage({
   const rawEvents = visibleSeries.reduce((sum, item) => sum + item.logs, 0)
   const anomalousFindings = findings.length
   const correlatedFindingIds = new Set(cases.flatMap((item) => item.windowIds))
-  const manualCases = cases.filter(isManualInvestigation)
-  const reviewedFindingIds = new Set(manualCases.flatMap((item) => item.windowIds.filter((findingId) => findingId in (caseBoards[item.id] || {}))))
-  const correlatedFindings = correlatedFindingIds.size
+  const autoCases = cases.filter(isSystemResolved)
+  // 系统自动处置层 = 自动处置链覆盖的窗口 + 未成链、自动归档的孤立低危窗口。
+  const autoResolvedFindings = new Set(autoCases.flatMap((item) => item.windowIds.filter((findingId) => findingIds.has(findingId)))).size
+  const autoLayer = Math.max(0, autoResolvedFindings + (anomalousFindings - correlatedFindingIds.size))
+  // 进入人工研判 = 案件队列中“待研判”分类（含自动观察/抑制/归并）案件的全部窗口。
+  const pendingCases = cases.filter((item) => ['manual_review', 'auto_observe', 'suppressed', 'merged'].includes(investigationQueueStatus(item)))
+  const reviewedFindingIds = new Set(pendingCases.flatMap((item) => item.windowIds.filter((findingId) => findingIds.has(findingId))))
   const reviewed = reviewedFindingIds.size
-  const mainChainEvidence = new Set(manualCases.flatMap((item) => Object.entries(caseBoards[item.id] || {}).filter(([findingId, stage]) => stage === 'main' && findingIds.has(findingId)).map(([findingId]) => findingId))).size
-  const reviewReduction = rawEvents > 0 ? ((rawEvents - reviewed) / rawEvents) * 100 : 0
+  const mainChainEvidence = new Set(pendingCases.flatMap((item) => Object.entries(caseBoards[item.id] || {}).filter(([findingId, stage]) => stage === 'main' && findingIds.has(findingId)).map(([findingId]) => findingId))).size
+  // 研判压缩率按同一窗口口径计算：从异常发现窗口收敛到进入人工研判的窗口。
+  const reviewReduction = anomalousFindings > 0 ? ((anomalousFindings - reviewed) / anomalousFindings) * 100 : 0
 
   const sourceOption = useMemo(() => ({
     tooltip: { trigger: 'axis' },
@@ -96,18 +102,38 @@ export default function OverviewPage({
     ],
   }), [visibleSeries])
 
-  const distributionOption = useMemo(() => ({
-    tooltip: { trigger: 'item' },
-    series: [{
-      type: 'pie',
-      radius: ['48%', '72%'],
-      data: Array.from(new Set(findings.flatMap((finding) => finding.sourceTypes))).map((name) => ({
-        name,
-        value: findings.filter((finding) => finding.sourceTypes.includes(name)).length,
-      })),
-      label: { formatter: '{b}: {c}' },
-    }],
-  }), [findings])
+  const distributionOption = useMemo(() => {
+    const sourceRows = source === 'all'
+      ? inputOverviewSeries
+      : inputOverviewSeries.filter((item) => item.source === source)
+    const rangedRows = timeRange === '30d' ? sourceRows : filterRowsBySourceTimeRange(sourceRows, timeRange)
+    // 原始事件口径：外环为主（日志文件类型 / 跨域），内环为辅（Short / Long）。
+    const kindTotals = new Map<string, number>()
+    const datasetTotals = new Map<string, number>()
+    rangedRows.forEach((item) => {
+      const dataset = item.source || '其他'
+      datasetTotals.set(dataset, (datasetTotals.get(dataset) || 0) + (item.logs || 0))
+      Object.entries(item.kinds || {}).forEach(([kind, count]) => kindTotals.set(kind, (kindTotals.get(kind) || 0) + count))
+    })
+    const kindData = Array.from(kindTotals.entries())
+      .map(([name, value]) => ({ name, value }))
+      .sort((left, right) => right.value - left.value)
+    const datasetData = Array.from(datasetTotals.entries())
+      .map(([name, value]) => ({ name, value }))
+      .sort((left, right) => right.value - left.value)
+    return {
+      tooltip: { trigger: 'item', formatter: '{b}: {c}（{d}%）' },
+      series: [
+        // 外环（主）：日志文件类型，体现跨域来源。
+        { type: 'pie', radius: ['62%', '84%'], data: kindData, label: { show: false } },
+        // 内环（辅）：Short / Long 数据集分类。
+        { type: 'pie', radius: ['32%', '52%'], data: datasetData, label: { show: false } },
+      ],
+      graphic: [
+        { type: 'text', left: 'center', top: '38%', style: { text: '原始事件', fill: '#64748b', fontSize: 12, textAlign: 'center' } },
+      ],
+    }
+  }, [inputOverviewSeries, source, timeRange])
 
   return (
     <>
@@ -128,8 +154,8 @@ export default function OverviewPage({
                   {[
                     { label: '事件', value: rawEvents },
                     { label: '异常发现', value: anomalousFindings },
-                    { label: `候选链证据（${cases.length} 条链）`, value: correlatedFindings },
-                    { label: `进入人工研判（${manualCases.length} 个案件）`, value: reviewed },
+                    { label: `系统自动处置（${autoCases.length} 条自动链 + 自动归档）`, value: autoLayer },
+                    { label: `进入人工研判（${reviewed} 窗口 / ${pendingCases.length} 案件）`, value: reviewed },
                     { label: '主链证据', value: mainChainEvidence },
                   ].map((item, index) => (
                     <div key={item.label} className="mc-setting-row">
@@ -151,7 +177,7 @@ export default function OverviewPage({
           </Card>
         </Col>
         <Col xs={24} xl={8}>
-          <Card title={<HelpTitle title="数据源分布" description="展示当前筛选范围内，各日志源贡献的异常发现数量。" />} className="mc-panel">
+          <Card title={<HelpTitle title="跨域来源分布" description="按原始事件统计：外环为主，展示日志文件类型（认证 / 系统 / 网络遥测 / 审计 / 入侵检测）的跨域构成；内环为辅，保持 Short / Long 数据集分类。随右上角数据集筛选与时间范围联动。" />} className="mc-panel">
             <Suspense fallback={<ChartFallback height={280} />}>
               <EChartsView option={distributionOption} style={{ height: 280 }} />
             </Suspense>

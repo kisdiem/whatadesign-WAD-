@@ -1,0 +1,19 @@
+{
+  "dataset_id": "APT",
+  "kind": "demo_system_projection",
+  "model_execution": false,
+  "synthetic_scores": true,
+  "formal_evaluation": false,
+  "event_count": 7298,
+  "anomaly_count": 30,
+  "threat_level_counts": {
+    "info": 0,
+    "low": 7268,
+    "medium": 13,
+    "high": 15,
+    "critical": 2
+  },
+  "time_range": "2022-01-24T13:30:00.000000Z/2022-01-31T13:30:00.000000Z",
+  "candidate_chain_id": "APT-CANDIDATE-001",
+  "candidate_chain_status": "candidate"
+}

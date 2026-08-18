@@ -32,7 +32,6 @@ import {
 } from './mocks/data'
 import { loadDemoDataset, type DemoDatasetId } from './services/demoData'
 import { deleteIngestedSource, getIngestionSnapshot, uploadLogFile, type IngestResult } from './services/ingestion'
-import { downloadAttackChainReport } from './services/attackChainReport'
 import {
   askAssistant,
   getInvestigations,
@@ -40,9 +39,10 @@ import {
   type AssistantContext,
 } from './services/api'
 import {
+  attachCaseIds,
   buildEntityProfiles,
   buildEvidence,
-  buildFindings,
+  buildFindingEvidence,
   initialCaseBoards,
   type CaseBoard,
   type EntityProfile,
@@ -51,6 +51,7 @@ import {
 } from './services/investigationDomain'
 import {
   buildM3GraphSnapshot,
+  layoutForceDirected,
   loadM3GraphSnapshots,
   persistM3GraphSnapshot,
   removeM3GraphSnapshot,
@@ -93,22 +94,26 @@ function mergePersistedCases(baseCases: Investigation[]) {
     .filter((item) => item.id !== 'CASE-XLOG-30D-001')
     .forEach((item) => {
       const base = merged.get(item.id)
-      merged.set(item.id, base ? {
+      // 旧版本遗留、已被新逻辑淘汰的案件（id 不在最新生成结果中）直接丢弃，避免数量回涨。
+      if (!base) return
+      // 仅保留用户对案件的研判状态修改，其余字段（窗口成员、标题、摘要、严重度等）以最新生成结果为准。
+      merged.set(item.id, {
         ...base,
-        ...item,
-        title: base.title,
         queueStatus: item.queueStatus || base.queueStatus,
+        decisionSource: item.decisionSource || base.decisionSource,
+        decisionAt: item.decisionAt || base.decisionAt,
+        owner: item.owner || base.owner,
         escalationScore: item.escalationScore ?? base.escalationScore,
         escalationReasons: item.escalationReasons || base.escalationReasons,
-        decisionSource: item.decisionSource || base.decisionSource,
-      } : item)
+      })
     })
   return Array.from(merged.values()).filter((item) => !item.id.startsWith('CASE-XLOG-'))
 }
 
 const preparedDemoSources: LogSource[] = [
-  { id: 'DEMO-SHORT', name: 'Short', path: 'stream://short', kind: '事件流', status: 'online', size: '2,570 条事件 / 30 天窗口', lastRead: '2026-07-11 - 2026-08-09（UTC）' },
-  { id: 'DEMO-LONG', name: 'Long', path: 'stream://long', kind: '事件流', status: 'online', size: '44,175 条事件 / 30 天窗口', lastRead: '2026-07-11 - 2026-08-09（UTC）' },
+  { id: 'DEMO-SHORT', name: 'Short', path: 'stream://short', kind: '事件流', status: 'online', size: '2,749 条事件 / 30 天窗口', lastRead: '2026-07-11 - 2026-08-09（UTC）' },
+  { id: 'DEMO-LONG', name: 'Long', path: 'stream://long', kind: '事件流', status: 'online', size: '44,775 条事件 / 30 天窗口', lastRead: '2026-07-11 - 2026-08-09（UTC）' },
+  { id: 'DEMO-APT', name: 'APT', path: 'stream://apt', kind: '事件流', status: 'online', size: '7,298 条事件 / 30 天窗口', lastRead: '2026-07-11 - 2026-08-09（UTC）' },
 ]
 
 function eventStreamText(value?: string) {
@@ -232,7 +237,7 @@ export default function MissionControlApp() {
   const latestPreparedTimestamps = useMemo(() => {
     const latest = new Map<DemoDatasetId, number>()
     for (const item of windowItems) {
-      for (const dataset of ['Short', 'Long'] as DemoDatasetId[]) {
+      for (const dataset of ['Short', 'Long', 'APT'] as DemoDatasetId[]) {
         if (!item.sourceTypes.includes(dataset)) continue
         const timestamp = parseWindowDateTime(item.end || item.start, extractDatePrefix(item.end || item.start) || referenceDate)
         latest.set(dataset, Math.max(latest.get(dataset) || 0, timestamp))
@@ -244,7 +249,7 @@ export default function MissionControlApp() {
   const filteredWindowItems = useMemo(() => {
     const cutoff = latestWindowTimestamp - rangeToMilliseconds(timeRange)
     return windowItems.filter((item) => {
-      const preparedSource = (['Short', 'Long'] as DemoDatasetId[]).find((dataset) => item.sourceTypes.includes(dataset))
+      const preparedSource = (['Short', 'Long', 'APT'] as DemoDatasetId[]).find((dataset) => item.sourceTypes.includes(dataset))
       if (preparedSource) {
         const timestamp = parseWindowDateTime(item.end || item.start, extractDatePrefix(item.end || item.start) || referenceDate)
         return timestamp >= (latestPreparedTimestamps.get(preparedSource) || timestamp) - rangeToMilliseconds(timeRange)
@@ -265,11 +270,26 @@ export default function MissionControlApp() {
     [caseItems, filteredWindowIds],
   )
 
-  const allFindings = useMemo(() => buildFindings(windowItems, caseItems), [caseItems, windowItems])
-  const allEvidenceByFinding = useMemo(() => buildEvidence(allFindings), [allFindings])
+  // 证据计算（实体稀有度、三层分数、M5 关联）只依赖窗口数据，是 O(n²) 的重计算；
+  // 案件编辑（插入/排除节点）只改窗口归属，不改变这些证据字段，故单独缓存，
+  // 避免每次拖拽节点都全量重算 1,269 个窗口的关联证据。
+  const findingEvidence = useMemo(() => buildFindingEvidence(windowItems), [windowItems])
+  // 案件归属（caseId）轻量实时补：只随案件列表变化，O(n·m)。
+  const allFindings = useMemo(() => attachCaseIds(findingEvidence, caseItems), [findingEvidence, caseItems])
+  // 证据与实体画像不读 caseId，直接基于稳定的 findingEvidence 计算，避免随 caseItems 重算。
+  const allEvidenceByFinding = useMemo(() => buildEvidence(findingEvidence), [findingEvidence])
   const findings = useMemo(() => allFindings.filter((finding) => filteredWindowIds.has(finding.id)), [allFindings, filteredWindowIds])
   const evidenceByFinding = useMemo(() => buildEvidence(findings), [findings])
-  const entityProfiles = useMemo(() => buildEntityProfiles(allFindings, demoEvents), [allFindings, demoEvents])
+  const entityProfiles = useMemo(() => buildEntityProfiles(findingEvidence, demoEvents), [findingEvidence, demoEvents])
+  // 事件级 M0-M6 分数：供案件页自动攻击链提取模块计算链级罕见度（M2 实体稀有 / M4 模板稀有）。
+  const moduleScoresByEvent = useMemo(() => {
+    const map = new Map<string, Record<string, number>>()
+    windowItems.forEach((window) => {
+      if (!window.moduleScores) return
+      window.events.forEach((event) => map.set(event.id, window.moduleScores as Record<string, number>))
+    })
+    return map
+  }, [windowItems])
   const onlineSources = sourceItems.filter((source) => source.status === 'online').length
   const saveM3Graph = (finding: FindingRecord) => {
     const anchorTimestamp = Date.parse(finding.anchorEvent?.time || finding.start)
@@ -285,7 +305,9 @@ export default function MissionControlApp() {
     const enrichedFinding = contextEvents.length
       ? { ...finding, events: contextEvents }
       : finding
-    const next = persistM3GraphSnapshot(buildM3GraphSnapshot(enrichedFinding))
+    const snapshot = buildM3GraphSnapshot(enrichedFinding)
+    const laidOut = layoutForceDirected(snapshot.nodes, snapshot.links)
+    const next = persistM3GraphSnapshot({ ...snapshot, nodes: laidOut.nodes })
     setM3GraphSnapshots(next)
     setCaseItems((current) => {
       const existingIndex = current.findIndex((item) => item.id === finding.caseId || item.windowIds.includes(finding.id))
@@ -319,7 +341,7 @@ export default function MissionControlApp() {
       setDashboardLoading(true)
       setDashboardError('')
       try {
-        const datasets: DemoDatasetId[] = ['Short', 'Long']
+        const datasets: DemoDatasetId[] = ['Short', 'Long', 'APT']
         const loaded = await Promise.all(datasets.map((dataset) => loadDemoDataset(dataset).then((data) => ({
           ...data,
           dataset,
@@ -482,16 +504,7 @@ export default function MissionControlApp() {
   }
 
   const openFindingAssistant = (finding: FindingRecord) => {
-    openAssistantWithContext({ windowIds: [finding.id], entityIds: [finding.entity], timeRange })
-  }
-
-  const openCaseAssistant = (investigation: Investigation) => {
-    const entityIds = Array.from(new Set(findings.filter((finding) => investigation.windowIds.includes(finding.id)).map((finding) => finding.entity)))
-    openAssistantWithContext({ caseId: investigation.id, windowIds: investigation.windowIds, entityIds, timeRange })
-  }
-
-  const openEntityAssistant = (entity: EntityProfile) => {
-    openAssistantWithContext({ entityIds: [entity.id], windowIds: entity.findingIds, timeRange })
+    openAssistantWithContext({ windowIds: [finding.id], timeRange })
   }
 
   const submitBatchToAssistant = (prompt: string, nextContext: AssistantContext) => {
@@ -501,50 +514,6 @@ export default function MissionControlApp() {
     setAssistantChat([{ role: 'user', content: '已提交当前页面的完整筛选结果，请小影归纳分析。' }])
     navigate('/assistant')
     void runAssistant(prompt, nextContext, { appendUserMessage: false })
-  }
-
-  const generateAttackChainReport = async (
-    prompt: string,
-    nextContext: AssistantContext,
-    report: { caseId: string; caseTitle: string },
-  ) => {
-    if (assistantSending) return
-    setAssistantContext(nextContext)
-    setAssistantQuestion('')
-    setAssistantDockCollapsed(false)
-    setAssistantChat([{ role: 'user', content: `正在生成案件 ${report.caseId} 的攻击链分析报告。` }])
-    navigate('/assistant')
-    setAssistantSending(true)
-    try {
-      let answer = await askAssistant(prompt, nextContext)
-      const requiredSections = ['概况', '链路判断', '关键证据', '不确定项', '处置建议']
-      if (!requiredSections.every((section) => answer.answer.includes(section))) {
-        answer = await askAssistant(
-          `${prompt}\n\n你的上一版没有完整按模板输出。现在只输出五个必需章节，并在“关键证据”中给出至少三条来自案件快照的具体证据。`,
-          nextContext,
-        )
-      }
-      if (!requiredSections.every((section) => answer.answer.includes(section))) {
-        throw new Error('小影未返回完整报告模板，未生成下载文件。')
-      }
-      setAssistantChat((current) => [...current, {
-        role: 'assistant',
-        content: answer.answer,
-        evidence: answer.evidence,
-        verified: answer.verified,
-        confidence: answer.confidence,
-        structured: answer.structured,
-        verification: answer.verification,
-      }])
-      await downloadAttackChainReport({ caseId: report.caseId, caseTitle: report.caseTitle, content: answer.answer })
-      message.success('攻击链分析报告已生成并下载。')
-    } catch (error) {
-      const detail = error instanceof Error ? error.message : '未知错误'
-      setAssistantChat((current) => [...current, { role: 'assistant', content: `报告生成失败：${detail}` }])
-      message.error('攻击链分析报告生成失败。')
-    } finally {
-      setAssistantSending(false)
-    }
   }
 
   const runAssistantNavigation = (
@@ -666,15 +635,25 @@ export default function MissionControlApp() {
     message.success(`已删除案件 ${target.title} 及其 30 分钟窗口数据。`)
   }
 
-  const escalateInvestigation = (caseId: string) => {
+  const completeInvestigation = (caseId: string) => {
+    setCaseItems((current) => current.map((item) => item.id === caseId ? {
+      ...item,
+      queueStatus: 'resolved',
+      decisionSource: 'analyst',
+      decisionAt: new Date().toISOString(),
+    } : item))
+    message.success('已完成研判：完整攻击链路已确定')
+  }
+
+  const reopenInvestigation = (caseId: string) => {
     setCaseItems((current) => current.map((item) => item.id === caseId ? {
       ...item,
       queueStatus: 'manual_review',
       decisionSource: 'analyst',
       decisionAt: new Date().toISOString(),
-      owner: item.owner === 'M5 自动关联' || item.owner === 'm0-m6-ingestion' ? '待分配分析员' : item.owner,
+      owner: item.owner === 'M5 自动关联' || item.owner === 'm0-m6-ingestion' || item.owner === '系统自动研判' ? '待分配分析员' : item.owner,
     } : item))
-    message.success('候选链已升级为人工研判案件')
+    message.success('已移回待研判')
   }
 
   const setFindingStage = (caseId: string, findingId: string, stage: FindingStage) => {
@@ -692,6 +671,43 @@ export default function MissionControlApp() {
         [findingId]: stage,
       },
     }))
+  }
+
+  const insertEvidenceAt = (caseId: string, findingId: string, afterId: string) => {
+    setCaseItems((current) => current.map((item) => {
+      if (item.id !== caseId) return item
+      const without = item.windowIds.filter((id) => id !== findingId)
+      let next: string[]
+      if (afterId === 'start') next = [findingId, ...without]
+      else if (without.includes(afterId)) {
+        const idx = without.indexOf(afterId)
+        next = [...without.slice(0, idx + 1), findingId, ...without.slice(idx + 1)]
+      } else next = [...without, findingId]
+      return {
+        ...item,
+        windowIds: next,
+        gapEvidenceIds: (item.gapEvidenceIds || []).filter((id) => id !== findingId),
+        gapDistractorIds: (item.gapDistractorIds || []).filter((id) => id !== findingId),
+      }
+    }))
+    setCaseBoards((current) => ({
+      ...current,
+      [caseId]: { ...(current[caseId] || {}), [findingId]: 'main' as FindingStage },
+    }))
+    message.success('已插入主链')
+  }
+
+  const excludeGapEvidence = (caseId: string, findingId: string) => {
+    setCaseItems((current) => current.map((item) => item.id === caseId ? {
+      ...item,
+      gapEvidenceIds: (item.gapEvidenceIds || []).filter((id) => id !== findingId),
+      gapDistractorIds: (item.gapDistractorIds || []).filter((id) => id !== findingId),
+    } : item))
+    setCaseBoards((current) => ({
+      ...current,
+      [caseId]: { ...(current[caseId] || {}), [findingId]: 'excluded' as FindingStage },
+    }))
+    message.success('已排除该候选证据')
   }
 
   return (
@@ -755,9 +771,9 @@ export default function MissionControlApp() {
           <Suspense fallback={<div style={{ padding: 24 }}>加载中…</div>}>
             <Routes>
               <Route path="/overview" element={<OverviewPage findings={findings} cases={filteredCaseItems} caseBoards={caseBoards} timeRange={timeRange} inputOverviewSeries={demoOverviewSeries} />} />
-              <Route path="/findings" element={<FindingsPage findings={findings} evidenceByFinding={evidenceByFinding} onOpenAssistant={openFindingAssistant} onOpenEntity={(entityId) => navigate(`/entities?entity=${encodeURIComponent(entityId)}`)} onOpenInvestigation={() => navigate('/investigations')} onSaveM3Graph={saveM3Graph} />} />
-              <Route path="/entities" element={<EntityInvestigationPage profiles={entityProfiles} findings={findings} timeRange={timeRange} onOpenAssistant={openEntityAssistant} onSubmitBatch={submitBatchToAssistant} onExplain={explainWithAssistant} onOpenFinding={() => navigate('/findings')} />} />
-              <Route path="/investigations" element={<InvestigationsPage cases={caseItems} findings={allFindings} evidenceByFinding={allEvidenceByFinding} caseBoards={caseBoards} activeFindingIds={filteredWindowIds} timeRange={timeRange} m3GraphSnapshots={m3GraphSnapshots} onDeleteCase={deleteCase} onEscalateCase={escalateInvestigation} onSetFindingStage={setFindingStage} onOpenAssistant={openCaseAssistant} onSubmitBatch={submitBatchToAssistant} onGenerateReport={generateAttackChainReport} onExplain={explainWithAssistant} onOpenEntity={(entityId) => navigate(`/entities?entity=${encodeURIComponent(entityId)}`)} />} />
+              <Route path="/findings" element={<FindingsPage findings={findings} evidenceByFinding={evidenceByFinding} onOpenAssistant={openFindingAssistant} onOpenEntity={(entityId) => navigate(`/entities?entity=${encodeURIComponent(entityId)}`)} onOpenInvestigation={() => navigate('/investigations')} />} />
+              <Route path="/entities" element={<EntityInvestigationPage profiles={entityProfiles} findings={findings} timeRange={timeRange} onSubmitBatch={submitBatchToAssistant} onExplain={explainWithAssistant} onOpenFinding={() => navigate('/findings')} />} />
+              <Route path="/investigations" element={<InvestigationsPage cases={caseItems} findings={allFindings} evidenceByFinding={allEvidenceByFinding} caseBoards={caseBoards} activeFindingIds={filteredWindowIds} timeRange={timeRange} m3GraphSnapshots={m3GraphSnapshots} moduleScoresByEvent={moduleScoresByEvent} onDeleteCase={deleteCase} onCompleteCase={completeInvestigation} onReopenCase={reopenInvestigation} onSetFindingStage={setFindingStage} onInsertEvidence={insertEvidenceAt} onExcludeEvidence={excludeGapEvidence} onSubmitBatch={submitBatchToAssistant} onExplain={explainWithAssistant} onOpenEntity={(entityId) => navigate(`/entities?entity=${encodeURIComponent(entityId)}`)} />} />
               <Route path="/logs" element={<LogsPage findings={findings} evidenceByFinding={evidenceByFinding} demoEvents={demoEvents} timeRange={timeRange} onSubmitBatch={submitBatchToAssistant} onExplain={explainWithAssistant} onSaveM3Graph={saveM3Graph} />} />
               <Route path="/sources" element={<SourcesPage sources={sourceItems} onDeleteSource={deleteLogSource} onRefresh={async () => setIngestionRevision((current) => current + 1)} onImportFile={importLogFile} />} />
               <Route

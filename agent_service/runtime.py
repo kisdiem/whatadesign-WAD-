@@ -62,12 +62,14 @@ def _settings(
     verbosity: str = "low",
     *,
     parallel_tool_calls: bool | None = None,
+    tool_choice: str | None = None,
 ) -> ModelSettings:
     return ModelSettings(
         reasoning=Reasoning(effort=effort),
         verbosity=verbosity,
         truncation="auto",
         parallel_tool_calls=parallel_tool_calls,
+        tool_choice=tool_choice,
     )
 
 
@@ -89,7 +91,7 @@ router_agent = Agent(
 security_agent = Agent[AgentContext](
     name="WAD Security Analyst",
     model=ANALYST_MODEL,
-    model_settings=_settings("high", "medium", parallel_tool_calls=False),
+    model_settings=_settings("high", "medium", parallel_tool_calls=False, tool_choice="required"),
     tools=SECURITY_TOOLS,
     output_type=SecurityDraft,
     instructions=(
@@ -325,6 +327,13 @@ class AgentRuntime:
                     answer = draft.answer
                     verified = False
                     confidence = min(draft.confidence, 0.6)
+                elif draft.answer.strip():
+                    # 模型未成功调用任何内部工具，但已给出回答（例如兼容接口的 function calling
+                    # 偶发不触发，模型基于用户附带的快照作答）。保留回答但显著降级置信度，
+                    # 避免把未经工具复核的推断误当成已确认结论。
+                    answer = draft.answer
+                    verified = False
+                    confidence = min(draft.confidence, 0.4)
                 else:
                     answer = "当前问题需要读取真实安全数据，但本次 Agent 没有获得任何成功的内部数据工具结果，因此不生成当前环境事实判断。"
                     verified = False

@@ -30,20 +30,6 @@
       "evidence_event_ids": [
         "SHORT-000006"
       ]
-    },
-    {
-      "sequence": 5,
-      "label": "T1098.007 附加本地或域组：加入 shadow/adm",
-      "evidence_event_ids": [
-        "SHORT-000011"
-      ]
-    },
-    {
-      "sequence": 6,
-      "label": "T1098.007 附加本地或域组：加入 shadow/dialout",
-      "evidence_event_ids": [
-        "SHORT-000012"
-      ]
     }
   ],
   "limitations": [

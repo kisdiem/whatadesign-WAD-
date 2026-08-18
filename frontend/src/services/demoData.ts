@@ -1,6 +1,6 @@
 import type { AnomalyWindow, Investigation, LogSource, SecurityEvent, Severity } from '../mocks/data'
 
-export type DemoDatasetId = 'Short' | 'Long'
+export type DemoDatasetId = 'Short' | 'Long' | 'APT'
 
 type DemoTimelineEvent = {
   event_id: string
@@ -51,12 +51,22 @@ const REPLAY_BANDS: Record<DemoDatasetId, ReplayBand[]> = {
     { cumulativeShare: 0.75, centers: [1.6 * DAY, 3.2 * DAY, 5.2 * DAY], spreads: [0.25 * DAY, 0.5 * DAY, 0.8 * DAY] },
     { cumulativeShare: 1, centers: [6.4 * DAY, 6.9 * DAY], spreads: [0.2 * DAY, 0.15 * DAY] },
   ],
+  // APT 叙事集：铺满 7 天，早期（侦察/WebShell/提权）分散、末期（C2/渗出）密集，
+  // 让「跨源、跨主机、跨 7 天」的长周期攻击链叙事在时间轴上自然呈现。
+  APT: [
+    { cumulativeShare: 0.3, centers: [1 * HOUR, 6 * HOUR, 14 * HOUR], spreads: [25 * MINUTE, 60 * MINUTE, 100 * MINUTE] },
+    { cumulativeShare: 0.65, centers: [1.5 * DAY, 3.0 * DAY, 4.5 * DAY], spreads: [0.2 * DAY, 0.4 * DAY, 0.6 * DAY] },
+    { cumulativeShare: 1, centers: [6.0 * DAY, 6.8 * DAY], spreads: [0.25 * DAY, 0.1 * DAY] },
+  ],
 }
 
-// 基准链六步证据的年龄（越早越旧）：Short 在 30 分钟内完成、Long 跨约 7 天。
+// 基准链证据年龄（越早越旧）：Short 短程约 30 分钟完成 4 步、Long 长程跨约 7 天完成 10 步。
 const CHAIN_STAGE_AGES: Record<DemoDatasetId, number[]> = {
-  Short: [25 * MINUTE, 20 * MINUTE, 15 * MINUTE, 10 * MINUTE, 5 * MINUTE, MINUTE],
-  Long: [6.8 * DAY, 5.4 * DAY, 3.8 * DAY, 2.1 * DAY, 16 * HOUR, 40 * MINUTE],
+  Short: [28 * MINUTE, 20 * MINUTE, 12 * MINUTE, 4 * MINUTE],
+  Long: [6.9 * DAY, 6.1 * DAY, 5.3 * DAY, 4.5 * DAY, 3.7 * DAY, 2.9 * DAY, 2.1 * DAY, 1.3 * DAY, 16 * HOUR, 40 * MINUTE],
+  // APT 10 步：侦察(6.9d) → WebShell/执行(6d) → 账户/提权(5.1d) → 爆破/横向(4.1d)
+  // → PowerShell(3.1d) → DNS 隧道(1.1d) → 数据渗出(40m)。
+  APT: [6.9 * DAY, 6.0 * DAY, 6.0 * DAY, 5.1 * DAY, 5.1 * DAY, 4.1 * DAY, 4.1 * DAY, 3.1 * DAY, 1.1 * DAY, 40 * MINUTE],
 }
 
 function stableUnit(value: string) {
@@ -177,6 +187,20 @@ const severity = (value?: string): Severity => {
 
 const sourceName = (path: string) => path.split('/').pop() || path
 
+// 日志文件类型分类：用于总览页跨域来源分布（原始事件口径）。
+function logKindForEvent(event: { source_file?: string; raw?: string }) {
+  const value = (event.source_file || '').toLowerCase()
+  if (value.includes('.evtx')) return 'Windows 事件 EVTX'
+  if (value.includes('network.log')) return '网络遥测 network'
+  if (value.includes('dnsteal')) return 'DNS 隧道/外泄'
+  if (value.includes('auth.log')) return '认证日志 auth'
+  if (value.includes('syslog')) return '系统日志 syslog'
+  if (value.includes('audit.log')) return '审计日志 audit'
+  if (value.includes('eve.') || value.includes('suricata')) return '入侵检测 suricata'
+  if (value.includes('access') || value.includes('nginx') || value.includes('apache')) return 'Web 访问'
+  return '其他'
+}
+
 function eventAction(raw: string) {
   const message = raw.split(': ').slice(1).join(': ').trim()
   return message ? message.slice(0, 68) : raw.slice(0, 68)
@@ -229,8 +253,14 @@ type WindowCorrelation = {
   timeGapMs: number
 }
 
-const AUTO_CASE_LIMIT = 4
-const AUTO_CASE_EVIDENCE_LIMIT = 7
+// 每个数据集最多生成 2 条待人工研判候选链：减少数量、聚焦高质量线索。
+const AUTO_CASE_LIMIT = 2
+// 人工候选链证据上限随数据集语义变化：Short 短程 4 步、Long 长程 8 步，使长程链明显更长。
+const AUTO_CASE_EVIDENCE_LIMIT: Record<DemoDatasetId, number> = { Short: 4, Long: 8, APT: 10 }
+// 自动处置链聚合约束：只在 24 小时时间窗内聚类，防止高频共享实体把整个数据集串成一条巨型链。
+const AUTO_RESOLVE_CHAIN_LIMIT = 20
+const AUTO_RESOLVE_CHAIN_MAX_MEMBERS: Record<DemoDatasetId, number> = { Short: 5, Long: 10, APT: 10 }
+const AUTO_RESOLVE_TIME_GAP = 24 * HOUR
 
 function windowActionFamily(window: AnomalyWindow) {
   const text = window.events.map((event) => `${event.action || ''} ${event.raw || ''}`).join(' ').toLowerCase()
@@ -300,18 +330,39 @@ function correlateWindows(
   return { window: candidate, score, sharedEntities, timeGapMs }
 }
 
+const ACTION_FAMILY_LABELS: Record<string, string> = {
+  account: '账户权限变更',
+  authentication: '异常认证',
+  privilege: '权限提升',
+  execution: '命令执行',
+  network: '网络外联',
+  file: '文件访问',
+  system: '系统服务异常',
+  other: '多阶段异常行为',
+}
+
+function actionFamilyLabel(family: string) {
+  return ACTION_FAMILY_LABELS[family] || ACTION_FAMILY_LABELS.other
+}
+
+function readableDuration(start: string, end: string) {
+  const ms = Date.parse(end) - Date.parse(start)
+  if (!Number.isFinite(ms) || ms < 0) return '未知时长'
+  if (ms < MINUTE) return '1 分钟内'
+  if (ms < HOUR) return `${Math.max(1, Math.round(ms / MINUTE))} 分钟`
+  if (ms < DAY) return `${(ms / HOUR).toFixed(1)} 小时`
+  return `${(ms / DAY).toFixed(1)} 天`
+}
+
+function anchorRoleLabel(anchor: string) {
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(anchor)) return `IP ${anchor}`
+  if (anchor.startsWith('/')) return `文件 ${anchor}`
+  if (/server|host|workstation|desktop/i.test(anchor)) return `主机 ${anchor}`
+  return `账号 ${anchor}`
+}
+
 function caseBehaviorLabel(windows: AnomalyWindow[]) {
   const counts = new Map<string, number>()
-  const labels: Record<string, string> = {
-    account: '账户权限变更',
-    authentication: '异常认证',
-    privilege: '权限提升',
-    execution: '命令执行',
-    network: '网络外联',
-    file: '文件访问',
-    system: '系统服务异常',
-    other: '多阶段异常行为',
-  }
   windows.forEach((window) => {
     const family = windowActionFamily(window)
     counts.set(family, (counts.get(family) || 0) + 1)
@@ -319,8 +370,8 @@ function caseBehaviorLabel(windows: AnomalyWindow[]) {
   return Array.from(counts.entries())
     .sort((left, right) => right[1] - left[1])
     .slice(0, 2)
-    .map(([family]) => labels[family])
-    .join('与') || labels.other
+    .map(([family]) => actionFamilyLabel(family))
+    .join('与') || actionFamilyLabel('other')
 }
 
 function strongestCaseAnchor(windows: AnomalyWindow[], frequencies: Map<string, number>) {
@@ -348,11 +399,11 @@ function highestSeverity(windows: AnomalyWindow[]): Severity {
   return [...windows].sort((left, right) => rank[right.severity] - rank[left.severity])[0]?.severity || 'medium'
 }
 
-function automaticEscalation(windows: AnomalyWindow[], strongestLinkScore: number) {
+function automaticEscalation(windows: AnomalyWindow[], strongestLinkScore: number, evidenceLimit: number) {
   const maxRisk = Math.max(...windows.map((window) => window.score), 0)
   const familyCount = new Set(windows.map(windowActionFamily)).size
   const sourceCount = new Set(windows.flatMap((window) => window.sourceTypes)).size
-  const evidenceVolume = Math.min(1, windows.length / AUTO_CASE_EVIDENCE_LIMIT)
+  const evidenceVolume = Math.min(1, windows.length / evidenceLimit)
   const score = maxRisk * 0.34
     + strongestLinkScore * 0.32
     + Math.min(1, familyCount / 3) * 0.14
@@ -370,6 +421,37 @@ function automaticEscalation(windows: AnomalyWindow[], strongestLinkScore: numbe
     reasons,
     shouldEscalate: score >= 0.76 && highImpact && (familyCount >= 2 || sourceCount >= 2),
   }
+}
+
+// 将完整聚类链截断成“待人工补全”的骨架链，返回保留段与缺失段（真证据）。
+// variant 奇数=首 2 尾 1（中间整体缺失）、偶数=多段缺口（隔段缺失），避免所有案件同一种缺口形态。
+function truncateChainForReview(members: AnomalyWindow[], variant: number) {
+  const last = members.length - 1
+  if (members.length <= 3) {
+    return { kept: [members[0], members[last]], gaps: members.slice(1, last) }
+  }
+  if (variant % 2 === 1) {
+    return { kept: [members[0], members[1], members[last]], gaps: members.slice(2, last) }
+  }
+  const kept: AnomalyWindow[] = []
+  const gaps: AnomalyWindow[] = []
+  members.forEach((window, i) => {
+    if (i === 0 || i === last || (i > 0 && i < last && i % 2 === 0)) kept.push(window)
+    else gaps.push(window)
+  })
+  return { kept, gaps }
+}
+
+// 从候选池中挑选与案件共享实体、但不在链内的窗口作为干扰项，增加人工补全的研判难度。
+function selectDistractorIds(members: AnomalyWindow[], windows: AnomalyWindow[], reserved: Set<string>, count: number) {
+  const memberIds = new Set(members.map((window) => window.id))
+  const memberEntities = new Set(members.flatMap((window) => window.entities))
+  return windows
+    .filter((window) => !memberIds.has(window.id) && !reserved.has(window.id))
+    .filter((window) => window.entities.some((entity) => memberEntities.has(entity)))
+    .sort((left, right) => right.score - left.score)
+    .slice(0, count)
+    .map((window) => window.id)
 }
 
 function buildAutomaticInvestigations(
@@ -392,7 +474,7 @@ function buildAutomaticInvestigations(
       .map((window) => correlateWindows(seed, window, frequencies, windows.length))
       .filter((item) => item.score >= 0.48)
       .sort((left, right) => right.score - left.score || left.timeGapMs - right.timeGapMs || left.window.id.localeCompare(right.window.id))
-      .slice(0, AUTO_CASE_EVIDENCE_LIMIT - 1)
+      .slice(0, AUTO_CASE_EVIDENCE_LIMIT[dataset] - 1)
     if (!related.length) continue
 
     const members = [seed, ...related.map((item) => item.window)]
@@ -408,24 +490,96 @@ function buildAutomaticInvestigations(
     const index = investigations.length + 1
     const firstTime = members[0]?.start || seed.start
     const lastTime = members[members.length - 1]?.start || seed.start
-    const shared = Array.from(new Set(related.flatMap((item) => item.sharedEntities))).slice(0, 3)
-    const escalation = automaticEscalation(members, strongestLink.score)
+    const escalation = automaticEscalation(members, strongestLink.score, AUTO_CASE_EVIDENCE_LIMIT[dataset])
+    const span = readableDuration(firstTime, lastTime)
+    // 截断成骨架链：保留首尾/关键段，中间证据从 windowIds 移除，作为待补全的缺口。
+    const { kept, gaps } = truncateChainForReview(members, index)
+    const distractorIds = selectDistractorIds(members, windows, assigned, 2)
     investigations.push({
       id: `${dataset.toUpperCase()}-AUTO-${String(index).padStart(3, '0')}`,
-      title: `${caseBehaviorLabel(members)}${anchor ? ` · ${anchor}` : ''} · ${compactCaseTime(firstTime)}`,
+      title: `${caseBehaviorLabel(members)}链${anchor ? ` · ${anchorRoleLabel(anchor)}` : ''} · ${compactCaseTime(firstTime)}`,
       severity: highestSeverity(members),
       status: 'investigating',
       queueStatus: 'manual_review',
       escalationScore: Math.round(escalation.score * 100),
       escalationReasons: escalation.reasons,
       decisionSource: 'system',
-      windowIds: members.map((window) => window.id),
+      windowIds: kept.map((window) => window.id),
+      gapEvidenceIds: gaps.map((window) => window.id),
+      gapDistractorIds: distractorIds,
       owner: 'M5 自动关联',
       createdAt: firstTime,
-      summary: `由 ${members.length} 个异常发现自动聚类形成；${shared.length ? `共享锚点 ${shared.join('、')}，` : ''}时间范围 ${firstTime} 至 ${lastTime}，最强关联置信 ${(strongestLink.score * 100).toFixed(0)}%。该链为待人工核验的候选线索，不代表已确认攻击。`,
+      summary: anchor
+        ? `围绕${anchorRoleLabel(anchor)}的候选攻击链，当前已确认 ${kept.length} 个关键窗口，中间缺失 ${gaps.length} 个证据环节，时间跨度 ${span}。请从候选证据中补全缺口，再核验该实体的授权来源与攻击意图。`
+        : `候选攻击链当前已确认 ${kept.length} 个关键窗口，中间缺失 ${gaps.length} 个证据环节，时间跨度 ${span}。请补全缺口后核验共享实体间的行为连续性。`,
     })
   }
   return investigations
+}
+
+// 系统自动处置链：将未进入任何人工案件的异常窗口，按共享实体 + 24h 时间窗聚成
+// 可直接处置的自动链（queueStatus=resolved / decisionSource=system），未成链的
+// 孤立低危窗口保持为“自动归档”。通过链长上限与行为多样性护栏避免巨型链。
+function buildAutomaticResolutions(
+  dataset: DemoDatasetId,
+  windows: AnomalyWindow[],
+  reservedWindowIds: Set<string>,
+): Investigation[] {
+  const frequencies = entityFrequencies(windows)
+  const assigned = new Set(reservedWindowIds)
+  const candidates = [...windows]
+    .filter((window) => !assigned.has(window.id))
+    .sort((left, right) => right.score - left.score || Date.parse(right.start) - Date.parse(left.start) || left.id.localeCompare(right.id))
+  const resolutions: Investigation[] = []
+
+  for (const seed of candidates) {
+    if (resolutions.length >= AUTO_RESOLVE_CHAIN_LIMIT) break
+    if (assigned.has(seed.id)) continue
+    const related = windows
+      .filter((window) => window.id !== seed.id && !assigned.has(window.id))
+      .map((window) => correlateWindows(seed, window, frequencies, windows.length))
+      .filter((item) => item.score >= 0.45 && Number.isFinite(item.timeGapMs) && item.timeGapMs <= AUTO_RESOLVE_TIME_GAP)
+      .sort((left, right) => right.score - left.score || left.timeGapMs - right.timeGapMs || left.window.id.localeCompare(right.window.id))
+      .slice(0, AUTO_RESOLVE_CHAIN_MAX_MEMBERS[dataset] - 1)
+    if (!related.length) continue
+
+    const members = [seed, ...related.map((item) => item.window)]
+      .sort((left, right) => Date.parse(left.start) - Date.parse(right.start))
+    const anchor = strongestCaseAnchor(members, frequencies)
+    const uniqueFamilies = new Set(members.map(windowActionFamily)).size
+    const spanHours = (Date.parse(members[members.length - 1].start) - Date.parse(members[0].start)) / HOUR
+    // 自动处置只接受可信子链：存在稀有实体锚点、行为阶段多样或 1 小时内突发；
+    // 否则该窗口保持孤立，计入总览“自动归档”。
+    if (!anchor && uniqueFamilies < 2 && spanHours > 1) continue
+
+    members.forEach((window) => assigned.add(window.id))
+    const index = resolutions.length + 1
+    const firstTime = members[0]?.start || seed.start
+    const lastTime = members[members.length - 1]?.start || seed.start
+    const shared = Array.from(new Set(related.flatMap((item) => item.sharedEntities))).slice(0, 3)
+    const meanScore = members.reduce((sum, window) => sum + window.score, 0) / members.length
+    const maxScore = Math.max(...members.map((window) => window.score), 0)
+    const familyLabel = caseBehaviorLabel(members)
+    resolutions.push({
+      id: `${dataset.toUpperCase()}-DISP-${String(index).padStart(3, '0')}`,
+      title: `${familyLabel} · 系统自动处置 · ${compactCaseTime(firstTime)}`,
+      severity: highestSeverity(members),
+      status: 'contained',
+      queueStatus: 'resolved',
+      escalationScore: Math.round(maxScore * 100),
+      escalationReasons: [
+        `系统自动研判 · 平均风险 ${(meanScore * 100).toFixed(0)}%`,
+        `${uniqueFamilies} 类行为阶段`,
+        `最强关联置信 ${(related[0].score * 100).toFixed(0)}%`,
+      ],
+      decisionSource: 'system',
+      windowIds: members.map((window) => window.id),
+      owner: '系统自动研判',
+      createdAt: firstTime,
+      summary: `由 ${members.length} 个异常发现按共享实体与 ${AUTO_RESOLVE_TIME_GAP / HOUR}h 时间窗自动聚类，系统自动研判为${familyLabel}链并完成处置${shared.length ? `；共享锚点 ${shared.join('、')}` : ''}。时间范围 ${firstTime} 至 ${lastTime}。该链无需人工研判，可在“自动处置”队列复核或转人工。`,
+    })
+  }
+  return resolutions
 }
 
 export async function loadDemoDataset(dataset: DemoDatasetId): Promise<{
@@ -436,11 +590,12 @@ export async function loadDemoDataset(dataset: DemoDatasetId): Promise<{
   overviewSeries: Array<{ time: string; logs: number; anomalies: number }>
 }> {
   const base = `/demo-data/${dataset}`
-  const [timeline, detections, chain, manifest] = await Promise.all([
+  const [timeline, detections, chain, manifest, moduleScores] = await Promise.all([
     fetch(`${base}/timeline.json`).then((response) => response.json() as Promise<DemoTimelineEvent[]>),
     fetch(`${base}/detection_results.json`).then((response) => response.json() as Promise<DemoDetection[]>),
     fetch(`${base}/attack_chain.json`).then((response) => response.json() as Promise<DemoChain>),
     fetch(`${base}/manifest.json`).then((response) => response.json() as Promise<{ source_slice?: string; event_count?: number }>),
+    fetch(`${base}/module_scores.json`).then((response) => response.json() as Promise<Record<string, Record<'M0' | 'M1' | 'M2' | 'M3' | 'M4' | 'M5' | 'M6', number>>>),
   ])
 
   const replayTimeline = projectReplayTimeline(timeline, chain, dataset)
@@ -472,6 +627,7 @@ export async function loadDemoDataset(dataset: DemoDatasetId): Promise<{
         title: event.action,
         severity: severity(projection?.threat_level),
         score,
+        moduleScores: moduleScores[item.event_id],
         start: item.timestamp,
         end: item.timestamp,
         status: score >= 0.75 ? 'new' : 'reviewing',
@@ -485,24 +641,44 @@ export async function loadDemoDataset(dataset: DemoDatasetId): Promise<{
     })
 
   const chainEventIds = new Set((chain.steps || []).flatMap((step) => step.evidence_event_ids))
-  const chainWindows = anomalyWindows.filter((item) => chainEventIds.has(item.id.replace('WIN-', '')))
+  const chainWindows = anomalyWindows
+    .filter((item) => chainEventIds.has(item.id.replace('WIN-', '')))
+    .sort((left, right) => Date.parse(left.start) - Date.parse(right.start))
+  const chainSeverity = severity([...chainWindows].sort((left, right) => right.score - left.score)[0]?.severity)
+  // 基准链同样截断为骨架链，保留首尾/关键段、中间作为缺口，使待研判队列案件形态一致；
+  // 完整基准链仍保留在 attack_chain 证据文件中，用于和自动关联结果对照。
+  // 演示优化：APT 基准链提前补全到只剩最后一步（数据渗出），现场只需连接最后一个节点，避免逐个补全浪费时间。
+  const { kept: curatedKept, gaps: curatedGaps } = dataset === 'APT'
+    ? { kept: chainWindows.slice(0, -1), gaps: chainWindows.slice(-1) }
+    : truncateChainForReview(chainWindows, 1)
+  const curatedDistractorIds = dataset === 'APT' ? [] : selectDistractorIds(chainWindows, anomalyWindows, new Set(), 2)
   const curatedInvestigation: Investigation = {
     id: chain.chain_id,
     title: `${caseBehaviorLabel(chainWindows)} · 人工整理基准链`,
-    severity: severity(chainWindows.sort((a, b) => b.score - a.score)[0]?.severity),
+    severity: chainSeverity,
     status: chain.status === 'confirmed' ? 'contained' : chain.status === 'dismissed' ? 'closed' : 'investigating',
     queueStatus: chain.status === 'candidate' ? 'manual_review' : 'resolved',
     escalationScore: 100,
     escalationReasons: ['独立攻击链证据文件提供六阶段关联', '用于人工整理基准链与自动结果对照'],
     decisionSource: 'analyst',
-    windowIds: Array.from(chainEventIds).map((id) => `WIN-${id}`),
+    windowIds: curatedKept.map((window) => window.id),
+    gapEvidenceIds: curatedGaps.map((window) => window.id),
+    gapDistractorIds: curatedDistractorIds,
     owner: 'analyst-01',
     createdAt: events[0]?.time || new Date().toISOString(),
-    summary: '由独立攻击链证据文件整理的基准候选链，用于和自动关联拆案结果对照；真实标签不参与检测。',
+    summary: `由独立攻击链证据文件整理的基准候选链（完整 ${chainWindows.length} 个关键窗口），截断为骨架链后供研判补全，用于和自动关联拆案结果对照；真实标签不参与检测。`,
   }
+  const curatedReservedIds = new Set([...curatedInvestigation.windowIds, ...(curatedInvestigation.gapEvidenceIds || []), ...(curatedInvestigation.gapDistractorIds || [])])
+  const autoManualInvestigations = buildAutomaticInvestigations(dataset, anomalyWindows, curatedReservedIds)
+  const autoResolvedInvestigations = buildAutomaticResolutions(
+    dataset,
+    anomalyWindows,
+    new Set([...curatedReservedIds, ...autoManualInvestigations.flatMap((item) => item.windowIds)]),
+  )
   const investigations: Investigation[] = [
     curatedInvestigation,
-    ...buildAutomaticInvestigations(dataset, anomalyWindows, new Set(curatedInvestigation.windowIds)),
+    ...autoManualInvestigations,
+    ...autoResolvedInvestigations,
   ]
 
   const logSources: LogSource[] = [{
@@ -516,14 +692,16 @@ export async function loadDemoDataset(dataset: DemoDatasetId): Promise<{
   }]
 
   const bucketMinutes = 5
-  const buckets = new Map<string, { logs: number; anomalies: number }>()
+  const buckets = new Map<string, { logs: number; anomalies: number; kinds: Record<string, number> }>()
   replayTimeline.forEach((item) => {
     const timestamp = new Date(item.timestamp)
     timestamp.setUTCSeconds(0, 0)
     timestamp.setUTCMinutes(Math.floor(timestamp.getUTCMinutes() / bucketMinutes) * bucketMinutes)
     const key = timestamp.toISOString().slice(0, 16).replace('T', ' ')
-    const current = buckets.get(key) || { logs: 0, anomalies: 0 }
+    const current = buckets.get(key) || { logs: 0, anomalies: 0, kinds: {} }
     current.logs += 1
+    const kind = logKindForEvent(item)
+    current.kinds[kind] = (current.kinds[kind] || 0) + 1
     if ((detectionById.get(item.event_id) || item.system_projection)?.final_score! >= 0.5) current.anomalies += 1
     buckets.set(key, current)
   })
