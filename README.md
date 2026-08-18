@@ -28,11 +28,19 @@ The resulting flow is:
 
 This keeps Transformer context length independent from total campaign duration while retaining interpretable evidence for every long-horizon edge and chain assignment.
 
+## M5 seed external knowledge
+
+`knowledge/m5_seed_knowledge.jsonl` provides a deliberately small seed knowledge base for the external retrieval/cross-attention path. It currently contains 17 concise MITRE ATT&CK Enterprise technique/sub-technique records spanning initial access, execution, persistence, credential access, discovery, lateral movement, command and control, collection, exfiltration and impact.
+
+Each record contains ATT&CK identity, concise semantic text, practical log clues, one or more coarse M5 stage positions and a soft progress prior. `knowledge/m5_seed_stage_schema.json` documents the ten model positions. These positions are model priors rather than an official ATT&CK timeline.
+
+The committed knowledge file intentionally does not contain fabricated embeddings. A build step should encode `name + primary_tactic + text + log_clues`, attach the resulting vector as `embedding`, and then construct `AttackKnowledgeIndex`. Target-test labels or scenario ground truth must never be added to this knowledge base.
+
 ## Current status
 
 The repository contains implementation contracts, smoke/unit tests, source-held-out and leakage-audit utilities, release protocol gates, and reduced M3-M6 model components. It does not contain real training data, model checkpoints, final source-domain metrics, or AIT predictions.
 
-The last previously recorded server-wide test result is `34 passed` at commit `f2bb562`. This branch adds new M5 architecture tests for 15-minute windows, learned link scoring, transition compatibility and chain-aware assignment; a fresh server-wide CI result has not yet been recorded here.
+The last previously recorded server-wide test result is `34 passed` at commit `f2bb562`. This branch adds new M5 architecture tests for 15-minute windows, learned link scoring, transition compatibility, chain-aware assignment and seed-knowledge schema validation; a fresh server-wide CI result has not yet been recorded here.
 
 The current data fallback route is CERT long-term behavior, EVTX endpoint/entity relationships, CTU-13 network continuity, and Sandworm attack-window validation. LANL is not part of the current training route.
 
