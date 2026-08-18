@@ -23,26 +23,17 @@ class M5TrainBatch:
     progress_mask: Tensor | None = None
     ranking_pairs: Tensor | None = None
     allowed_knowledge_mask: Tensor | None = None
+    semantic_token_states: Tensor | None = None
 
 
 class M5ProgressRunner:
-    """Minimal M5 train/inference runner.
-
-    Tokenization, production knowledge-database I/O, and ANN prefiltering remain
-    outside this class. The runner operates on the bounded candidate knowledge
-    set passed to the model.
-    """
+    """Minimal train/inference runner; tokenization and knowledge DB I/O stay external."""
 
     def __init__(self, model: M5KnowledgeProgressTransformer, loss_config: M5LossConfig | None = None) -> None:
         self.model = model
         self.loss_config = loss_config or M5LossConfig()
 
-    def train_step(
-        self,
-        batch: M5TrainBatch,
-        knowledge: AttackKnowledgeIndex,
-        optimizer: torch.optim.Optimizer,
-    ) -> dict[str, float]:
+    def train_step(self, batch: M5TrainBatch, knowledge: AttackKnowledgeIndex, optimizer: torch.optim.Optimizer) -> dict[str, float]:
         self.model.train()
         optimizer.zero_grad(set_to_none=True)
         output = self.model(
@@ -50,6 +41,7 @@ class M5ProgressRunner:
             batch.attention_mask,
             knowledge,
             allowed_knowledge_mask=batch.allowed_knowledge_mask,
+            semantic_token_states=batch.semantic_token_states,
         )
         losses = m5_multitask_loss(
             output,
@@ -72,6 +64,7 @@ class M5ProgressRunner:
         knowledge: AttackKnowledgeIndex,
         *,
         allowed_knowledge_mask: Tensor | None = None,
+        semantic_token_states: Tensor | None = None,
     ) -> dict[str, Tensor]:
         self.model.eval()
         return self.model(
@@ -79,4 +72,5 @@ class M5ProgressRunner:
             attention_mask,
             knowledge,
             allowed_knowledge_mask=allowed_knowledge_mask,
+            semantic_token_states=semantic_token_states,
         )
