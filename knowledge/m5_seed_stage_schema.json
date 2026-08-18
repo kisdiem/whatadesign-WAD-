@@ -1,0 +1,22 @@
+{
+  "schema_version": "m5_seed_stage_v1",
+  "description": "Ten coarse model positions used only as soft attack-progress priors for M5 knowledge cross-attention. They are not an official MITRE ATT&CK ordering and must not be treated as a strict attack sequence.",
+  "positions": [
+    {"index": 0, "name": "initial_access", "progress_prior": 0.08},
+    {"index": 1, "name": "execution", "progress_prior": 0.18},
+    {"index": 2, "name": "foothold_persistence_privilege", "progress_prior": 0.28},
+    {"index": 3, "name": "credential_access", "progress_prior": 0.38},
+    {"index": 4, "name": "discovery", "progress_prior": 0.48},
+    {"index": 5, "name": "lateral_movement", "progress_prior": 0.60},
+    {"index": 6, "name": "command_and_control", "progress_prior": 0.70},
+    {"index": 7, "name": "collection_staging", "progress_prior": 0.80},
+    {"index": 8, "name": "exfiltration", "progress_prior": 0.90},
+    {"index": 9, "name": "impact", "progress_prior": 0.97}
+  ],
+  "rules": [
+    "One knowledge item may map to multiple positions.",
+    "Progress is a soft prior, never a hard chronological constraint.",
+    "Real campaigns may revisit earlier tactics; M5 transition compatibility remains learnable.",
+    "Target-test ground truth must never be converted into knowledge records."
+  ]
+}
