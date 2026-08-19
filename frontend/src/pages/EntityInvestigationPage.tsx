@@ -225,9 +225,22 @@ export default function EntityInvestigationPage({
       const profileFindings = findings.filter((finding) => profile.findingIds.includes(finding.id) || finding.entities.includes(profile.id))
       const findingSummary = profileFindings.map((finding) => `${finding.start} ${finding.title} (${finding.host || 'host unresolved'}, risk ${finding.risk})`).join('; ') || 'no linked finding'
       return `entity=${profile.id}; type=${entityTypeLabel[profile.type]}; first_seen=${profile.firstSeen}; last_seen=${profile.lastSeen}; event_count=${profile.thirtyDayEvents}; active_hosts=${profile.currentLoginHosts}; new_relations=${profile.newHostRelations}; linked_findings=${findingSummary}`
-    }).join('\n')
+    })
+    // 后端 /agent/query/stream 的 message 上限为 12000 字符，批量实体快照极易超限
+    // 触发 422 校验失败，前端会静默降级为演示回答。这里按预算截断快照文本，
+    // 实体清单本身仍通过 context.entityIds 完整传递。
+    const SNAPSHOT_BUDGET = 9500
+    let snapshotText = ''
+    for (const line of snapshot) {
+      if (snapshotText.length + line.length + 1 > SNAPSHOT_BUDGET) break
+      snapshotText += `${snapshotText ? '\n' : ''}${line}`
+    }
+    const includedCount = snapshotText ? snapshotText.split('\n').length : 0
+    const scopeLabel = includedCount < filtered.length
+      ? `the top ${includedCount} of ${filtered.length} entities currently filtered`
+      : `the complete set of ${filtered.length} entities currently filtered`
     onSubmitBatch(
-      `The following is the complete set of ${filtered.length} entities currently filtered in Entity Investigation, with their related findings. Analyze them as security investigation context. In Chinese, first state what this entity set represents, then list no more than four entities needing attention and why. Risk scores and anomalous-relation labels are leads, not proof of compromise. Do not invent events not present in this snapshot.\n\n${snapshot}`,
+      `The following is ${scopeLabel} in Entity Investigation, with their related findings. Analyze them as security investigation context. In Chinese, first state what this entity set represents, then list no more than four entities needing attention and why. Risk scores and anomalous-relation labels are leads, not proof of compromise. Do not invent events not present in this snapshot.\n\n${snapshotText}`,
       { entityIds: filtered.map((item) => item.id), windowIds: Array.from(new Set(filtered.flatMap((item) => item.findingIds))), timeRange },
     )
   }

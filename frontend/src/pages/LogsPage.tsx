@@ -377,9 +377,19 @@ export default function LogsPage({
       `risk=${event.risk ?? 'none'}`,
       `raw=${event.raw.slice(0, 500)}`,
     ].join('; ')).join('\n')
+    // 与实体页同理：后端 /agent/query/stream 的 message 上限 12000 字符，
+    // 200 条快照极易超限 422，这里按预算截断，避免被静默降级为演示回答。
+    const SNAPSHOT_BUDGET = 9500
+    const snapshotLines = snapshot.split('\n')
+    let snapshotText = ''
+    for (const line of snapshotLines) {
+      if (snapshotText.length + line.length + 1 > SNAPSHOT_BUDGET) break
+      snapshotText += `${snapshotText ? '\n' : ''}${line}`
+    }
+    const includedCount = snapshotText ? snapshotText.split('\n').length : 0
     const entityIds = Array.from(new Set(filtered.flatMap((event) => [event.actor, event.host, event.process, event.ip, ...(event.entities || [])]).filter((value): value is string => Boolean(value))))
     onSubmitBatch(
-      `Log Search currently contains ${filtered.length} matching events. The snapshot below contains the first ${sample.length} events after the active time, source and keyword filters. Analyze in concise Chinese: identify the dominant behavior, explain whether there is a coherent sequence worth investigating, list at most four events or patterns that deserve attention, and state what cannot be concluded. Do not claim the snapshot is the complete dataset. Event labels and risk scores are only leads, not ground truth.\n\n${snapshot}`,
+      `Log Search currently contains ${filtered.length} matching events. The snapshot below contains the first ${includedCount} events (of ${sample.length} sampled) after the active time, source and keyword filters. Analyze in concise Chinese: identify the dominant behavior, explain whether there is a coherent sequence worth investigating, list at most four events or patterns that deserve attention, and state what cannot be concluded. Do not claim the snapshot is the complete dataset. Event labels and risk scores are only leads, not ground truth.\n\n${snapshotText}`,
       { windowIds: Array.from(new Set(filtered.map((event) => event.findingId).filter((value): value is string => Boolean(value)))), entityIds, timeRange },
     )
   }

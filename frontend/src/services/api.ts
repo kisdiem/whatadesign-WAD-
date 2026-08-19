@@ -12,6 +12,12 @@ import {
 const USE_LOCAL_DATA = import.meta.env.VITE_USE_MOCKS !== 'false'
 const AGENT_USE_MOCKS = import.meta.env.VITE_AGENT_USE_MOCKS === 'true'
 const API_BASE = import.meta.env.VITE_API_BASE || '/api'
+// SSE 流式响应经 Vite 开发代理转发时偶发断流（浏览器读流报 network error），
+// 后端已配置 CORS 允许本地前端源，开发模式下流式请求直连后端规避该问题；
+// 生产环境仍使用同源 /api。
+const STREAM_BASE = import.meta.env.DEV
+  ? (import.meta.env.VITE_API_DIRECT || 'http://127.0.0.1:8000/api')
+  : API_BASE
 
 function detailToMessage(detail: unknown, fallback: string): string {
   if (typeof detail === 'string' && detail.trim()) return detail
@@ -633,7 +639,7 @@ function buildAgentPayload(question: string, context: AssistantContext) {
 async function agentStreamRequest(question: string, context: AssistantContext): Promise<AgentApiResponse> {
   let response: Response
   try {
-    response = await fetch(`${API_BASE}/agent/query/stream`, {
+    response = await fetch(`${STREAM_BASE}/agent/query/stream`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(buildAgentPayload(question, context)),
@@ -752,7 +758,9 @@ async function askAssistantDemo(
   const normalized = question.toLowerCase()
   const projectKnowledgeQuestion = /(m[0-6]|多尺度|主动检索|长周期|攻击链|跨源|语义统一|实体关系|综合风险|评分|弱监督|无监督|真实标签|召回|误报|消融|吞吐|tb|collector|知识库|小影)/i.test(question)
   const knowledgeResult = (activeAgentMode === 'knowledge' || projectKnowledgeQuestion)
-    ? await searchProjectKnowledge(question).catch(() => null)
+    // 知识检索接口 query 上限 4000 字符：批量提交的长快照直接整段发送会 422，
+    // 这里截断到安全长度，避免降级回答也连带失败。
+    ? await searchProjectKnowledge(question.slice(0, 3800)).catch(() => null)
     : null
   const knowledgeAnswer = knowledgeResult?.documents.length
     ? `根据链影寻踪项目知识库：\n${knowledgeResult.documents.slice(0, 2).map((document, index) => `${index + 1}. ${document.title}：${String(document.content || document.chunk || '').slice(0, 220)}`).join('\n')}`

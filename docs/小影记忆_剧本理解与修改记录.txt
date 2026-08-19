@@ -1,0 +1,172 @@
+================================================================================
+《链影寻踪》小影（AI 助手）记忆存档
+记录时间：2026-08-19（scx-v3 分支阶段）
+本文件是小影对演示剧本的理解 + 对本项目所做修改的记忆，供后续会话恢复上下文使用。
+================================================================================
+
+
+一、项目定位（一句话）
+================================================================================
+面向海量多源安全日志，用弱监督方法识别罕见攻击链，把「海量日志」收敛成
+「少量可解释、可追溯、可执行的人工研判」。
+—— 不是花哨仪表盘，而是跑通「事件 → 发现 → 案件 → 证据 → 决策」调查闭环。
+
+技术栈：
+- 前端：React 18 + Vite 6 + TypeScript 5 + Ant Design 5 + ECharts 5
+- 后端：FastAPI + Uvicorn + OpenAI Agents SDK + DeepSeek（deepseek-chat，Chat Completions 兼容）
+- 页面 8 个：总览 / 发现 / 实体调查 / 案件调查 / 日志检索 / 数据源 / 小影 / 评测
+
+
+二、演示剧本理解（10 分钟 APT 版）
+================================================================================
+剧本文件：docs/演示剧本_10分钟_APT版.md
+叙事主线：攻击者 45.155.205.233 用 7 天跨 6 类日志源、跨 3+1 台主机完成完整 APT，
+系统从 7,000+ 条日志里恢复出 10 步攻击链，只留少量关键窗口给分析员研判。
+
+三项核心创新（每幕的落点）：
+  1. 跨源语义统一     —— Syslog/EVTX/Suricata/DNS 各说各话，先统一成同一语义空间再关联
+  2. 多尺度上下文主动检索 —— 以事件为锚点，1h/24h/7d/30d 按需扩展，不是等量扫全量
+  3. 长周期攻击链关联 —— 用稳定实体锚点（攻击者 IP、后门账户）连接跨日窗口
+
+贯穿价值主张：研判压缩（海量 → 千分之一人工量）+ 可解释可追溯（每结论回溯到原始日志与分层分数）。
+
+8 幕结构（约 10:40）：
+  第 0 幕 开场（0:40）总览页：8 导航 + 右上时间范围选择器（多尺度入口）
+  第 1 幕 态势总览 + 研判漏斗（1:20）：4 统计卡（原始事件→异常发现→人工研判→压缩率）；
+          L1→L5 漏斗（L3 系统自动处置是重点，强调压缩到千分之一）；跨源双层环图
+  第 2 幕 发现页 + 风险可解释（1:20）：切 APT 数据集；展开三层分数（事件异常/局部/长程）；
+          点分数弹 weak_fusion_v2 解释（36% 事件 + 29% 局部 + 35% 长程）；M3 事件关联图
+  第 3 幕 实体调查 + 多尺度基线（0:50）：svc_backup 实体画像；偏离基线对比（稀有≠恶意）；
+          加分动作：时间范围 7d→24h→1h 切换演示尺度联动
+  第 4 幕 案件调查 + 攻击链图（2:10，核心亮点）：APT-CANDIDATE-001；攻击链路研判图
+          （上红主链 + 下灰候选池）；系统自动提取链（战术→技术ID→证据数→时间、链罕见度）；
+          现场拖拽研判（真证据进主链断口 / 干扰项拖排除）；已定案队列 + 双向流转
+  第 5 幕 日志检索 + 全量追溯（0:50）：已载入 47,524 + 7,298 条；搜 45.155.205.233/svc_backup/shell.php；
+          标准化字段 / 原始日志双视图；M0-M6 分阶段分数
+  第 6 幕 数据源 + 小文件真实上传（0:50）：数据源台账（Short/Long/APT + 实时上传源）；
+          上传 sample_upload_logs/ 样例 → 后端真实跑 M0-M6 → 并入事件/发现/案件
+          【诚实边界必讲】小文件实测 ≠ TB 级生产实测；TB 级走 Collector+Kafka+Flink
+  第 7 幕 小影 + 知识检索（1:20）：自动首轮分析；知识库检索返回知识卡片；
+          四模式 + 结构化输出四段卡（事实/判断/待确认/下一步核验）+ 可执行按钮
+          【答辩】"套壳 LLM？"→ 模型是可替换推理层，知识/检测工具/上下文/证据协议都是自研的
+  第 8 幕 评测 + 答辩口径（1:00）：PR-AUC、Recall@1%FPR、3-day Chain Recovery、EPS、Analyst Reduction；
+          消融 Full vs w/o M5（72.6%→41.2%）；错误案例 backup_admin（有工单被人工排除）；
+          源域对比；【底线】真实标签不进检测主流程（先独立预测、落盘后才读标签算指标）
+
+答辩要点（评委可能问）：
+  - 研判压缩是不是把真攻击压缩掉？→ 压缩的是人工看的量，不是检测（M0-M6 全覆盖）
+  - 三层分数权重？→ 弱监督信号+模板稀有度刻画"像不像攻击"权重最高（65%），每个分数可点开看依据
+  - 自动处置会不会把真攻击处置掉？→ 自动处置≠删除，案件窗口全保留可回溯，任何链可一键升级人工
+  - 链罕见度怎么算？→ M2实体稀有+M4模板稀有（65%权重，来自 2.2 亿行真实日志频率标定）
+    + 时间压缩度 + 高风险占比；是调查信号不是入侵结论
+  - 稀有=恶意？→ 不，backup_admin 有已批准维护工单被人工排除（系统解释误报来源）
+  - 标签隔离 → 标签不进检测主流程，杜绝泄漏
+
+APT 数据集速查：
+  事件 7,298 条（异常 30：medium 13 / high 15 / critical 2）
+  攻击者 IP：45.155.205.233
+  主机：WEB-01 → DB-01 → FILE-01（+ 干扰主机 FS-02）
+  账户：webadmin（被利用）→ svc_backup（后门/持久化）→ backup_admin（稀有但正常，干扰项）
+  日志源：Suricata / Syslog / auth.log / Windows EVTX / DNS 隧道 / 网络遥测
+  10 步链：扫描 → WebShell → 执行 → 建账户 → 提权 → 爆破 → 横向移动 → PowerShell → DNS 隧道 → 数据渗出
+  生成：python scripts/build_apt_demo.py（确定性，contains_labels=false）
+
+事件 APT-000008（用户追问的那条线索）：
+  原文：DB-01 Microsoft-Windows-Sysmon: EventID 1 Process Create powershell.exe
+        -enc QWxsIFN5c3RlbXMuTmV0LldlYkNsaWVudCk= (user svc_backup)
+  base64 解码 = "All Systems.Net.WebClient)"（PowerShell 编码命令片段，配合 WebClient 外联下载）
+  -enc 即 EncodedCommand：用 base64 编码命令避免明文出现在日志/进程命令行中
+  EventID 1 = Sysmon 进程创建事件；由持久化账户 svc_backup 启动 → 提权后横向移动前的载荷投递
+  威胁等级 critical，final_score 0.8624（M4 模板稀有度 0.92、M5 长程关联 0.9 最高）
+  对应窗口 WIN-APT-000008（命名规则：WIN-{事件ID}）
+
+
+三、关键技术机制记忆
+================================================================================
+1. 在线/降级双路径（askAssistant）：
+   askAssistant → 若 AGENT_USE_MOCKS 为 false 先走在线 askRealAgent（SSE 流）
+   → 失败捕获后降级 askAssistantDemo，降级回答带前缀「【在线小影未生效：...】」
+
+2. SSE 直连（重要修复）：
+   Vite 开发代理转发 SSE 偶发断流（浏览器读流报 network error，后端实际 200）。
+   已改为开发模式流式请求直连后端绕过代理：
+     STREAM_BASE = import.meta.env.DEV
+       ? (import.meta.env.VITE_API_DIRECT || 'http://127.0.0.1:8000/api')
+       : API_BASE
+   生产环境仍走同源 /api。后端 CORS 默认允许 http://localhost:5173, http://127.0.0.1:5173。
+
+3. 请求校验上限（422 根因）：
+   后端 AgentQueryRequest.message 上限 12000 字符；KnowledgeSearchRequest.query 上限 4000 字符。
+   实体/日志快照超长会触发 422 → 前端静默降级（表现为「在线模型未生效」）。
+   已在前端做快照截断（SNAPSHOT_BUDGET = 9500，只保留完整行）。
+
+4. 模型配置为进程内存存储：
+   /api/agent/provider 配置的 Key 只存进程内存，重启即清空（openai_configured=false）。
+   → 每次重启后端后，使用在线小影前必须在小影页重新「模型配置」：
+     provider=deepseek / model=deepseek-chat / base_url=https://api.deepseek.com/v1
+
+5. 环境变量：WAD_AGENT_USE_MOCKS=true 启用 DemoRepository（下拉三套 demo-data）；
+   VITE_USE_MOCKS !== 'false' 前端用本地 mock 数据。
+
+6. 安全智能体 security_agent 使用 tool_choice="required"；chat completions 模式下 output_type=None。
+
+7. 案件窗口命名：窗口 ID = `WIN-{事件ID}`（如 WIN-APT-000008）；链事件用事件 ID 匹配。
+
+
+四、项目修改记录（小影记得的改动）
+================================================================================
+【本次会话（scx-v3）】
+1. frontend/src/services/demoData.ts —— APT 基准链提前补全
+   - 演示优化：APT 链只保留前 9 步在主链，最后一步（数据渗出）放入候选池缺口，
+     清除干扰项（curatedDistractorIds = []），现场只需连接最后一个节点。
+   - 实测：主链 9 条 / 候选 0 条（干扰），案件 APT-CANDIDATE-001。
+
+2. docs/项目功能介绍.md —— 全面更新
+   - 新增三数据集对照表（Short 2,749 / Long 44,775 / APT 7,298，合计约 5.5 万）
+   - 新增「第十二章 · 评委问答（FAQ）」15 问
+   - 架构、总览、案件、7.3 数据、7.8 时间投影、6.5 后端仓库等章节补入 APT 与最新口径
+
+3. frontend/src/services/api.ts —— 在线模型链路修复（核心）
+   - 新增 STREAM_BASE：开发模式 SSE 直连后端规避 Vite 代理断流
+   - agentStreamRequest 改为 fetch(STREAM_BASE + '/agent/query/stream')
+   - 降级路径知识检索防 422：question.slice(0, 3800)
+
+4. frontend/src/pages/EntityInvestigationPage.tsx —— 实体快照截断
+   - submitEntities 先逐行拼装再按 SNAPSHOT_BUDGET=9500 截断（只保留完整行）
+   - 实体清单仍全部经 context.entityIds 传递；提示语按情况写 the top N of M entities
+
+5. frontend/src/pages/LogsPage.tsx —— 日志快照同样截断
+   - submitLogs 引入 SNAPSHOT_BUDGET=9500，对最多 200 条快照截断并统计 includedCount
+
+【更早会话】
+6. frontend/src/services/investigationDomain.ts、frontend/src/MissionControlApp.tsx
+   - buildFindingEvidence / attachCaseIds 性能拆分（大 List 数据下卡顿优化）
+
+7. scripts/build_apt_demo.py + frontend/public/demo-data/APT/（timeline.json 等）
+   - APT 数据集生成脚本与数据文件（确定性生成，7,298 事件）
+
+8. frontend 新增 autoAttackChain.ts（自动攻击链提取逻辑）
+
+9. 后端 agent_service/ 实体名冲突合并（APT 数据接入小影查询链路）
+
+【Git 状态】
+- 已推送 origin/scx-v3（最新 commit 3c87030，933351c..3c87030，48 文件）
+- 含：6 个 APT 数据文件、autoAttackChain.ts、两份文档、m6_calibration 脚本等
+- 注意：Long/timeline.json 53.24MB 超 GitHub 50MB 推荐上限（未阻断）
+- 【未提交】本次 4 处修复（api.ts、EntityInvestigationPage.tsx、LogsPage.tsx + demoData.ts）
+  尚未 git 提交/推送，需要的话可一并推 scx-v3
+
+
+五、注意事项 / 遗留事项
+================================================================================
+1. 【重要】后端重启后 DeepSeek Key 已被清空（内存设计），openai_configured=false。
+   演示「实体调查 → 发给小影」在线模型前，必须在小影页重新「模型配置」填 Key，
+   否则仍会降级为本地回答（带「【在线小影未生效】」前缀）。
+2. 4 处修复未提交 git（见上）。
+3. 演示开场前建议：健康检查 http://127.0.0.1:8000/api/agent/health（ok=true）+ 前端 5173。
+4. 演示稳妥口径：诚实边界必讲——小文件实测 ≠ TB 级生产实测；真实标签不进检测主流程。
+5. 命名约定：小影 = 智能体助手；系统名「链影寻踪」。
+
+================================================================================
+记忆存档结束。后续会话如需恢复，直接检索本文件即可。
+================================================================================
