@@ -9,12 +9,12 @@
     "gather/dns/dnsteal.log"
   ],
   "source_slice": "2022-01-24T13:30:00.000000Z/2022-01-31T13:30:00.000000Z",
-  "event_count": 7298,
+  "event_count": 7338,
   "sha256_events_log": "b506f1b6d4fa541f1f21e93b9ca86fb6ef188d0fc15fe66ceaef1ddba941fefb",
   "contains_labels": false,
   "contains_facts_json": false,
   "preserves_real_source_timestamps": true,
-  "generated_at": "2026-08-18T19:29:54.106978Z",
+  "generated_at": "2026-08-20T00:00:00.000000Z",
   "apt_narrative": true,
-  "note": "为 10 分钟演示剧本设计的跨源 APT 攻击叙事集；分数由与上传链路一致的 M6 融合公式合成，不读标签。"
+  "note": "APT 演示回放：运行时移除原 10 个预置恶意关键事件，并补充 50 个与原字段结构一致的正常业务/运维事件；检测仍不读取标签。"
 }
