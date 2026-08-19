@@ -62,6 +62,7 @@ class M1Encoder(nn.Module):
                           roles=predictions.get("roles", {}), outcome=predictions.get("outcome", "unknown"),
                           key_attributes=predictions.get("key_attributes", {}),
                           entity_mentions=predictions.get("entity_mentions", []),
+                          semantic_embedding=[float(value) for value in predictions.get("embedding", predictions.get("semantic_embedding", []))],
                           semantic_confidence=float(predictions.get("semantic_confidence", 0.0)),
                           unknown_score=float(predictions.get("unknown_score", 1.0)),
                           source_record_ref=source_record_ref, semantic_version="m1-encoder-1")

@@ -3,7 +3,8 @@ from __future__ import annotations
 from src.common.schema import FrozenFeatureRecord
 
 
-def join_frozen_features(frames, entities_by_event, graphs_by_event, m4_outputs, micro_by_event, macro_by_event, producer_artifact_hashes):
+def join_frozen_features(frames, entities_by_event, graphs_by_event, m4_outputs, micro_by_event, macro_by_event,
+                         producer_artifact_hashes, producer_checkpoint_hashes=None):
     records = []
     for frame in frames:
         key = (frame.dataset_id, frame.record_id)
@@ -19,5 +20,6 @@ def join_frozen_features(frames, entities_by_event, graphs_by_event, m4_outputs,
                                            slot_nll=float(m4.get("slot_nll", 0.0)), raw_event_score=float(m4["raw_event_logit"].detach().reshape(-1)[0]),
                                            micro_window_score=float(micro), macro_window_score=float(macro), long_horizon_score=float(max(micro, macro)),
                                            queue_features={}, source_record_ref=frame.source_record_ref,
+                                           producer_checkpoint_hashes=dict(producer_checkpoint_hashes or {}),
                                            producer_artifact_hashes=dict(producer_artifact_hashes)))
     return records

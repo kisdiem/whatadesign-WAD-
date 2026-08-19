@@ -23,6 +23,30 @@ micro-context embeddings without summing overlapping window scores. Qwen
 serialization excludes labels, split information, ground truth, and post-hoc
 results by construction.
 
+### M4 training contract
+
+M4 is trained as a source-only current-event anomaly head. The training runner
+receives strict causal M4 batches built from frozen M1 EventFrame embeddings,
+M3 graph context, and either the frozen Qwen window representation or an
+exact, hash-keyed Qwen cache. The Qwen backbone is not updated by the M4 head.
+Labels are read only at loss time and are never serialized into EventFrame,
+graph, Qwen, or frozen-feature inputs.
+
+The supervised objective is binary anomaly loss on `score_logit`. When source
+triplets are available, an InfoNCE relation term is added between source-fact
+positive and negative events; pair construction uses factual EventFrame
+relations and preserves the causal time boundary. The validation split is
+time/source held out and selects the checkpoint by validation loss and its
+validation-fitted threshold. Held-out test data is scored only after checkpoint
+selection. AIT remains target-only for the strict V3 release path; any
+AIT-supervised run is a separately named upper-bound experiment and must not be
+reported as zero-shot cross-domain performance.
+
+The formal entry point is `scripts/train_m4_source_supervised.py`. It writes
+the selected checkpoint, validation threshold, split manifest, loss history,
+and provenance report. A smoke test or cache test is an interface check only,
+not a claim of real M4 training quality.
+
 ## Storage architecture
 
 Formal storage uses **PostgreSQL as the system of record**. The former SQLite

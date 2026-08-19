@@ -11,6 +11,7 @@ feature artifact caching is a separate required scale-out step.
 import argparse
 import hashlib
 import json
+import random
 from pathlib import Path
 
 import torch
@@ -21,6 +22,8 @@ from src.models.m4_backbone_adapter import QwenBackboneAdapter
 from src.models.m4_qformer import M4Config, M4QFormerDecoder
 from src.training.m4_multiscale_builder import StrictM4BatchBuilder
 from src.training.m4_exact_cache import ExactM4Cache
+from src.training.m4_metrics import binary_metrics, select_f1_threshold
+from src.training.m4_relation_pairs import build_source_relation_triplets
 from src.training.m4_source_dataset import StrictM4SourceDataset
 from src.training.m4_supervised_runner import M4SupervisedRunner
 
@@ -46,29 +49,23 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def binary_metrics(labels: list[int], scores: list[float], threshold: float = 0.5) -> dict[str, float | int | None]:
-    """Threshold metrics plus rank-based ROC-AUC without sklearn dependency."""
-    predictions = [int(score >= threshold) for score in scores]
-    tp = sum(p == 1 and y == 1 for p, y in zip(predictions, labels))
-    fp = sum(p == 1 and y == 0 for p, y in zip(predictions, labels))
-    tn = sum(p == 0 and y == 0 for p, y in zip(predictions, labels))
-    fn = sum(p == 0 and y == 1 for p, y in zip(predictions, labels))
-    precision = tp / (tp + fp) if tp + fp else 0.0
-    recall = tp / (tp + fn) if tp + fn else 0.0
-    f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
-    positives, negatives = sum(labels), len(labels) - sum(labels)
-    auc = None
-    if positives and negatives:
-        wins = ties = 0
-        for score, label in zip(scores, labels):
-            if label:
-                for other, other_label in zip(scores, labels):
-                    if not other_label:
-                        wins += score > other
-                        ties += score == other
-        auc = (wins + 0.5 * ties) / (positives * negatives)
-    return {"threshold": threshold, "roc_auc": auc, "f1": f1, "precision": precision,
-            "recall": recall, "tp": tp, "fp": fp, "tn": tn, "fn": fn}
+def balanced_epoch_targets(dataset: StrictM4SourceDataset, targets: list, *, seed: int) -> list:
+    """Return a deterministic, label-balanced order without exposing labels to features.
+
+    Labels are consulted only by the training scheduler.  They are never put
+    into an EventFrame, Qwen text, cache key, or M4 input tensor.
+    """
+    by_label = {0: [], 1: []}
+    for target in targets:
+        by_label[dataset.loss_label(target)].append(target)
+    rng = random.Random(seed)
+    rng.shuffle(by_label[0]); rng.shuffle(by_label[1])
+    ordered = []
+    while by_label[0] or by_label[1]:
+        for label in (0, 1):
+            if by_label[label]:
+                ordered.append(by_label[label].pop())
+    return ordered
 
 
 def main() -> None:
@@ -79,8 +76,14 @@ def main() -> None:
     parser.add_argument("--qwen-model", required=True)
     parser.add_argument("--qwen-cache")
     parser.add_argument("--qwen-cache-mapping")
+    parser.add_argument("--event-chunk-size", type=int, default=128,
+                        help="Time-ordered event embeddings per hierarchical M4 token; no events are dropped.")
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--epochs", type=int, default=1)
+    parser.add_argument("--seed", type=int, default=20260810)
+    parser.add_argument("--early-stopping-patience", type=int, default=3)
+    parser.add_argument("--contrastive-weight", type=float, default=0.10)
+    parser.add_argument("--contrastive-temperature", type=float, default=0.20)
     parser.add_argument("--learning-rate", type=float, default=1e-4)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--max-train", type=int, default=None)
@@ -92,19 +95,24 @@ def main() -> None:
     frames = read_frames(args.events)
     if bool(args.qwen_cache) != bool(args.qwen_cache_mapping):
         raise ValueError("--qwen-cache and --qwen-cache-mapping must be supplied together")
-    cache = ExactM4Cache(args.qwen_cache, args.qwen_cache_mapping) if args.qwen_cache else None
+    cache = ExactM4Cache(args.qwen_cache, args.qwen_cache_mapping, event_chunk_size=args.event_chunk_size) if args.qwen_cache else None
     qwen = None if cache else QwenBackboneAdapter(args.qwen_model, mode="frozen", local_files_only=True)
     builder = None if cache else StrictM4BatchBuilder(qwen, qwen_device=args.device)
     qwen_hidden = len(next(iter(cache.windows.values()))["qwen_embedding"]) if cache else qwen.hidden_size
     model = M4QFormerDecoder(M4Config(input_dim=768, hidden_dim=128, qwen_hidden_dim=qwen_hidden, heads=4, layers=1))
     runner = M4SupervisedRunner(model, device=args.device, learning_rate=args.learning_rate)
     output = Path(args.output_dir); output.mkdir(parents=True, exist_ok=True)
+    progress_path = output / "epoch_progress.jsonl"
+    progress_path.write_text("", encoding="utf-8")
+    train_triplets = build_source_relation_triplets(dataset.split_targets("train"), frames) if args.contrastive_weight else {}
 
-    def run_split(name: str, limit: int | None, training: bool) -> dict[str, float]:
+    def run_split(name: str, limit: int | None, training: bool, epoch: int = 0) -> tuple[dict, list[int], list[float]]:
         targets = dataset.split_targets(name)
         if limit is not None:
             targets = targets[:limit]
-        losses, scores, observed_labels = [], [], []
+        if training:
+            targets = balanced_epoch_targets(dataset, targets, seed=args.seed + epoch)
+        losses, scores, observed_labels, contrastive_losses = [], [], [], []
         for target in targets:
             rows = frames.get(target.dataset_id)
             if rows is None:
@@ -112,27 +120,77 @@ def main() -> None:
             batch = cache.build(rows, dataset_id=target.dataset_id, record_id=target.record_id) if cache else StrictM4BatchBuilder.collate([builder.build_one(rows, target.record_id)])
             label = dataset.loss_label(target)  # Only supervision read in this runner.
             if training:
-                losses.append(runner.train_one(batch, loss_label=label))
+                triplet = train_triplets.get((target.dataset_id, target.record_id))
+                if triplet is None:
+                    losses.append(runner.train_one(batch, loss_label=label))
+                else:
+                    positive_batch = cache.build(rows, dataset_id=target.dataset_id, record_id=triplet.positive_record_id) if cache else StrictM4BatchBuilder.collate([builder.build_one(rows, triplet.positive_record_id)])
+                    negative_batch = cache.build(rows, dataset_id=target.dataset_id, record_id=triplet.negative_record_id) if cache else StrictM4BatchBuilder.collate([builder.build_one(rows, triplet.negative_record_id)])
+                    result = runner.train_triplet(
+                        batch, positive_batch, negative_batch,
+                        anchor_label=label,
+                        positive_label=dataset.loss_label(dataset.targets[(target.dataset_id, triplet.positive_record_id)]),
+                        negative_label=dataset.loss_label(dataset.targets[(target.dataset_id, triplet.negative_record_id)]),
+                        contrastive_weight=args.contrastive_weight,
+                        temperature=args.contrastive_temperature,
+                    )
+                    losses.append(result["loss"]); contrastive_losses.append(result["contrastive_loss"])
             else:
                 loss, score = runner.evaluate_one(batch, loss_label=label); losses.append(loss); scores.append(score); observed_labels.append(label)
         result = {"count": len(targets), "mean_loss": sum(losses) / max(len(losses), 1), "mean_score": sum(scores) / max(len(scores), 1)}
         if not training:
             result["metrics"] = binary_metrics(observed_labels, scores)
-        return result
+        elif contrastive_losses:
+            result["contrastive_triplets"] = len(contrastive_losses)
+            result["mean_contrastive_loss"] = sum(contrastive_losses) / len(contrastive_losses)
+        return result, observed_labels, scores
 
     best = float("inf"); history = []
+    best_checkpoint: Path | None = None
+    stale_epochs = 0
     for epoch in range(1, args.epochs + 1):
-        train = run_split("train", args.max_train, True)
-        validation = run_split("validation", args.max_validation, False)
+        train, _, _ = run_split("train", args.max_train, True, epoch)
+        validation, validation_labels, validation_scores = run_split("validation", args.max_validation, False)
+        decision_threshold, selection_metrics = select_f1_threshold(validation_labels, validation_scores)
+        validation["f1_selected_threshold"] = decision_threshold
+        validation["f1_selected_metrics"] = selection_metrics
         row = {"epoch": epoch, "train": train, "validation": validation}; history.append(row)
         if validation["mean_loss"] < best:
             best = validation["mean_loss"]
             checkpoint = output / "best_validation_m4_qformer.pt"
-            torch.save({"epoch": epoch, "model": model.state_dict(), "optimizer": runner.optimizer.state_dict(), "validation": validation}, checkpoint)
+            torch.save({"epoch": epoch, "model": model.state_dict(), "optimizer": runner.optimizer.state_dict(),
+                        "validation": validation, "decision_threshold": decision_threshold}, checkpoint)
             row["checkpoint"] = str(checkpoint)
-    test = run_split("test", args.max_test, False)
+            best_checkpoint = checkpoint
+            stale_epochs = 0
+        else:
+            stale_epochs += 1
+            if stale_epochs >= args.early_stopping_patience:
+                row["early_stopped"] = True
+        row["checkpoint_selected"] = best_checkpoint == checkpoint if "checkpoint" in row else False
+        with progress_path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(row, ensure_ascii=True) + "\n")
+        print(json.dumps({"event": "epoch_completed", **row}, ensure_ascii=True), flush=True)
+        if row.get("early_stopped"):
+            break
+    if best_checkpoint is None:
+        raise RuntimeError("no validation checkpoint was produced; refusing held-out evaluation")
+    # Held-out evaluation must use the checkpoint selected solely by validation
+    # loss, never the final post-update epoch.
+    selected = torch.load(best_checkpoint, map_location=runner.device, weights_only=False)
+    model.load_state_dict(selected["model"])
+    test, test_labels, test_scores = run_split("test", args.max_test, False)
+    test["metrics_fixed_validation_threshold"] = binary_metrics(test_labels, test_scores, float(selected["decision_threshold"]))
     report = {"status": "COMPLETED", "protocol": "source_only_strict_m4", "ait_accessed": False,
-              "labels_used_only_for_loss": True, "qwen": (qwen.export_backbone_manifest() if qwen else {"cache": args.qwen_cache, "mode": "frozen_cached_exact"}), "history": history, "held_out_test": test,
+              "labels_used_only_for_loss": True,
+              "contrastive": {"enabled": bool(args.contrastive_weight), "weight": args.contrastive_weight,
+                              "temperature": args.contrastive_temperature, "source_fact_triplets": len(train_triplets)},
+              "event_hierarchy": {"event_chunk_size": args.event_chunk_size, "aggregation": "ordered_mean_no_event_drop"},
+              "qwen": (qwen.export_backbone_manifest() if qwen else {"cache": args.qwen_cache, "mode": "frozen_cached_exact"}), "history": history,
+              "selected_checkpoint": {"path": str(best_checkpoint), "epoch": selected["epoch"], "validation": selected["validation"],
+                                      "decision_threshold": selected["decision_threshold"]},
+              "epoch_progress": str(progress_path),
+              "held_out_test": test,
               "input_hashes": {str(Path(path)): sha256(Path(path)) for path in [args.targets, args.labels, *args.events]}}
     (output / "training_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     print(json.dumps(report, indent=2))

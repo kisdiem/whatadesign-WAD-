@@ -3,6 +3,7 @@ from __future__ import annotations
 """Build strict M4 tensors from a reproducible exact-Qwen cache."""
 
 import json
+from bisect import bisect_left
 from pathlib import Path
 
 import torch
@@ -12,13 +13,17 @@ from src.training.m4_window_cache import parse_utc
 
 
 class ExactM4Cache:
-    def __init__(self, cache_path: str | Path, mapping_path: str | Path) -> None:
+    def __init__(self, cache_path: str | Path, mapping_path: str | Path, *, event_chunk_size: int = 128) -> None:
+        if event_chunk_size <= 0:
+            raise ValueError("event_chunk_size must be positive")
         self.windows = {row["window_id"]: row for row in self._jsonl(cache_path)}
         self.mapping = {(row["dataset_id"], row["record_id"]): row["window_ids"] for row in self._jsonl(mapping_path)}
         if any(row.get("alignment") != "current" for row in self.windows.values()):
             raise ValueError("strict M4 training refuses non-current-aligned cache")
         if any(bool(row.get("is_mock")) for row in self.windows.values()):
             raise ValueError("strict M4 training refuses mock Qwen cache")
+        self._frame_indices: dict[tuple[str, int], tuple[list, list[EventFrame], dict[str, EventFrame], dict[str, int], torch.Tensor]] = {}
+        self.event_chunk_size = event_chunk_size
 
     @staticmethod
     def _jsonl(path):
@@ -27,25 +32,73 @@ class ExactM4Cache:
                 if line.strip(): yield json.loads(line)
 
     def build(self, frames: list[EventFrame], *, dataset_id: str, record_id: str) -> dict[str, torch.Tensor]:
-        current = next(frame for frame in frames if frame.record_id == record_id)
+        timestamps, ordered_frames, by_record_id, positions, embedding_prefix = self._frame_index(frames, dataset_id)
+        try:
+            current = by_record_id[record_id]
+        except KeyError as error:
+            raise ValueError(f"target record not present in source EventFrames: {(dataset_id, record_id)}") from error
         ids = self.mapping[(dataset_id, record_id)]
         rows = [self.windows[item] for item in ids]
-        members = []
+        spans = []
         for row in rows:
             start, end = parse_utc(row["start"]), parse_utc(row["end"])
-            members.append([frame for frame in frames if frame.record_id != record_id and frame.timestamp
-                            and start <= parse_utc(frame.timestamp) < end])
+            left = bisect_left(timestamps, start)
+            right = bisect_left(timestamps, end)
+            spans.append((left, right))
         dim = len(current.semantic_embedding or [])
         if not dim: raise ValueError("current EventFrame lacks M1 semantic_embedding")
-        width = max((len(item) for item in members), default=0)
+        # Keep every event, but represent long windows hierarchically.  Direct
+        # MHA over 20k+ events is quadratic and infeasible.  Each time-ordered
+        # chunk contains every member once; no events are sampled or dropped.
+        width = max(((right - left + self.event_chunk_size - 1) // self.event_chunk_size for left, right in spans), default=0)
         events = torch.zeros((1, len(rows), width, dim), dtype=torch.float32)
         event_mask = torch.zeros((1, len(rows), width), dtype=torch.bool)
-        for window_index, frames_in_window in enumerate(members):
-            for event_index, frame in enumerate(frames_in_window):
-                events[0, window_index, event_index] = torch.tensor(frame.semantic_embedding, dtype=torch.float32)
-                event_mask[0, window_index, event_index] = True
+        current_position = positions[record_id]
+        for window_index, (left, right) in enumerate(spans):
+            # In strict current-aligned windows the current event is at end and
+            # therefore outside [left, right). Retain a safe fallback for
+            # malformed cache/source combinations rather than silently leaking.
+            if left <= current_position < right:
+                members = [frame for frame in ordered_frames[left:right] if frame.record_id != record_id]
+                for chunk_index, start_index in enumerate(range(0, len(members), self.event_chunk_size)):
+                    chunk = torch.tensor([frame.semantic_embedding for frame in members[start_index:start_index + self.event_chunk_size]], dtype=torch.float32)
+                    events[0, window_index, chunk_index] = chunk.mean(dim=0)
+                    event_mask[0, window_index, chunk_index] = True
+                continue
+            for chunk_index, start_index in enumerate(range(left, right, self.event_chunk_size)):
+                end_index = min(start_index + self.event_chunk_size, right)
+                events[0, window_index, chunk_index] = (embedding_prefix[end_index] - embedding_prefix[start_index]) / (end_index - start_index)
+                event_mask[0, window_index, chunk_index] = True
         return {"micro_event_embeddings": events,
                 "qwen_window_embeddings": torch.tensor([[row["qwen_embedding"] for row in rows]], dtype=torch.float32),
                 "current_event_embedding": torch.tensor([current.semantic_embedding], dtype=torch.float32),
                 "micro_event_valid_mask": event_mask,
                 "micro_window_mask": torch.ones((1, len(rows)), dtype=torch.bool)}
+
+    def _frame_index(self, frames: list[EventFrame], dataset_id: str) -> tuple[list, list[EventFrame], dict[str, EventFrame], dict[str, int], torch.Tensor]:
+        """Index timestamps once per immutable source frame list.
+
+        M4 trains on overlapping windows, so rescanning all source events for
+        every target turns a small cached experiment into CPU-bound quadratic
+        work.  This index preserves the exact `[start, end)` predicate while
+        reducing membership lookup to two binary searches.
+        """
+        key = (dataset_id, id(frames))
+        indexed = self._frame_indices.get(key)
+        if indexed is None:
+            pairs = sorted(
+                ((parse_utc(frame.timestamp), frame) for frame in frames if frame.timestamp),
+                key=lambda item: (item[0], item[1].record_id),
+            )
+            by_record_id = {frame.record_id: frame for frame in frames}
+            if len(by_record_id) != len(frames):
+                raise ValueError(f"duplicate record_id in source EventFrames for dataset {dataset_id}")
+            ordered = [item[1] for item in pairs]
+            if any(not frame.semantic_embedding for frame in ordered):
+                raise ValueError("strict M4 cache requires M1 semantic_embedding on every history EventFrame")
+            embeddings = torch.tensor([frame.semantic_embedding for frame in ordered], dtype=torch.float32)
+            prefix = torch.cat([torch.zeros((1, embeddings.shape[1]), dtype=torch.float32), embeddings.cumsum(dim=0)], dim=0)
+            positions = {frame.record_id: position for position, frame in enumerate(ordered)}
+            indexed = ([item[0] for item in pairs], ordered, by_record_id, positions, prefix)
+            self._frame_indices[key] = indexed
+        return indexed

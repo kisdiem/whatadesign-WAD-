@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import gzip
 import hashlib
+import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
@@ -101,12 +102,71 @@ class LanlEventAdapter:
         return AdapterResult(self.dataset_id, tuple(records), "ok")
 
 
+class AITWazuhAdapter:
+    """Read AIT v2 Wazuh JSONL while keeping labels outside the raw record.
+
+    The adapter only extracts a source timestamp and preserves the sanitized
+    event payload.  AIT attack intervals are loaded by the preparation script
+    as loss-only supervision and are never copied into ``RawRecord``.
+    """
+
+    dataset_id = "ait_v2_wazuh"
+    _FORBIDDEN = {"label", "target_label", "attack_label", "anomaly_label", "ground_truth", "split"}
+
+    @classmethod
+    def _timestamp(cls, value):
+        if isinstance(value, dict):
+            for key in ("@timestamp", "timestamp", "event_time", "time"):
+                candidate = value.get(key)
+                if isinstance(candidate, (str, int, float)) and candidate not in ("", None):
+                    return str(candidate)
+            for nested in value.values():
+                found = cls._timestamp(nested)
+                if found:
+                    return found
+        return None
+
+    @classmethod
+    def _sanitize(cls, value):
+        if isinstance(value, dict):
+            return {str(key): cls._sanitize(item) for key, item in value.items() if str(key).lower() not in cls._FORBIDDEN}
+        if isinstance(value, list):
+            return [cls._sanitize(item) for item in value]
+        return value
+
+    def read(self, path: Path, scenario: str | None = None, limit: int = 0, start: int = 0) -> AdapterResult:
+        records: list[RawRecord] = []
+        errors: list[str] = []
+        with path.open("r", encoding="utf-8", errors="replace") as stream:
+            for line_no, line in enumerate(stream, 1):
+                if line_no <= start or not line.strip():
+                    continue
+                try:
+                    payload = self._sanitize(json.loads(line))
+                except json.JSONDecodeError as exc:
+                    errors.append(f"{path}:{line_no}: {exc}")
+                    continue
+                raw = json.dumps(payload, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
+                rid = hashlib.sha256(f"{self.dataset_id}|{scenario or path.stem}|{path}|{line_no}".encode()).hexdigest()
+                records.append(RawRecord(
+                    self.dataset_id if scenario is None else f"{self.dataset_id}:{scenario}",
+                    str(path), line_no, self._timestamp(payload), payload,
+                    "ait_wazuh_jsonl_v1", "ait_v2", rid,
+                    hashlib.sha256(raw.encode()).hexdigest(),
+                    {"scenario": scenario or path.stem, "labels_in_payload": False},
+                ))
+                if limit and len(records) >= limit:
+                    break
+        return AdapterResult(self.dataset_id, tuple(records), "ok" if not errors else "ok_with_errors", tuple(errors))
+
+
 def adapter_for(dataset_id: str):
     adapters = {
         "loghub_2_0": LogHubTextAdapter,
         "sandworm_flow": SandwormFlowAdapter,
         "evtx_attack_samples": EvtxAdapter,
         "lanl_comprehensive": LanlEventAdapter,
+        "ait_v2_wazuh": AITWazuhAdapter,
     }
     try:
         return adapters[dataset_id]()

@@ -47,9 +47,9 @@ class M3EventGraphBuilder:
     def build(self, frames: Iterable[tuple[EventFrame, list[ResolvedEntity]]]) -> EventGraph:
         rows = list(frames)
         timestamps = [
-            self._parse_timestamp(x.attributes.get("timestamp"))
+            self._parse_timestamp(x.timestamp or x.attributes.get("timestamp"))
             for x, _ in rows
-            if x.attributes.get("timestamp")
+            if x.timestamp or x.attributes.get("timestamp")
         ]
         start = min(timestamps) if timestamps else None
         end = max(timestamps) if timestamps else None
@@ -98,7 +98,7 @@ class M3EventGraphBuilder:
     def _add_edge(self, edges: dict[tuple[str, str, str], GraphEdge], source: str, target: str, relation: str, frame: EventFrame) -> None:
         key = (source, target, relation)
         old = edges.get(key)
-        edges[key] = GraphEdge(source, target, relation, (old.weight + 1.0 if old else 1.0), frame.attributes.get("timestamp"))
+        edges[key] = GraphEdge(source, target, relation, (old.weight + 1.0 if old else 1.0), frame.timestamp or frame.attributes.get("timestamp"))
 
     def _window_id(self, start: datetime | None, rows: list[tuple[EventFrame, list[ResolvedEntity]]]) -> str:
         anchor = self._format(start) or (rows[0][0].record_id if rows else "empty")
