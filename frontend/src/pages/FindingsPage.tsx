@@ -12,12 +12,17 @@ import {
   findingSeverityLevels,
   findingSortOptions,
   parseAbsoluteDateTime,
+  readableAction,
   scoreTone,
   severityLabel,
   type FindingSortMode,
 } from './shared'
 
 const { Text } = Typography
+
+function riskMetricClass(value: number) {
+  return value >= 80 ? 'critical' : value >= 65 ? 'high' : 'medium'
+}
 
 export default function FindingsPage({
   findings,
@@ -71,13 +76,10 @@ export default function FindingsPage({
   }, [filtered, selected])
 
   const columns = [
-    { title: 'Finding', dataIndex: 'title', key: 'title', render: (value: string, row: FindingRecord) => <div><Text strong>{value}</Text><div className="mc-row-id">{row.id}</div></div> },
-    { title: '实体', dataIndex: 'entity', key: 'entity', width: 140, render: (value: string, row: FindingRecord) => <div><div>{value}</div><Text type="secondary">{row.entityType}</Text></div> },
-    { title: '综合风险', dataIndex: 'risk', key: 'risk', width: 100, render: (value: number) => <RiskBadge value={value} /> },
-    { title: '事件异常', dataIndex: 'eventScore', key: 'eventScore', width: 120, render: (value: number) => <Progress percent={value} size="small" status={scoreTone(value)} /> },
-    { title: '局部上下文', dataIndex: 'localScore', key: 'localScore', width: 120, render: (value: number) => <Progress percent={value} size="small" status={scoreTone(value)} /> },
-    { title: '长程关联', dataIndex: 'longScore', key: 'longScore', width: 120, render: (value: number) => <Progress percent={Math.min(100, Math.max(0, Number(value)))} size="small" status={scoreTone(Number(value))} format={(percent) => `${percent ?? 0}%`} /> },
-    { title: <HelpTitle title="理由" description="理由说明系统为何将该发现列为需要关注。点击每个标签可查看具体关联依据。" />, dataIndex: 'reasons', key: 'reasons', render: (value: string[]) => <Space size={[4, 4]} wrap>{value.map((item) => <ReasonTag key={item} reason={item} />)}</Space> },
+    { title: '关键行为', key: 'action', width: 220, render: (_: unknown, row: FindingRecord) => <div><Text strong>{readableAction(row.anchorEvent.action)}</Text><div className="mc-row-id">{row.start}</div></div> },
+    { title: '调查对象', key: 'entity', width: 170, render: (_: unknown, row: FindingRecord) => <div><div>{row.entity}</div><Text type="secondary">{row.entityType} · {row.host || '主机待解析'}</Text></div> },
+    { title: '风险', dataIndex: 'risk', key: 'risk', width: 90, render: (value: number) => <RiskBadge value={value} /> },
+    { title: '为什么关注', key: 'reason', render: (_: unknown, row: FindingRecord) => <div><Text>{row.summary}</Text><div style={{ marginTop: 5 }}><Space size={[4, 4]} wrap>{row.reasons.slice(0, 3).map((item) => <ReasonTag key={item} reason={item} />)}</Space></div></div> },
   ]
 
   return (
@@ -110,6 +112,14 @@ export default function FindingsPage({
       <Drawer open={Boolean(selected)} onClose={() => setSelected(null)} width={680} title={selected?.title} extra={selected && <RiskBadge value={selected.risk} />}>
         {selected && (
           <div className="mc-detail-drawer">
+            <Card size="small" className="mc-investigation-brief" title="调查摘要">
+              <Descriptions size="small" column={1}>
+                <Descriptions.Item label="发生了什么"><Text strong>{readableAction(selected.anchorEvent.action)}</Text> · {selected.summary}</Descriptions.Item>
+                <Descriptions.Item label="重点对象">{selected.entity} · {selected.host || '主机待解析'}</Descriptions.Item>
+                <Descriptions.Item label="调查范围">{selected.start} 至 {selected.end} · {selected.events.length} 条事件</Descriptions.Item>
+                <Descriptions.Item label="当前结论"><Text type="secondary">这是需要优先核验的异常线索，不等同于已确认攻击。</Text></Descriptions.Item>
+              </Descriptions>
+            </Card>
             <Card size="small" title={<HelpTitle title="M3 事件关联图" description="当前异常发现的 30 分钟事实窗口：事件、实体、时间先后与涉及关系，随所选发现即时构建，无需保存。" />} className="mc-drawer-card" styles={{ body: { padding: 0 } }}>
               {m3Layout ? (
                 <InteractiveCaseGraph
@@ -128,7 +138,7 @@ export default function FindingsPage({
 
             <Card size="small" title={<HelpTitle title="调查锚点" description="当前异常发现的核心对象、主机和时间范围，是开始复核的切入点。" />} className="mc-drawer-card">
               <Descriptions bordered size="small" column={2}>
-                <Descriptions.Item label="异常发现">{selected.id}</Descriptions.Item>
+                <Descriptions.Item label="关键行为">{readableAction(selected.anchorEvent.action)}</Descriptions.Item>
                 <Descriptions.Item label="实体">{selected.entity}</Descriptions.Item>
                 <Descriptions.Item label="主机">{selected.host}</Descriptions.Item>
                 <Descriptions.Item label="锚点事件">{selected.anchorEvent.action}</Descriptions.Item>
@@ -138,11 +148,11 @@ export default function FindingsPage({
             </Card>
 
             <Card size="small" title={<HelpTitle title="M6 风险融合" description="综合事件自身、短程上下文和长程关联形成排序分数。分数用于优先级，不是攻击结论。" />} className="mc-drawer-card">
-              <Row gutter={[8, 8]}>
-                <Col span={8}><Statistic title="综合风险" value={selected.risk} /></Col>
-                <Col span={8}><Statistic title="事件自身异常" value={selected.eventScore} /></Col>
-                <Col span={8}><Statistic title="局部上下文" value={selected.localScore} /></Col>
-                <Col span={24}><Statistic title="长程关联" value={selected.longScore} /></Col>
+              <Row gutter={8} wrap={false} className="mc-compact-risk-row">
+                <Col flex="1"><Statistic className={`mc-risk-stat ${riskMetricClass(selected.risk)}`} title="综合风险" value={selected.risk} /></Col>
+                <Col flex="1"><Statistic className={`mc-risk-stat ${riskMetricClass(selected.eventScore)}`} title="事件自身异常" value={selected.eventScore} /></Col>
+                <Col flex="1"><Statistic className={`mc-risk-stat ${riskMetricClass(selected.localScore)}`} title="局部上下文" value={selected.localScore} /></Col>
+                <Col flex="1"><Statistic className={`mc-risk-stat ${riskMetricClass(selected.longScore)}`} title="长程关联" value={selected.longScore} /></Col>
               </Row>
               <Divider style={{ margin: '12px 0 8px' }} />
               <Text type="secondary">综合风险 = M6 风险融合输出（weak_fusion_v2），融合事件异常、局部上下文与长程关联信号。</Text>
@@ -154,7 +164,7 @@ export default function FindingsPage({
                 locale={{ emptyText: '暂无远程候选' }}
                 renderItem={(item) => (
                   <List.Item>
-                    <List.Item.Meta title={<Text strong>{item.title}</Text>} description={`${item.id} · ${item.time}`} />
+                    <List.Item.Meta title={<Text strong>{item.title}</Text>} description={item.time} />
                     <Space size={[4, 4]} wrap>{item.reasons.map((reason) => <ReasonTag key={`${item.id}-${reason}`} reason={reason} />)}</Space>
                   </List.Item>
                 )}
@@ -162,17 +172,15 @@ export default function FindingsPage({
             </Card>
 
             <Card size="small" title={<HelpTitle title="M5 关联依据" description="说明长程关联使用的共同实体、时间间隔和关联强度。" />} className="mc-drawer-card">
-              <Descriptions size="small" column={2}>
-                <Descriptions.Item label="关联置信度">{selected.association.confidence.toFixed(2)}</Descriptions.Item>
-                <Descriptions.Item label="共享锚点">{selected.association.sharedAnchor}</Descriptions.Item>
-                <Descriptions.Item label="锚点强度">{selected.association.anchorStrength}</Descriptions.Item>
-                <Descriptions.Item label="实体稀有度">{selected.association.entityRarity.toFixed(2)}</Descriptions.Item>
-                <Descriptions.Item label="行为兼容度">{selected.association.actionCompatibility.toFixed(2)}</Descriptions.Item>
-                <Descriptions.Item label="图相似度">{selected.association.graphSimilarity.toFixed(2)}</Descriptions.Item>
-                <Descriptions.Item label="时间间隔" span={2}>{selected.association.timeGap}</Descriptions.Item>
+              <Text>
+                当前发现与其他窗口通过 <Text strong>{selected.association.sharedAnchor}</Text> 相关，时间间隔为 <Text strong>{selected.association.timeGap}</Text>。
+                关联行为具有 <Text strong>{selected.association.actionCompatibility.toFixed(2)}</Text> 的兼容度，作为长程调查线索，仍需结合原始日志复核。
+              </Text>
+              <Descriptions size="small" column={1} style={{ marginTop: 10 }}>
+                <Descriptions.Item label="共享对象">{selected.association.sharedAnchor}</Descriptions.Item>
+                <Descriptions.Item label="时间间隔">{selected.association.timeGap}</Descriptions.Item>
+                <Descriptions.Item label="关联行为">{selected.association.summary[0] || '存在跨窗口行为关联'}</Descriptions.Item>
               </Descriptions>
-              <Divider />
-              <List size="small" dataSource={selected.association.summary} renderItem={(item) => <List.Item>{item}</List.Item>} />
             </Card>
 
             <Card size="small" title={<HelpTitle title="证据" description="保留支撑该发现的原始日志引用和事实陈述，可作为人工复核依据。" />} className="mc-drawer-card">
@@ -180,7 +188,7 @@ export default function FindingsPage({
                 dataSource={evidenceByFinding[selected.id]}
                 renderItem={(item) => (
                   <List.Item>
-                    <List.Item.Meta title={<Text strong>{item.statement}</Text>} description={`${item.id} · ${item.rawLogRef}`} />
+                    <List.Item.Meta title={<Text strong>{item.statement}</Text>} description={item.rawLogRef} />
                   </List.Item>
                 )}
               />

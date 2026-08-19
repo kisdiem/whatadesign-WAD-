@@ -111,9 +111,7 @@ function mergePersistedCases(baseCases: Investigation[]) {
 }
 
 const preparedDemoSources: LogSource[] = [
-  { id: 'DEMO-SHORT', name: 'Short', path: 'stream://short', kind: '事件流', status: 'online', size: '2,749 条事件 / 30 天窗口', lastRead: '2026-07-11 - 2026-08-09（UTC）' },
-  { id: 'DEMO-LONG', name: 'Long', path: 'stream://long', kind: '事件流', status: 'online', size: '44,775 条事件 / 30 天窗口', lastRead: '2026-07-11 - 2026-08-09（UTC）' },
-  { id: 'DEMO-APT', name: 'APT', path: 'stream://apt', kind: '事件流', status: 'online', size: '7,298 条事件 / 30 天窗口', lastRead: '2026-07-11 - 2026-08-09（UTC）' },
+  { id: 'DEMO-APT', name: 'apt.log', path: 'stream://apt', kind: '事件流', status: 'online', size: '7,298 条事件 / 30 天窗口', lastRead: '2026-07-11 - 2026-08-09（UTC）' },
 ]
 
 function eventStreamText(value?: string) {
@@ -341,7 +339,7 @@ export default function MissionControlApp() {
       setDashboardLoading(true)
       setDashboardError('')
       try {
-        const datasets: DemoDatasetId[] = ['Short', 'Long', 'APT']
+        const datasets: DemoDatasetId[] = ['APT']
         const loaded = await Promise.all(datasets.map((dataset) => loadDemoDataset(dataset).then((data) => ({
           ...data,
           dataset,

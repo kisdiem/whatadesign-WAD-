@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { Button, Card, Col, Divider, Input, List, Progress, Row, Space, Statistic, Table, Tag, Typography } from 'antd'
-import { InfoCircleOutlined, LinkOutlined, RobotOutlined, SearchOutlined } from '@ant-design/icons'
+import { Button, Card, Col, Descriptions, Divider, Input, List, Progress, Row, Space, Statistic, Table, Tag, Typography } from 'antd'
+import { ApartmentOutlined, ClockCircleFilled, DesktopOutlined, InfoCircleOutlined, LinkOutlined, RobotOutlined, SearchOutlined, WarningFilled } from '@ant-design/icons'
 import {
   getSecurityBaseline,
   getSecurityEntity,
@@ -17,6 +17,7 @@ import {
   HelpTitle,
   PageTitle,
   ReasonTag,
+  readableAction,
   parseAbsoluteDateTime,
   useRepositoryPresentation,
 } from './shared'
@@ -105,6 +106,24 @@ function buildBaselineRows(
     },
   ].filter((item) => item.current !== '0' || item.baseline !== '—')
   return rows.length ? rows : fallback
+}
+
+function riskTagColor(value: number) {
+  if (value >= 75) return 'red'
+  if (value >= 50) return 'orange'
+  return 'green'
+}
+
+function relationTagColor(value: number) {
+  if (value >= 3) return 'red'
+  if (value >= 2) return 'orange'
+  return 'green'
+}
+
+function deviationTagColor(value: number) {
+  if (value >= 0.8) return 'red'
+  if (value >= 0.6) return 'orange'
+  return 'green'
 }
 
 export default function EntityInvestigationPage({
@@ -217,8 +236,11 @@ export default function EntityInvestigationPage({
     Asset: '文件或资产',
   }
   const attentionLevel = selected.rareRelations >= 3 ? '高关注' : selected.rareRelations >= 2 ? '需要核查' : '一般关注'
-  const attentionColor = selected.rareRelations >= 3 ? 'red' : selected.rareRelations >= 2 ? 'orange' : 'blue'
-  const entityExplanation = `${entityTypeLabel[selected.type]} ${selected.id} 在近 30 天资产画像中出现 ${selected.thirtyDayEvents} 次，涉及 ${selected.currentLoginHosts} 个关联主机。系统将它标记为${attentionLevel}，主要依据是关联关系的稀有程度、最近活动与历史基线的偏离，以及它参与的异常发现。`
+  const attentionColor = selected.rareRelations >= 3 ? 'red' : selected.rareRelations >= 2 ? 'orange' : 'green'
+  const associatedHosts = selected.hostHistory.map((item) => `${item.host}（${item.count} 次）`).join('、') || '暂无已确认关联主机'
+  const riskReason = relatedFindings.length
+    ? `关联 ${relatedFindings.length} 个异常发现，最高风险 ${Math.max(...relatedFindings.map((finding) => finding.risk))}；需结合对应事件和原始日志复核。`
+    : `${attentionLevel}：依据事件频次、关联关系稀有程度和最近活动变化标记，当前没有直接关联的异常发现。`
 
   const submitEntities = () => {
     const snapshot = filtered.map((profile) => {
@@ -258,7 +280,7 @@ export default function EntityInvestigationPage({
               renderItem={(item) => (
                 <List.Item className={item.id === selected?.id ? 'active' : ''} onClick={() => setSelectedId(item.id)}>
                   <List.Item.Meta title={<Text strong>{item.id}</Text>} description={`${entityTypeLabel[item.type]} · 最近活动 ${item.lastSeen}`} />
-                  <Tag color={item.rareRelations >= 2 ? 'red' : 'blue'}>{item.rareRelations} 个异常关系</Tag>
+                  <Tag color={relationTagColor(item.rareRelations)}>{item.rareRelations} 个异常关系</Tag>
                 </List.Item>
               )}
             />
@@ -268,14 +290,19 @@ export default function EntityInvestigationPage({
           <Card className="mc-case-card">
             <div className="mc-case-head">
               <div>
-                <Title level={3}><ExplainableText fallback={selected.id} context={{ entityIds: [selected.id], windowIds: selected.findingIds }} onExplain={onExplain}>{selected.id}</ExplainableText></Title>
-                <Text type="secondary">{entityTypeLabel[selected.type]} · 首次出现 {selected.firstSeen} · 最近出现 {selected.lastSeen}</Text>
+                <Title level={3} className="mc-entity-title"><ExplainableText fallback={selected.id} context={{ entityIds: [selected.id], windowIds: selected.findingIds }} onExplain={onExplain}>{selected.id}</ExplainableText></Title>
+                <Text type="secondary">{entityTypeLabel[selected.type]} · 首次出现 <Text strong>{selected.firstSeen}</Text> · 最近出现 <Text strong>{selected.lastSeen}</Text></Text>
               </div>
               <Tag color={attentionColor}>关注级别：{attentionLevel}</Tag>
             </div>
             <div className="mc-entity-explanation">
               <InfoCircleOutlined />
-              <div><strong>实体说明</strong><div>{entityExplanation}</div></div>
+              <div className="mc-entity-explanation-content">
+                <Space size={8} wrap>
+                  <Tag color={attentionColor}>{attentionLevel}</Tag>
+                  <Text>已出现 {selected.thirtyDayEvents} 次，关联 {selected.currentLoginHosts} 台主机，关联发现 {relatedFindings.length} 个。</Text>
+                </Space>
+              </div>
             </div>
             {useRepositoryData && (
               <div style={{ marginTop: 10 }}>
@@ -284,15 +311,34 @@ export default function EntityInvestigationPage({
             )}
           </Card>
 
-          <Row gutter={[12, 12]}>
-            <Col xs={12} md={6}><Card className="mc-summary-card"><Statistic title="时间范围内事件" value={selected.thirtyDayEvents} suffix="次" /></Card></Col>
-            <Col xs={12} md={6}><Card className="mc-summary-card"><Statistic title="正常主机" value={selected.normalLoginHosts} /></Card></Col>
-            <Col xs={12} md={6}><Card className="mc-summary-card"><Statistic title="当前主机" value={selected.currentLoginHosts} /></Card></Col>
-            <Col xs={12} md={6}><Card className="mc-summary-card"><Statistic title="新增关系" value={selected.newHostRelations} /></Card></Col>
+          <Row gutter={[8, 8]} className="mc-entity-summary-row">
+            <Col xs={12} md={6}><Card size="small" className={`mc-summary-card mc-entity-kpi mc-entity-kpi-${attentionColor}`}><Statistic title={<span><WarningFilled /> 风险等级</span>} value={attentionLevel} /></Card></Col>
+            <Col xs={12} md={6}><Card size="small" className="mc-summary-card mc-entity-kpi mc-entity-kpi-blue"><Statistic title={<span><ClockCircleFilled /> 关联事件</span>} value={selected.thirtyDayEvents} suffix="次" /></Card></Col>
+            <Col xs={12} md={6}><Card size="small" className="mc-summary-card mc-entity-kpi mc-entity-kpi-green"><Statistic title={<span><DesktopOutlined /> 关联主机</span>} value={selected.currentLoginHosts} /></Card></Col>
+            <Col xs={12} md={6}><Card size="small" className="mc-summary-card mc-entity-kpi mc-entity-kpi-purple"><Statistic title={<span><ApartmentOutlined /> 攻击步骤</span>} value={relatedFindings.length} /></Card></Col>
           </Row>
 
+          <Card title="实体关键信息" className="mc-panel">
+            <Descriptions size="small" column={{ xs: 1, sm: 2, md: 3 }}>
+              <Descriptions.Item label="原名">{selected.id}</Descriptions.Item>
+              <Descriptions.Item label="实体类型">{entityTypeLabel[selected.type]}</Descriptions.Item>
+              <Descriptions.Item label="关联事件数">{selected.thirtyDayEvents} 次</Descriptions.Item>
+              <Descriptions.Item label="首次出现">{selected.firstSeen}</Descriptions.Item>
+              <Descriptions.Item label="最近出现">{selected.lastSeen}</Descriptions.Item>
+              <Descriptions.Item label="关联主机">{associatedHosts}</Descriptions.Item>
+              <Descriptions.Item label="参与的攻击步骤" span={3}>
+                <Space size={[4, 4]} wrap>
+                  {relatedFindings.length
+                    ? relatedFindings.slice(0, 6).map((finding) => <Tag className="mc-attack-step-tag" key={finding.id} color={riskTagColor(finding.risk)}>{readableAction(`${finding.anchorEvent.action} ${finding.anchorEvent.raw || ''}`)}</Tag>)
+                    : <Text type="secondary">暂无已关联攻击步骤</Text>}
+                </Space>
+              </Descriptions.Item>
+              <Descriptions.Item label="风险原因" span={3}>{riskReason}</Descriptions.Item>
+            </Descriptions>
+          </Card>
+
            <Row gutter={[12, 12]}>
-             <Col xs={24}>
+             {false && <Col xs={24}>
               <Card title={<HelpTitle title="基线对比" description="将当前实体行为与历史常态比较。偏离表示值得关注，不代表单独成立的攻击证据。" />} className="mc-panel">
                 <Table
                   rowKey="feature"
@@ -302,26 +348,26 @@ export default function EntityInvestigationPage({
                     { title: '特征', dataIndex: 'feature', key: 'feature' },
                     { title: '当前观察', dataIndex: 'current', key: 'current' },
                     { title: '历史常态', dataIndex: 'baseline', key: 'baseline' },
-                    { title: '偏离程度', dataIndex: 'deviation', key: 'deviation', render: (value: number) => <Space size={6}><Progress percent={Math.round(value * 100)} size="small" status={value >= 0.8 ? 'exception' : 'normal'} /><Text type="secondary">{value >= 0.8 ? '明显偏离' : value >= 0.6 ? '有所偏离' : '接近常态'}</Text></Space> },
+                    { title: '偏离程度', dataIndex: 'deviation', key: 'deviation', render: (value: number) => <Space size={6}><Progress percent={Math.round(value * 100)} size="small" strokeColor={deviationTagColor(value) === 'red' ? '#dc2626' : deviationTagColor(value) === 'orange' ? '#d97706' : '#16a34a'} trailColor="#e5e7eb" /><Tag color={deviationTagColor(value)}>{value >= 0.8 ? '明显偏离' : value >= 0.6 ? '有所偏离' : '接近常态'}</Tag></Space> },
                   ]}
                   dataSource={selected.baseline}
                   className="mc-baseline-table"
                   scroll={{ x: 582 }}
                 />
               </Card>
-            </Col>
-            <Col span={24}>
+             </Col>}
+             <Col span={24}>
               <Card title={<HelpTitle title="关联发现" description="列出近期与该实体有关的异常发现。点击关联理由标签可查看为什么被关联。" />} className="mc-panel">
                 <Table
                   rowKey="id"
                   size="small"
                   pagination={{ pageSize: 5, hideOnSinglePage: true }}
                   columns={[
-                    { title: '时间', dataIndex: 'start', key: 'start', width: 170 },
-                    { title: '关联行为', dataIndex: 'title', key: 'title', width: 220 },
-                    { title: '主机', dataIndex: 'host', key: 'host', width: 150 },
-                    { title: <HelpTitle title="为什么关联" description="这些标签说明当前实体与异常发现之间的关联依据。点击标签可查看简要解释。" />, key: 'reason', render: (_: unknown, row: FindingRecord) => <Space size={4} wrap>{row.reasons.slice(0, 3).map((reason) => <ReasonTag key={reason} reason={reason} />)}</Space> },
-                    { title: '风险', dataIndex: 'risk', key: 'risk', width: 90, render: (value: number) => <Tag color={value >= 75 ? 'red' : value >= 50 ? 'orange' : 'blue'}>{value}</Tag> },
+                    { title: '时间', dataIndex: 'start', key: 'start', width: 155, render: (value: string) => <Text strong className="mc-finding-time">{value}</Text> },
+                    { title: '发生了什么', key: 'action', width: 230, render: (_: unknown, row: FindingRecord) => <div><Text strong>{readableAction(`${row.anchorEvent.action} ${row.anchorEvent.raw || ''}`)}</Text><div className="mc-finding-summary">{row.summary}</div></div> },
+                    { title: '关联主机', dataIndex: 'host', key: 'host', width: 140, render: (value: string) => <Tag color="blue" className="mc-finding-host-tag">{value || '待解析'}</Tag> },
+                    { title: '为什么关联', key: 'reason', render: (_: unknown, row: FindingRecord) => <Space size={[4, 4]} wrap>{row.reasons.slice(0, 2).map((reason) => <ReasonTag key={reason} reason={reason} />)}</Space> },
+                    { title: '风险', dataIndex: 'risk', key: 'risk', width: 100, render: (value: number) => <Tag color={riskTagColor(value)} className={`mc-finding-risk-tag ${value >= 75 ? 'high' : value >= 50 ? 'review' : 'low'}`}>{value >= 75 ? '高风险' : value >= 50 ? '需核查' : '低风险'} · {value}</Tag> },
                   ]}
                   dataSource={relatedFindings}
                   locale={{ emptyText: '当前实体暂无关联异常发现' }}
@@ -331,8 +377,8 @@ export default function EntityInvestigationPage({
                   children: <div><strong>{finding.start}</strong><div>{finding.title}</div><Text type="secondary">{finding.id} · {finding.host}</Text></div>,
                 }))} */}
               </Card>
-            </Col>
-            <Col span={24}>
+             </Col>
+             {false && <Col span={24}>
               <Card title={<HelpTitle title="调查提示" description="根据当前证据整理的复核方向，帮助分析人员决定下一步查看什么。" />} className="mc-panel">
                 <Space direction="vertical" size={6}>
                   <Text><LinkOutlined /> 优先核对：{selected.currentActivity} 附近是否存在认证、远程访问或进程启动行为。</Text>
@@ -340,7 +386,7 @@ export default function EntityInvestigationPage({
                   <Text><LinkOutlined /> 证据边界：以上内容来自实体历史、标准化事件和关联发现；异常分数是模型判断，不会改写原始日志事实。</Text>
                 </Space>
               </Card>
-            </Col>
+             </Col>}
           </Row>
         </Col>
       </Row>

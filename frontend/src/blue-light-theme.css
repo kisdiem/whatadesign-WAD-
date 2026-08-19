@@ -181,6 +181,240 @@ body,
   color: var(--wad-text) !important;
 }
 
+/* Entity investigation priority cards: stronger visual hierarchy than ordinary panels. */
+.mc-workspace .mc-entity-kpi {
+  border: 1px solid #cbd5e1 !important;
+  border-left-width: 5px !important;
+  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.08) !important;
+}
+
+.mc-workspace .mc-entity-kpi-red {
+  background: #fff1f2 !important;
+  border-color: #fecdd3 !important;
+  border-left-color: #dc2626 !important;
+}
+
+.mc-workspace .mc-entity-kpi-orange {
+  background: #fff7ed !important;
+  border-color: #fed7aa !important;
+  border-left-color: #d97706 !important;
+}
+
+.mc-workspace .mc-entity-kpi-blue {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  border-left-color: #2563eb !important;
+}
+
+.mc-workspace .mc-entity-kpi-green {
+  background: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+  border-left-color: #16a34a !important;
+}
+
+.mc-workspace .mc-entity-kpi-purple {
+  background: #faf5ff !important;
+  border-color: #e9d5ff !important;
+  border-left-color: #7c3aed !important;
+}
+
+.mc-workspace .mc-entity-kpi .ant-card-body {
+  padding: 12px 14px !important;
+}
+
+.mc-workspace .mc-entity-kpi .ant-statistic-title {
+  font-weight: 700 !important;
+  font-size: 12px !important;
+}
+
+.mc-workspace .mc-entity-kpi .ant-statistic-content {
+  font-size: 22px !important;
+  font-weight: 800 !important;
+}
+
+.mc-workspace .mc-entity-kpi-red .ant-statistic-title,
+.mc-workspace .mc-entity-kpi-red .ant-statistic-title .anticon,
+.mc-workspace .mc-entity-kpi-red .ant-statistic-content,
+.mc-workspace .mc-entity-kpi-red .ant-statistic-content-suffix {
+  color: #b91c1c !important;
+}
+
+.mc-workspace .mc-entity-kpi-orange .ant-statistic-title,
+.mc-workspace .mc-entity-kpi-orange .ant-statistic-title .anticon,
+.mc-workspace .mc-entity-kpi-orange .ant-statistic-content,
+.mc-workspace .mc-entity-kpi-orange .ant-statistic-content-suffix {
+  color: #b45309 !important;
+}
+
+.mc-workspace .mc-entity-kpi-blue .ant-statistic-title,
+.mc-workspace .mc-entity-kpi-blue .ant-statistic-title .anticon,
+.mc-workspace .mc-entity-kpi-blue .ant-statistic-content,
+.mc-workspace .mc-entity-kpi-blue .ant-statistic-content-suffix {
+  color: #1d4ed8 !important;
+}
+
+.mc-workspace .mc-entity-kpi-green .ant-statistic-title,
+.mc-workspace .mc-entity-kpi-green .ant-statistic-title .anticon,
+.mc-workspace .mc-entity-kpi-green .ant-statistic-content,
+.mc-workspace .mc-entity-kpi-green .ant-statistic-content-suffix {
+  color: #15803d !important;
+}
+
+.mc-workspace .mc-entity-kpi-purple .ant-statistic-title,
+.mc-workspace .mc-entity-kpi-purple .ant-statistic-title .anticon,
+.mc-workspace .mc-entity-kpi-purple .ant-statistic-content,
+.mc-workspace .mc-entity-kpi-purple .ant-statistic-content-suffix {
+  color: #6d28d9 !important;
+}
+
+.mc-workspace .mc-entity-title,
+.mc-workspace .mc-entity-title .ant-typography {
+  color: #0f3d91 !important;
+  font-weight: 800 !important;
+}
+
+/* 实体关键信息第二列为实体类型，使用蓝色信息标签突出。 */
+.mc-workspace .mc-entity-summary-row + .mc-panel .ant-descriptions-row:first-child .ant-descriptions-item:nth-child(2) .ant-descriptions-item-content {
+  display: inline-flex !important;
+  width: auto !important;
+  max-width: 100%;
+  padding: 2px 9px;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8 !important;
+  font-weight: 700 !important;
+}
+
+.mc-workspace .mc-entity-summary-row + .mc-panel .ant-descriptions-row:first-child .ant-descriptions-item:nth-child(3) .ant-descriptions-item-content {
+  color: #1d4ed8 !important;
+  font-size: 15px;
+  font-weight: 800 !important;
+}
+
+.mc-workspace .mc-entity-summary-row + .mc-panel .ant-descriptions-item-label {
+  color: #64748b !important;
+  font-weight: 600 !important;
+}
+
+.mc-workspace .mc-entity-summary-row + .mc-panel .ant-descriptions-item-content {
+  color: #1e40af !important;
+  line-height: 1.55;
+  background: #eff6ff !important;
+  border: 1px solid #bfdbfe !important;
+  border-radius: 6px;
+  font-weight: 600 !important;
+}
+
+.mc-workspace .mc-entity-summary-row + .mc-panel .ant-descriptions-row > th,
+.mc-workspace .mc-entity-summary-row + .mc-panel .ant-descriptions-row > td {
+  vertical-align: middle;
+}
+
+.mc-workspace .mc-entity-summary-row + .mc-panel .ant-descriptions-row:first-child .ant-descriptions-item:nth-child(2) .ant-descriptions-item-content {
+  display: table-cell !important;
+  width: auto !important;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.mc-workspace .mc-attack-step-tag {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.mc-workspace .mc-finding-time {
+  color: #334155 !important;
+  white-space: nowrap;
+}
+
+.mc-workspace .mc-finding-summary {
+  max-width: 220px;
+  margin-top: 3px;
+  overflow: hidden;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mc-workspace .mc-finding-host-tag,
+.mc-workspace .mc-finding-risk-tag,
+.mc-workspace .mc-explainable-tag {
+  font-weight: 700;
+}
+
+.mc-workspace .mc-finding-host-tag {
+  color: #075985 !important;
+  background: #bae6fd !important;
+  border-color: #38bdf8 !important;
+}
+
+.mc-workspace .mc-finding-risk-tag.high {
+  color: #991b1b !important;
+  background: #fecaca !important;
+  border-color: #ef4444 !important;
+}
+
+.mc-workspace .mc-finding-risk-tag.review {
+  color: #9a3412 !important;
+  background: #fed7aa !important;
+  border-color: #f97316 !important;
+}
+
+.mc-workspace .mc-finding-risk-tag.low {
+  color: #166534 !important;
+  background: #bbf7d0 !important;
+  border-color: #22c55e !important;
+}
+
+/* Override the generic light-theme tag rule for investigation signals. */
+.mc-workspace .mc-panel .ant-tag.mc-finding-host-tag {
+  color: #075985 !important;
+  background: #7dd3fc !important;
+  border-color: #0284c7 !important;
+}
+
+.mc-workspace .mc-panel .ant-tag.mc-finding-risk-tag.high {
+  color: #7f1d1d !important;
+  background: #fca5a5 !important;
+  border-color: #dc2626 !important;
+}
+
+.mc-workspace .mc-panel .ant-tag.mc-finding-risk-tag.review {
+  color: #7c2d12 !important;
+  background: #fdba74 !important;
+  border-color: #ea580c !important;
+}
+
+.mc-workspace .mc-panel .ant-tag.mc-finding-risk-tag.low {
+  color: #14532d !important;
+  background: #86efac !important;
+  border-color: #16a34a !important;
+}
+
+.mc-workspace .mc-panel .ant-tag.mc-reason-shared-account {
+  color: #581c87 !important;
+  background: #d8b4fe !important;
+  border-color: #9333ea !important;
+}
+
+.mc-workspace .mc-panel .ant-tag.mc-reason-unusual-time {
+  color: #7c2d12 !important;
+  background: #fdba74 !important;
+  border-color: #ea580c !important;
+}
+
+.mc-workspace .mc-panel .ant-tag.mc-reason-context {
+  color: #075985 !important;
+  background: #7dd3fc !important;
+  border-color: #0284c7 !important;
+}
+
 .mc-filterbar,
 .mc-queue-head,
 .mc-chat-composer,
@@ -420,6 +654,66 @@ body,
 .mc-status-dot.active { background: #f59e0b !important; }
 .mc-risk-score.high { background: #ea580c !important; }
 .mc-risk-score.critical { background: #dc2626 !important; }
+
+/* 全站风险标签颜色，覆盖通用浅色主题的灰色标签规则。 */
+.mc-workspace .ant-tag.ant-tag-red,
+.mc-workspace .ant-tag.ant-tag-red-inverse {
+  color: #7f1d1d !important;
+  background: #fca5a5 !important;
+  border-color: #dc2626 !important;
+  font-weight: 700 !important;
+}
+
+.mc-workspace .ant-tag.ant-tag-orange,
+.mc-workspace .ant-tag.ant-tag-volcano,
+.mc-workspace .ant-tag.ant-tag-gold {
+  color: #7c2d12 !important;
+  background: #fdba74 !important;
+  border-color: #ea580c !important;
+  font-weight: 700 !important;
+}
+
+.mc-workspace .ant-tag.ant-tag-green {
+  color: #14532d !important;
+  background: #86efac !important;
+  border-color: #16a34a !important;
+  font-weight: 700 !important;
+}
+
+.mc-workspace .ant-tag.ant-tag-blue,
+.mc-workspace .ant-tag.ant-tag-geekblue,
+.mc-workspace .ant-tag.ant-tag-cyan {
+  color: #075985 !important;
+  background: #7dd3fc !important;
+  border-color: #0284c7 !important;
+  font-weight: 700 !important;
+}
+
+.mc-workspace .ant-tag.ant-tag-purple {
+  color: #581c87 !important;
+  background: #d8b4fe !important;
+  border-color: #9333ea !important;
+  font-weight: 700 !important;
+}
+
+.mc-workspace .mc-risk-stat .ant-statistic-title {
+  font-weight: 700 !important;
+}
+
+.mc-workspace .mc-risk-stat.medium .ant-statistic-content,
+.mc-workspace .mc-risk-stat.medium .ant-statistic-title {
+  color: #b45309 !important;
+}
+
+.mc-workspace .mc-risk-stat.high .ant-statistic-content,
+.mc-workspace .mc-risk-stat.high .ant-statistic-title {
+  color: #ea580c !important;
+}
+
+.mc-workspace .mc-risk-stat.critical .ant-statistic-content,
+.mc-workspace .mc-risk-stat.critical .ant-statistic-title {
+  color: #dc2626 !important;
+}
 
 .mc-workspace .ant-tag:not(.ant-tag-has-color) {
   background: #f1f5f9 !important;

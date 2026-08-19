@@ -366,7 +366,7 @@ export default function InvestigationsPage({
           const active = activeFindingIds.has(finding.id)
           return {
           id: finding.id,
-          name: finding.title,
+          name: `${index + 1}. ${readableAction(finding.anchorEvent.action)}`,
           category: stage === 'main' ? 0 : 1,
           symbolSize: stage === 'main' ? 52 : 44,
           x: 140 + index * 160,
@@ -377,7 +377,7 @@ export default function InvestigationsPage({
             borderWidth: 1.5,
             opacity: active ? (stage === 'main' ? 1 : 0.82) : 0.34,
           },
-          label: { show: true, formatter: finding.title, fontSize: 11, color: '#f8fbff' },
+          label: { show: true, formatter: `${index + 1}. ${readableAction(finding.anchorEvent.action)}`, fontSize: 11, color: '#f8fbff' },
           }
         }),
         ...graphEntities.map((entity, index) => ({
@@ -444,7 +444,7 @@ export default function InvestigationsPage({
                         <Text strong className="mc-stage-item-title">
                           <ExplainableText fallback={item.title} context={{ caseId: selected.id, windowIds: [item.id], entityIds: [item.entity] }} onExplain={onExplain}>{item.title}</ExplainableText>
                         </Text>
-                        <div className="mc-row-id">{item.id} · {item.start}</div>
+                        <div className="mc-row-id">{item.start}</div>
                       </div>
                       <RiskBadge value={item.risk} />
                     </div>
@@ -506,7 +506,7 @@ export default function InvestigationsPage({
               dataSource={visibleCases}
               renderItem={(item) => (
                 <List.Item className={item.id === selected?.id ? 'active' : ''} onClick={() => setSelectedId(item.id)} actions={[<Button key="delete" danger type="text" size="small" icon={<DeleteOutlined />} aria-label={`删除案件 ${item.title}`} onClick={(event) => { event.stopPropagation(); onDeleteCase(item.id) }} />]}>
-                  <List.Item.Meta title={<Text strong>{item.title}</Text>} description={<Space size={4} wrap><Text type="secondary">{item.id}</Text><Tag color={investigationQueueMeta[investigationQueueStatus(item)].color}>{investigationQueueMeta[investigationQueueStatus(item)].label}</Tag></Space>} />
+                  <List.Item.Meta title={<Text strong>{item.title}</Text>} description={<Space size={4} wrap><Text type="secondary">{item.createdAt}</Text><Tag color={investigationQueueMeta[investigationQueueStatus(item)].color}>{investigationQueueMeta[investigationQueueStatus(item)].label}</Tag></Space>} />
                   <Tag color={item.severity === 'critical' ? 'red' : 'orange'}>{severityLabel[item.severity]}</Tag>
                 </List.Item>
               )}
@@ -518,18 +518,18 @@ export default function InvestigationsPage({
             <div className="mc-case-head">
               <div>
                 <Title level={3}>{selected.title}</Title>
-                <Space size={6} wrap><Text type="secondary">{selected.id} · {selected.owner}</Text><Tag color={selectedQueueMeta.color}>{selectedQueueMeta.label}</Tag>{typeof selected.escalationScore === 'number' && <Tag color="geekblue">升级评分 {selected.escalationScore}</Tag>}</Space>
-                <Paragraph style={{ margin: '8px 0 0' }}>{selected.summary}</Paragraph>
-                <Space size={[6, 6]} wrap>
-                  <Tag color="blue">多尺度上下文主动检索</Tag>
-                  <Tag color="geekblue">跨时间窗口长周期关联</Tag>
-                  <Tag color="cyan">跨源语义与实体关系建模</Tag>
-                  {(selected.escalationReasons || []).slice(0, 3).map((reason) => <Tag key={reason}>{reason}</Tag>)}
+                <Space size={6} wrap><Tag color={selected.severity === 'critical' ? 'red' : selected.severity === 'high' ? 'orange' : 'blue'}>{severityLabel[selected.severity]}</Tag><Tag color={selectedQueueMeta.color}>{selectedQueueMeta.label}</Tag><Text type="secondary">负责人：{selected.owner}</Text></Space>
+                <Paragraph className="mc-case-summary">{selected.summary}</Paragraph>
+                <Space size={[6, 6]} wrap className="mc-case-priority-row">
+                  <Tag color="red">主链 {main.length} 步</Tag>
+                  <Tag color="orange">候选 {candidate.length} 步</Tag>
+                  <Tag color="blue">关联事件 {related.length} 条</Tag>
+                  {typeof selected.escalationScore === 'number' && <Tag color="volcano">升级评分 {selected.escalationScore}</Tag>}
                 </Space>
               </div>
               <Space direction="vertical" align="end" size={4}>
-                <Tag color="processing">锚点 {related[0]?.entity || '—'}</Tag>
-                <Text type="secondary">完整链路 {related.length} 阶段 · {timeRange} 当前窗口 {activeRelatedCount} 阶段</Text>
+                <Tag color="processing">锚点：{related[0]?.entity || '—'}</Tag>
+                <Text type="secondary">当前窗口 {activeRelatedCount} / {related.length} 条</Text>
               </Space>
             </div>
           </Card>
@@ -634,11 +634,10 @@ export default function InvestigationsPage({
                   pagination={{ pageSize: 6, hideOnSinglePage: true }}
                   columns={[
                     { title: '发生时间', dataIndex: 'start', key: 'start', width: 165 },
-                    { title: '发生了什么', dataIndex: 'title', key: 'title', width: 220 },
+                    { title: '发生了什么', key: 'title', width: 220, render: (_: unknown, row: FindingRecord) => <div><Text strong>{readableAction(`${row.anchorEvent.action} ${row.anchorEvent.raw || ''}`)}</Text><div className="mc-row-id">{row.entity}</div></div> },
                     { title: '涉及实体', dataIndex: 'entity', key: 'entity', width: 145 },
-                    { title: '证据说明', key: 'statement', render: (_: unknown, row: FindingRecord) => evidenceByFinding[row.id]?.[0]?.statement || row.summary },
-                    { title: '窗口归属', key: 'scope', width: 105, render: (_: unknown, row: FindingRecord) => <Tag color={activeFindingIds.has(row.id) ? 'green' : 'default'}>{activeFindingIds.has(row.id) ? timeRange : '历史锚点'}</Tag> },
-                    { title: '调查状态', key: 'stage', width: 105, render: (_: unknown, row: FindingRecord) => <Tag color={board[row.id] === 'main' ? 'blue' : board[row.id] === 'candidate' ? 'orange' : 'default'}>{readableStage(board[row.id] || 'candidate')}</Tag> },
+                    { title: '证据摘要', key: 'statement', render: (_: unknown, row: FindingRecord) => <span className="mc-evidence-summary">{evidenceByFinding[row.id]?.[0]?.statement || row.summary}</span> },
+                    { title: '调查状态', key: 'stage', width: 105, render: (_: unknown, row: FindingRecord) => <Tag color={board[row.id] === 'main' ? 'red' : board[row.id] === 'candidate' ? 'orange' : 'default'}>{readableStage(board[row.id] || 'candidate')}</Tag> },
                   ]}
                   dataSource={[...related].sort((a, b) => a.start.localeCompare(b.start))}
                   locale={{ emptyText: '当前案件暂无可展示证据' }}
@@ -657,7 +656,7 @@ export default function InvestigationsPage({
                       children: (
                         <div>
                           <strong>{finding.start} · {finding.title}</strong>
-                          <div><Text type="secondary">{finding.id} · {finding.entity} · {stage}</Text></div>
+                          <div><Text type="secondary">{finding.entity} · {stage}</Text></div>
                           <div><Text>{evidenceByFinding[finding.id]?.[0]?.statement || finding.summary}</Text></div>
                         </div>
                       ),
@@ -685,19 +684,29 @@ export default function InvestigationsPage({
         {graphDetail && (
           <>
           <Descriptions bordered size="small" column={1}>
-            <Descriptions.Item label="节点/边类型">{graphDetail.kind}</Descriptions.Item>
-            <Descriptions.Item label="关联依据">{graphDetail.description}</Descriptions.Item>
-            {graphDetail.evidence && <Descriptions.Item label="日志证据">{graphDetail.evidence}</Descriptions.Item>}
+            <Descriptions.Item label="对象类型">{graphDetail.kind}</Descriptions.Item>
             {graphDetail.relation && <Descriptions.Item label="关系类型">{graphDetail.relation}</Descriptions.Item>}
             {graphDetail.source && <Descriptions.Item label="来源或起点">{graphDetail.source}</Descriptions.Item>}
             {graphDetail.target && <Descriptions.Item label="终点">{graphDetail.target}</Descriptions.Item>}
           </Descriptions>
-          <Card size="small" title="解释详情" style={{ marginTop: 12 }}>
-            {graphDetail.explanation && <Paragraph>{graphDetail.explanation}</Paragraph>}
-            {graphDetail.boundary && <Paragraph type="secondary">判断边界：{graphDetail.boundary}</Paragraph>}
-            {graphDetail.originalName && <Paragraph>原始实体名：{graphDetail.originalName}</Paragraph>}
-            {graphDetail.details?.map((detail) => <Paragraph key={detail} style={{ marginBottom: 4 }}>{detail}</Paragraph>)}
-          </Card>
+          <div className="mc-evidence-sections">
+            <div className="mc-evidence-section">
+              <Text strong>事实</Text>
+              <Paragraph>{graphDetail.evidence || graphDetail.details?.find((detail) => /原始日志|原始事件|日志/.test(detail)) || graphDetail.originalName || '当前节点或关系暂无原始日志事实。'}</Paragraph>
+            </div>
+            <div className="mc-evidence-section">
+              <Text strong>判断</Text>
+              <Paragraph>{graphDetail.explanation || graphDetail.description || '当前没有额外的模型判断。'}</Paragraph>
+              {graphDetail.originalName && <Text type="secondary">原始名称：{graphDetail.originalName}</Text>}
+            </div>
+            <div className="mc-evidence-section">
+              <Text strong>关联证据</Text>
+              <Paragraph>{graphDetail.relation
+                ? `${graphDetail.source || '来源节点'} 与 ${graphDetail.target || '目标节点'} 通过“${graphDetail.relation}”建立关联。`
+                : graphDetail.boundary || '该节点属于当前 30 分钟调查窗口，需结合时间、实体和相邻事件核对。'}</Paragraph>
+              {graphDetail.details?.filter((detail) => !/原始日志|原始事件|日志/.test(detail)).map((detail) => <Paragraph key={detail} style={{ marginBottom: 4 }}>{detail}</Paragraph>)}
+            </div>
+          </div>
           </>
         )}
       </Drawer>

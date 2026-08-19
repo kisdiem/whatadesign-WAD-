@@ -192,7 +192,16 @@ export function reasonExplanation(value: string) {
 }
 
 export function ReasonTag({ reason }: { reason: string }) {
-  return <Popover trigger="click" placement="top" title={readableReason(reason)} content={<div className="mc-help-content">{reasonExplanation(reason)}</div>}><Tag className="mc-explainable-tag" onClick={(event) => event.stopPropagation()}>{readableReason(reason)}</Tag></Popover>
+  const normalized = reason.toLowerCase()
+  const color = normalized.includes('shared_account') || normalized.includes('same_user')
+    ? 'purple'
+    : normalized.includes('unusual_time') || normalized.includes('time')
+      ? 'orange'
+      : normalized.includes('host') || normalized.includes('entity')
+        ? 'blue'
+        : 'gold'
+  const reasonClass = normalized.includes('shared_account') ? 'mc-reason-shared-account' : normalized.includes('unusual_time') ? 'mc-reason-unusual-time' : 'mc-reason-context'
+  return <Popover trigger="click" placement="top" title={readableReason(reason)} content={<div className="mc-help-content">{reasonExplanation(reason)}</div>}><Tag color={color} className={`mc-explainable-tag ${reasonClass}`} onClick={(event) => event.stopPropagation()}>{readableReason(reason)}</Tag></Popover>
 }
 
 export function readableStage(stage: FindingStage) {
@@ -207,6 +216,21 @@ export function readableAction(value?: string) {
   const action = value || '未知行为'
   const normalized = action.toUpperCase()
   const labels: Array<[RegExp, string]> = [
+    [/\bEXECVE\b.*(?:A0=|ARGV|ARGC|PROGRAM)|\bEXECVE\b/i, '程序启动'],
+    [/SYSCALL.*(?:EXEC|EXECVE)|程序启动/i, '程序启动'],
+    [/SUDO|USER=ROOT|权限切换/i, '权限切换'],
+    [/USER_LOGIN|SESSION_OPENED|SESSION_CLOSED|登录会话/i, '登录会话变化'],
+    [/FILE_DELETE|UNLINK|删除文件/i, '删除文件'],
+    [/POWERSHELL(?:\.EXE)?|\s-ENC\b|编码命令/i, '编码 PowerShell 执行'],
+    [/NMAP|PORTSCAN|ET SCAN|端口扫描/i, '网络服务扫描'],
+    [/SHELL\.PHP|WEBSHELL|WEB SHELL/i, 'Web Shell 文件创建'],
+    [/(?:CURL|WGET).*(?:\|\s*SH|\|\s*BASH)|下载.*脚本/i, '下载并执行脚本'],
+    [/USERADD|NEW USER|CREATE ACCOUNT|创建.*账户/i, '创建本地账户'],
+    [/USERMOD.*(?:SUDO|GROUP)|-AG\s+SUDO|加入.*权限组/i, '修改账户权限'],
+    [/FAILED PASSWORD|密码尝试失败/i, 'SSH 密码尝试失败'],
+    [/ACCEPTED PASSWORD|成功登录|登录成功/i, 'SSH 登录成功'],
+    [/DNSTEAL|TYPE=TXT|DNS 隧道/i, 'DNS 隧道查询'],
+    [/OUT_BYTES=.*(?:CONNECTION|ESTABLISHED)|大流量外联/i, '大流量外联'],
     [/LOGIN_FAILURE|FAILED_PASSWORD|AUTH_FAILURE|登录失败|认证失败/i, '登录失败'],
     [/SSH_LOGIN|LOGIN|LOGON|AUTH|ACCEPTED_PASSWORD|登录成功|认证成功/i, '登录或认证'],
     [/PROCESS_START|EXEC|COMMAND|SHELL|进程启动|命令执行/i, '进程或命令执行'],

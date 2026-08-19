@@ -1152,3 +1152,160 @@ body,
 .mc-help-trigger:hover {
   color: #77a6e8;
 }
+
+.mc-evidence-sections {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.mc-evidence-section {
+  padding: 12px;
+  border: 1px solid #dbe4ee;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.mc-evidence-section .ant-typography {
+  margin-bottom: 6px;
+}
+
+.mc-entity-explanation-content {
+  display: grid;
+  gap: 6px;
+}
+
+.mc-entity-summary-row {
+  margin-bottom: 12px;
+}
+
+.mc-entity-summary-row .ant-statistic-title {
+  margin-bottom: 2px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.mc-entity-summary-row .ant-statistic-content {
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.mc-entity-kpi {
+  border-left: 4px solid #94a3b8;
+}
+
+.mc-entity-kpi .ant-statistic-title {
+  color: #475569;
+  font-weight: 600;
+}
+
+.mc-entity-kpi .ant-statistic-title .anticon {
+  margin-right: 4px;
+}
+
+.mc-entity-kpi .ant-statistic-content {
+  font-weight: 700;
+}
+
+.mc-entity-kpi-red {
+  border-left-color: #dc2626;
+}
+
+.mc-entity-kpi-red .ant-statistic-title,
+.mc-entity-kpi-red .ant-statistic-title .anticon,
+.mc-entity-kpi-red .ant-statistic-content {
+  color: #b91c1c;
+}
+
+.mc-entity-kpi-orange {
+  border-left-color: #d97706;
+}
+
+.mc-entity-kpi-orange .ant-statistic-title,
+.mc-entity-kpi-orange .ant-statistic-title .anticon,
+.mc-entity-kpi-orange .ant-statistic-content {
+  color: #b45309;
+}
+
+.mc-entity-kpi-blue {
+  border-left-color: #2563eb;
+}
+
+.mc-entity-kpi-blue .ant-statistic-title .anticon,
+.mc-entity-kpi-blue .ant-statistic-content {
+  color: #1d4ed8;
+}
+
+.mc-entity-kpi-green {
+  border-left-color: #16a34a;
+}
+
+.mc-entity-kpi-green .ant-statistic-title .anticon,
+.mc-entity-kpi-green .ant-statistic-content {
+  color: #15803d;
+}
+
+.mc-entity-kpi-purple {
+  border-left-color: #7c3aed;
+}
+
+.mc-entity-kpi-purple .ant-statistic-title .anticon,
+.mc-entity-kpi-purple .ant-statistic-content {
+  color: #6d28d9;
+}
+
+.mc-entity-title {
+  margin-bottom: 4px !important;
+}
+
+.mc-entity-fact,
+.mc-entity-judgment,
+.mc-entity-evidence {
+  line-height: 1.6;
+}
+
+.mc-compact-risk-row .ant-statistic {
+  min-width: 0;
+}
+
+.mc-compact-risk-row > .ant-col {
+  flex: 0 0 25%;
+  max-width: 25%;
+}
+
+.mc-compact-risk-row .ant-statistic-title {
+  margin-bottom: 2px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.mc-compact-risk-row .ant-statistic-content {
+  font-size: 20px;
+  line-height: 1.15;
+}
+
+.mc-case-summary {
+  max-width: 760px;
+  margin: 8px 0 10px !important;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.mc-case-priority-row .ant-tag {
+  font-weight: 700;
+}
+
+.mc-evidence-summary {
+  display: block;
+  max-width: 360px;
+  overflow: hidden;
+  color: #475569;
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 隐藏 M6 卡片中旧版的长说明，仅保留四个风险指标。 */
+.mc-compact-risk-row + .ant-divider + .ant-typography {
+  display: none;
+}

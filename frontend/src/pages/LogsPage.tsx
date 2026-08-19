@@ -10,6 +10,7 @@ import {
   ExplainableText,
   HelpTitle,
   PageTitle,
+  RiskBadge,
   filterRowsBySourceTimeRange,
   filterRowsByTimeRange,
   readableAction,
@@ -411,8 +412,8 @@ export default function LogsPage({
     },
     { title: '执行者', dataIndex: 'actor', key: 'actor', width: 120, render: (value?: string) => value || '—' },
     { title: '主机', dataIndex: 'host', key: 'host', width: 120, render: (value?: string) => value || '—' },
-    { title: '对象 / IP', key: 'target', width: 160, render: (_: unknown, row: EventRow) => row.process || row.ip || '—' },
-    { title: '异常发现', dataIndex: 'findingTitle', key: 'findingTitle', width: 220 },
+    { title: '关联对象', key: 'target', width: 160, render: (_: unknown, row: EventRow) => row.process || row.ip || '—' },
+    { title: '调查提示', key: 'findingTitle', width: 220, render: (_: unknown, row: EventRow) => <div><Text>{row.findingTitle || '暂无关联发现'}</Text>{typeof row.risk === 'number' && <div style={{ marginTop: 4 }}><RiskBadge value={row.risk} /></div>}</div> },
   ]
 
   return (
@@ -450,7 +451,13 @@ export default function LogsPage({
         />
       </Card>
 
-      <Drawer open={Boolean(selected)} onClose={() => setSelected(null)} width={620} title={selected?.id} extra={<Button size="small" icon={<LinkOutlined />} onClick={saveSelectedM3}>保存当前事件 30 分钟 M3 图</Button>}>
+      <Drawer
+        open={Boolean(selected)}
+        onClose={() => setSelected(null)}
+        width={620}
+        title={selected ? <div><div>{readableAction(selected.action)}</div><div className="mc-row-id">{selected.time}</div></div> : undefined}
+        extra={<Button size="small" icon={<LinkOutlined />} onClick={saveSelectedM3}>保存当前事件 30 分钟 M3 图</Button>}
+      >
         {selected && (
           <Tabs
             items={[
@@ -478,7 +485,7 @@ export default function LogsPage({
                   <>
                     <Descriptions bordered size="small" column={1}>
                       <Descriptions.Item label="日志源">{selected.source}</Descriptions.Item>
-                      <Descriptions.Item label="原始日志引用">{selected.rawLogRef || `${selected.source}:${selected.id}`}</Descriptions.Item>
+                      <Descriptions.Item label="日志来源">{selected.rawLogRef || selected.source}</Descriptions.Item>
                     </Descriptions>
                     <Divider />
                     <ExplainableBlock fallback={selected.raw} context={eventContext(selected)} onExplain={onExplain}>
