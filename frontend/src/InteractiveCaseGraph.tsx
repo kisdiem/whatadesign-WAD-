@@ -260,13 +260,13 @@ export default function InteractiveCaseGraph({
     ? (isStart(node) ? '#dc2626' : isEnd(node) ? '#10b981' : '#7c3aed')
     : node.kind === 'event' ? '#2563eb'
     : node.kind === 'window' ? (node.category === 0 ? '#dc2626' : '#d97706')
-    : '#65a30d'
+    : '#64748b'
   // 三种事实关系用线型区分：事件涉及实体（实线）、时间先后（虚线）、同一事件共同参与（点线）。
   const lineStyleFor = (relation: string, strong: boolean): { dash?: string; color: string; marker: 'strong' | 'weak' | 'blue' } => {
     if (relation === '事件涉及实体') return { color: '#b91c1c', marker: 'strong' }
     if (relation === '时间先后') return { dash: '8 6', color: '#2563eb', marker: 'blue' }
-    if (relation === '同一事件共同参与') return { dash: '3 7', color: '#94a3b8', marker: 'weak' }
-    return { color: strong ? '#b91c1c' : '#94a3b8', marker: strong ? 'strong' : 'weak' }
+    if (relation === '同一事件共同参与') return { dash: '3 7', color: '#f59e0b', marker: 'weak' }
+    return { color: strong ? '#b91c1c' : '#f59e0b', marker: strong ? 'strong' : 'weak' }
   }
   // 边从节点边缘的端口连接，而非圆心：端口位于源/目标节点朝向对方的边界处。
   const portPoint = (fromId: string, toward: Point, r: number): Point => {
@@ -351,7 +351,7 @@ export default function InteractiveCaseGraph({
             <path d="M0,0 L0,6 L9,3 z" fill="#2563eb" />
           </marker>
           <marker id={`mc-arrow-weak-${arrowId}`} markerWidth="11" markerHeight="11" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-            <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8" />
+            <path d="M0,0 L0,6 L9,3 z" fill="#f59e0b" />
           </marker>
         </defs>
         <rect width="1000" height={height} fill="#f8fafc" rx="8" />
@@ -406,7 +406,7 @@ export default function InteractiveCaseGraph({
                   onClick={(event) => { event.stopPropagation(); if (!suppressClickRef.current) onNodeClick(node) }}
                   style={{ cursor: staticView ? 'pointer' : 'grab' }}
                 >
-                  <circle r={nodeRadius} fill={isCandidate ? '#94a3b8' : color(node)} stroke={hovered ? '#1e293b' : '#ffffff'} strokeWidth={hovered ? 3 : 2} strokeDasharray={isCandidate ? '5 4' : undefined} />
+                  <circle r={nodeRadius} fill={isCandidate ? '#f59e0b' : color(node)} stroke={hovered ? '#7c2d12' : '#ffffff'} strokeWidth={hovered ? 3 : 2} strokeDasharray={isCandidate ? '5 4' : undefined} />
                   <text y={nodeRadius + 17} textAnchor="middle" fill="#111827" fontSize="12" fontWeight="600">{node.name}</text>
                 </g>
               )

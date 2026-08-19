@@ -150,7 +150,7 @@ export default function InvestigationsPage({
     : []
   const gapFindings = findings.filter((finding) => gapCandidateIds.includes(finding.id))
   // 证据链研判图：主链按 windowIds 顺序构成单向链，水平单行排列、超出画布自动换行；
-  // 候选证据（真证据 + 干扰项混合）作为独立灰色节点在下方自由池待研判。
+  // 候选证据（真证据 + 干扰项混合）作为独立黄色节点在下方自由池待研判。
   const mainOrdered = selected
     ? selected.windowIds.map((id) => findings.find((finding) => finding.id === id)).filter((finding): finding is FindingRecord => Boolean(finding))
     : []
@@ -253,7 +253,7 @@ export default function InvestigationsPage({
   ]
   const m3NodeLegend: CaseGraphNodeLegendItem[] = [
     { color: '#2563eb', label: '事件节点：30 分钟内日志事实' },
-    { color: '#65a30d', label: '实体节点：用户/主机/进程/IP' },
+    { color: '#64748b', label: '实体节点：用户/主机/进程/IP' },
   ]
   const saveInteractiveGraphPositions = (graphId: string, positions: Record<string, { x: number; y: number }>) => {
     setGraphPositions((current) => {
@@ -507,7 +507,7 @@ export default function InvestigationsPage({
               renderItem={(item) => (
                 <List.Item className={item.id === selected?.id ? 'active' : ''} onClick={() => setSelectedId(item.id)} actions={[<Button key="delete" danger type="text" size="small" icon={<DeleteOutlined />} aria-label={`删除案件 ${item.title}`} onClick={(event) => { event.stopPropagation(); onDeleteCase(item.id) }} />]}>
                   <List.Item.Meta title={<Text strong>{item.title}</Text>} description={<Space size={4} wrap><Text type="secondary">{item.createdAt}</Text><Tag color={investigationQueueMeta[investigationQueueStatus(item)].color}>{investigationQueueMeta[investigationQueueStatus(item)].label}</Tag></Space>} />
-                  <Tag color={item.severity === 'critical' ? 'red' : 'orange'}>{severityLabel[item.severity]}</Tag>
+                  <span className={`mc-severity-chip ${item.severity}`}>{severityLabel[item.severity]}</span>
                 </List.Item>
               )}
             />
@@ -518,7 +518,7 @@ export default function InvestigationsPage({
             <div className="mc-case-head">
               <div>
                 <Title level={3}>{selected.title}</Title>
-                <Space size={6} wrap><Tag color={selected.severity === 'critical' ? 'red' : selected.severity === 'high' ? 'orange' : 'blue'}>{severityLabel[selected.severity]}</Tag><Tag color={selectedQueueMeta.color}>{selectedQueueMeta.label}</Tag><Text type="secondary">负责人：{selected.owner}</Text></Space>
+                <Space size={6} wrap><span className={`mc-severity-chip ${selected.severity}`}>{severityLabel[selected.severity]}</span><Tag color={selectedQueueMeta.color}>{selectedQueueMeta.label}</Tag><Text type="secondary">负责人：{selected.owner}</Text></Space>
                 <Paragraph className="mc-case-summary">{selected.summary}</Paragraph>
                 <Space size={[6, 6]} wrap className="mc-case-priority-row">
                   <Tag color="red">主链 {main.length} 步</Tag>
@@ -536,7 +536,7 @@ export default function InvestigationsPage({
 
           <Row gutter={[12, 12]}>
             <Col span={24}>
-              {datasetName && <Card title={<HelpTitle title={`${datasetName} · 攻击链路研判`} description={`上方红色为已确认的主链证据窗口，按 windowIds 顺序从左到右构成单向链（超出自动换行），相邻窗口以端口连线衔接。下方灰色虚线为候选证据自由池。拖拽候选到主链任意节点前后即可插入（绿色「＋」指示落点），拖到右上角「拖到此处排除」区排除。${datasetName === 'Long' ? 'Long 长程窗口主链更长、候选更多，体现长周期关联能召回短窗口看不到的早期阶段。' : ''}`} />} extra={<Button type="primary" icon={<RobotOutlined />} size="small" onClick={sendChainReconstruction}>小影</Button>} className="mc-panel">
+              {datasetName && <Card title={<HelpTitle title={`${datasetName} · 攻击链路研判`} description={`上方红色为已确认的主链证据窗口，按时间顺序构成单向链。下方黄色虚线为候选证据自由池，等待人工核验。拖拽候选到主链任意节点前后即可插入，拖到右上角排除区即可移除。${datasetName === 'Long' ? 'Long 长程窗口主链更长、候选更多，体现长周期关联能召回短窗口看不到的早期阶段。' : ''}`} />} extra={<Button type="primary" icon={<RobotOutlined />} size="small" onClick={sendChainReconstruction}>小影</Button>} className="mc-panel">
                 {autoChain && (
                   <div style={{ marginBottom: 12 }}>
                     <Space wrap size={6}>
@@ -571,7 +571,7 @@ export default function InvestigationsPage({
                   onExcludeNode={(nodeId) => onExcludeEvidence(selected.id, nodeId)}
                   nodeLegend={[
                     { color: '#dc2626', label: '已确认主链' },
-                    { color: '#94a3b8', label: '候选证据（待研判）' },
+                    { color: '#f59e0b', label: '候选证据（待研判）' },
                   ]}
                   onNodeClick={(node) => {
                     setGraphDetail({ title: node.name, kind: candidateIdSet.has(node.id) ? '候选证据' : '主链证据窗口', description: node.description || '暂无补充说明', details: node.details, source: node.timestamp })

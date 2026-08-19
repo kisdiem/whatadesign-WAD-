@@ -280,7 +280,7 @@ export default function EntityInvestigationPage({
               renderItem={(item) => (
                 <List.Item className={item.id === selected?.id ? 'active' : ''} onClick={() => setSelectedId(item.id)}>
                   <List.Item.Meta title={<Text strong>{item.id}</Text>} description={`${entityTypeLabel[item.type]} · 最近活动 ${item.lastSeen}`} />
-                  <Tag color={relationTagColor(item.rareRelations)}>{item.rareRelations} 个异常关系</Tag>
+                  <span className={`mc-entity-relation-chip ${item.rareRelations >= 3 ? 'high' : item.rareRelations >= 2 ? 'review' : 'low'}`}>{item.rareRelations} 个异常关系</span>
                 </List.Item>
               )}
             />

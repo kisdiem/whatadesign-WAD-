@@ -153,8 +153,7 @@ export function RiskBadge({ value }: { value: number }) {
 }
 
 export function SeverityTag({ value }: { value: Severity }) {
-  const color = value === 'critical' ? 'red' : value === 'high' ? 'orange' : value === 'medium' ? 'gold' : 'blue'
-  return <Popover trigger="click" placement="top" title="风险等级" content={<div className="mc-help-content">严重：80 分及以上；高危：65 至 79 分；中危：低于 65 分。等级用于排序，不替代人工判断。</div>}><Tag color={color} className="mc-explainable-tag" onClick={(event) => event.stopPropagation()}>{severityLabel[value]}</Tag></Popover>
+  return <Popover trigger="click" placement="top" title="风险等级" content={<div className="mc-help-content">严重：80 分及以上；高危：65 至 79 分；中危：低于 65 分。等级用于排序，不替代人工判断。</div>}><span className={`mc-severity-chip ${value}`} onClick={(event) => event.stopPropagation()}>{severityLabel[value]}</span></Popover>
 }
 
 export function readableReason(value?: string) {
