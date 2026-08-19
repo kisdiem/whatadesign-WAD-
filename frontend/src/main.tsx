@@ -8,6 +8,7 @@ import './light-theme.css'
 import './mission-control.css'
 import './agent-mode.css'
 import './blue-light-theme.css'
+import './aptDemoPatch'
 import MissionControlApp from './MissionControlApp'
 
 const ApiSourceEnhancer = lazy(() => import('./ApiSourceEnhancer'))
