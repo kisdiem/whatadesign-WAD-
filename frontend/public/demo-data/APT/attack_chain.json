@@ -2,81 +2,10 @@
   "chain_id": "APT-CANDIDATE-001",
   "status": "candidate",
   "claim_type": "analyst_curated_replay",
-  "steps": [
-    {
-      "sequence": 1,
-      "label": "T1046 网络服务扫描：外部 IP 扫描 Web 主机",
-      "evidence_event_ids": [
-        "APT-000001"
-      ]
-    },
-    {
-      "sequence": 2,
-      "label": "T1505.003 Web Shell：shell.php 落地",
-      "evidence_event_ids": [
-        "APT-000002"
-      ]
-    },
-    {
-      "sequence": 3,
-      "label": "T1059.004 Unix Shell：下载并执行外部脚本",
-      "evidence_event_ids": [
-        "APT-000003"
-      ]
-    },
-    {
-      "sequence": 4,
-      "label": "T1136.001 创建本地账户：svc_backup",
-      "evidence_event_ids": [
-        "APT-000004"
-      ]
-    },
-    {
-      "sequence": 5,
-      "label": "T1548.003 Sudo 提权：账户加入 sudo 组",
-      "evidence_event_ids": [
-        "APT-000005"
-      ]
-    },
-    {
-      "sequence": 6,
-      "label": "T1110.001 密码猜测：SSH 爆破数据库主机",
-      "evidence_event_ids": [
-        "APT-000006"
-      ]
-    },
-    {
-      "sequence": 7,
-      "label": "T1078 有效账户：持久化账户横向移动登录",
-      "evidence_event_ids": [
-        "APT-000007"
-      ]
-    },
-    {
-      "sequence": 8,
-      "label": "T1059.001 PowerShell：编码命令执行",
-      "evidence_event_ids": [
-        "APT-000008"
-      ]
-    },
-    {
-      "sequence": 9,
-      "label": "T1071.001 DNS 隧道：命令与控制通道建立",
-      "evidence_event_ids": [
-        "APT-000009"
-      ]
-    },
-    {
-      "sequence": 10,
-      "label": "T1041 数据渗出：大量字节流向攻击者 IP",
-      "evidence_event_ids": [
-        "APT-000010"
-      ]
-    }
-  ],
+  "steps": [],
   "limitations": [
-    "这是基于原始日志的演示回放，不是模型预测。",
-    "候选关联只供人工调查，不是攻击事实。",
+    "原 10 个恶意关键节点已从演示基准链中移除。",
+    "当前文件不再预置人工攻击链证据，异常关联由系统运行时结果产生。",
     "未读取 AIT 标签或场景真值。"
   ]
 }
