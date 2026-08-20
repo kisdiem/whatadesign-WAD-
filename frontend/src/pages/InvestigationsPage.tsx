@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { Button, Card, Col, Descriptions, Drawer, List, Row, Segmented, Space, Table, Tag, Typography } from 'antd'
-import { CheckCircleFilled, ClockCircleOutlined, DeleteOutlined, RobotOutlined } from '@ant-design/icons'
+import { Button, Card, Col, Descriptions, Drawer, Input, List, Modal, Row, Segmented, Select, Space, Table, Tag, Typography } from 'antd'
+import { CheckCircleFilled, ClockCircleOutlined, DeleteOutlined, EditOutlined, RobotOutlined, SearchOutlined } from '@ant-design/icons'
 import type { Investigation } from '../mocks/data'
 import type { AssistantContext } from '../services/api'
 import {
@@ -54,6 +54,8 @@ export default function InvestigationsPage({
   activeFindingIds,
   timeRange,
   onSetFindingStage,
+  onReorderEvidence,
+  onMoveEvidenceAfter,
   onInsertEvidence,
   onExcludeEvidence,
   onSubmitBatch,
@@ -64,6 +66,9 @@ export default function InvestigationsPage({
   onDeleteCase,
   onCompleteCase,
   onReopenCase,
+  onRenameCase,
+  onMergeCases,
+  onAddFindings,
 }: {
   cases: Investigation[]
   findings: FindingRecord[]
@@ -72,6 +77,8 @@ export default function InvestigationsPage({
   activeFindingIds: Set<string>
   timeRange: string
   onSetFindingStage: (caseId: string, findingId: string, stage: FindingStage) => void
+  onReorderEvidence: (caseId: string, sourceId: string, targetId: string) => void
+  onMoveEvidenceAfter: (caseId: string, sourceId: string, afterId: string) => void
   onInsertEvidence: (caseId: string, findingId: string, afterId: string) => void
   onExcludeEvidence: (caseId: string, findingId: string) => void
   onSubmitBatch: (prompt: string, context: AssistantContext) => void
@@ -82,9 +89,21 @@ export default function InvestigationsPage({
   onDeleteCase: (caseId: string) => void
   onCompleteCase: (caseId: string) => void
   onReopenCase: (caseId: string) => void
+  onRenameCase: (caseId: string, title: string) => void
+  onMergeCases: (targetCaseId: string, sourceCaseId: string) => void
+  onAddFindings: (caseId: string, findingIds: string[]) => void
 }) {
   const location = useLocation()
   const [selectedId, setSelectedId] = useState(cases[0]?.id || '')
+  const [renameOpen, setRenameOpen] = useState(false)
+  const [renameValue, setRenameValue] = useState('')
+  const [mergeOpen, setMergeOpen] = useState(false)
+  const [mergeSourceId, setMergeSourceId] = useState<string | undefined>()
+  const [eventPickerOpen, setEventPickerOpen] = useState(false)
+  const [eventQuery, setEventQuery] = useState('')
+  const [eventSeverity, setEventSeverity] = useState<'all' | FindingRecord['severity']>('all')
+  const [eventSource, setEventSource] = useState('all')
+  const [pickedEventIds, setPickedEventIds] = useState<string[]>([])
   const [queueFilter, setQueueFilter] = useState<'manual' | 'resolved' | 'all'>('manual')
   const [datasetFilter, setDatasetFilter] = useState<'all' | 'short' | 'long' | 'apt' | 'other'>('all')
   const [graphDetail, setGraphDetail] = useState<{ title: string; kind: string; description: string; relation?: string; evidence?: string; explanation?: string; boundary?: string; originalName?: string; details?: string[]; source?: string; target?: string; prompt?: string } | null>(null)
@@ -137,11 +156,47 @@ export default function InvestigationsPage({
     }
   }, [selectedId, visibleCases])
   const selected = visibleCases.find((item) => item.id === selectedId) || visibleCases[0]
+  const existingCaseEventIds = new Set(selected?.windowIds || [])
+  const availableFindingSources = Array.from(new Set(findings.flatMap((finding) => finding.sourceTypes.length ? finding.sourceTypes : [finding.source]))).sort()
+  const pickerFindings = useMemo(() => {
+    const terms = eventQuery.trim().toLowerCase().split(/\s+/).filter(Boolean)
+    return findings
+      .filter((finding) => !existingCaseEventIds.has(finding.id))
+      .filter((finding) => {
+        const haystack = [
+          finding.id,
+          finding.title,
+          finding.summary,
+          finding.entity,
+          finding.host,
+          finding.source,
+          finding.sourceTypes.join(' '),
+          finding.reasons.join(' '),
+          finding.anchorEvent.action,
+          finding.anchorEvent.raw,
+        ].join(' ').toLowerCase()
+        const sourceMatches = eventSource === 'all' || finding.sourceTypes.includes(eventSource) || finding.source.includes(eventSource)
+        return terms.every((term) => haystack.includes(term))
+          && (eventSeverity === 'all' || finding.severity === eventSeverity)
+          && sourceMatches
+      })
+      .sort((left, right) => right.risk - left.risk || Date.parse(right.start) - Date.parse(left.start))
+  }, [eventQuery, eventSeverity, eventSource, existingCaseEventIds, findings])
+  const openEventPicker = () => {
+    setEventQuery('')
+    setEventSeverity('all')
+    setEventSource('all')
+    setPickedEventIds([])
+    setEventPickerOpen(true)
+  }
+  const openRename = (item: Investigation) => {
+    setSelectedId(item.id)
+    setRenameValue(item.title)
+    setRenameOpen(true)
+  }
   const related = selected ? findings.filter((finding) => selected.windowIds.includes(finding.id)) : []
   const activeRelatedCount = related.filter((finding) => activeFindingIds.has(finding.id)).length
   const board = selected ? caseBoards[selected.id] || {} : {}
-  const main = related.filter((finding) => board[finding.id] === 'main')
-  const candidate = related.filter((finding) => board[finding.id] === 'candidate')
   const excluded = related.filter((finding) => board[finding.id] === 'excluded')
   const entities = Array.from(new Set(related.flatMap((finding) => finding.entities))).slice(0, 8)
   // 证据缺口：待补全的真证据 + 干扰项混合，已补入主链的从中移除。
@@ -151,10 +206,24 @@ export default function InvestigationsPage({
   const gapFindings = findings.filter((finding) => gapCandidateIds.includes(finding.id))
   // 证据链研判图：主链按 windowIds 顺序构成单向链，水平单行排列、超出画布自动换行；
   // 候选证据（真证据 + 干扰项混合）作为独立黄色节点在下方自由池待研判。
+  const orderedIds = selected?.windowIds || []
+  const orderedFindings = orderedIds
+    .map((id) => findings.find((finding) => finding.id === id))
+    .filter((finding): finding is FindingRecord => finding !== undefined)
   const mainOrdered = selected
-    ? selected.windowIds.map((id) => findings.find((finding) => finding.id === id)).filter((finding): finding is FindingRecord => Boolean(finding))
+    ? [
+        ...orderedFindings.filter((finding) => (board[finding.id] || 'main') === 'main'),
+        ...related.filter((finding) => board[finding.id] === 'main' && !orderedIds.includes(finding.id)).sort((left, right) => Date.parse(left.start) - Date.parse(right.start)),
+      ]
     : []
-  const candidateIdSet = new Set(gapFindings.map((finding) => finding.id))
+  const graphCandidateFindings = Array.from(new Map([
+    ...related.filter((finding) => board[finding.id] === 'candidate'),
+    ...gapFindings.filter((finding) => !related.some((item) => item.id === finding.id)),
+  ].map((finding) => [finding.id, finding] as const)).values())
+  // 下方证据卡片与上方链路图必须使用同一组数据：避免主链排序、候选数量与图不一致。
+  const main = mainOrdered
+  const candidate = graphCandidateFindings
+  const candidateIdSet = new Set(graphCandidateFindings.map((finding) => finding.id))
   const CHAIN_ORIGIN_X = 110
   const CHAIN_ORIGIN_Y = 90
   const CHAIN_STEP_X = 160
@@ -175,24 +244,38 @@ export default function InvestigationsPage({
       return {
         id: finding.id,
         name: finding.title.length > 18 ? `${finding.title.slice(0, 18)}…` : finding.title,
+        originalName: finding.title,
         category: 0,
         kind: 'window' as const,
         timestamp: finding.start,
         description: finding.summary,
+        details: [
+          `事件来源：${finding.sourceTypes.join('、') || finding.source}`,
+          `风险等级：${severityLabel[finding.severity]} · ${finding.risk}`,
+          `涉及实体：${finding.entities.join('、') || finding.entity}`,
+          `原始事件：${finding.anchorEvent.raw || finding.anchorEvent.action || '暂无原始事件'}`,
+        ],
         x: pos.x,
         y: pos.y,
       }
     }),
-    ...gapFindings.map((finding, index) => {
+    ...graphCandidateFindings.map((finding, index) => {
       const row = Math.floor(index / 5)
       const col = index % 5
       return {
         id: finding.id,
         name: finding.title.length > 18 ? `${finding.title.slice(0, 18)}…` : finding.title,
+        originalName: finding.title,
         category: 2,
         kind: 'window' as const,
         timestamp: finding.start,
         description: finding.summary,
+        details: [
+          `事件来源：${finding.sourceTypes.join('、') || finding.source}`,
+          `风险等级：${severityLabel[finding.severity]} · ${finding.risk}`,
+          `涉及实体：${finding.entities.join('、') || finding.entity}`,
+          `原始事件：${finding.anchorEvent.raw || finding.anchorEvent.action || '暂无原始事件'}`,
+        ],
         x: CHAIN_ORIGIN_X + col * CHAIN_STEP_X,
         y: candidateOriginY + row * CHAIN_STEP_Y,
       }
@@ -345,7 +428,7 @@ export default function InvestigationsPage({
     const mainSnapshot = mainOrdered.map((finding, index) =>
       `${index + 1}. ${finding.title}（${finding.id}）[实体:${finding.entity}][风险:${finding.risk}][${finding.start}] ${finding.summary}`,
     ).join('\n')
-    const candidateSnapshot = gapFindings.map((finding, index) =>
+    const candidateSnapshot = graphCandidateFindings.map((finding, index) =>
       `候选${index + 1}. ${finding.title}（${finding.id}）[实体:${finding.entity}][风险:${finding.risk}][${finding.start}] ${finding.summary}`,
     ).join('\n')
     const prompt = `请基于当前攻击链路研判图，辅助判断如何还原完整攻击链。\n\n当前已确认主链（按时间先后）：\n${mainSnapshot || '（空）'}\n\n候选证据池（尚未纳入主链）：\n${candidateSnapshot || '（空）'}\n\n请给出：1）最可能的完整攻击链顺序——列出应纳入主链的候选及其插入位置（插到哪个已确认节点之前/之后）；2）每条建议的依据（时间先后、实体、行为）；3）建议排除的候选及原因。用简洁中文分点回答，除非证据已证明，否则不要写成“已确认入侵”。`
@@ -411,6 +494,11 @@ export default function InvestigationsPage({
   if (!selected) return null
   const selectedQueue = investigationQueueStatus(selected)
   const selectedQueueMeta = investigationQueueMeta[selectedQueue]
+  const mergeCandidates = cases.filter((item) => item.id !== selected?.id && investigationQueueStatus(item) !== 'resolved' && (investigationQueueStatus(item) === 'manual_review' || item.status === 'investigating'))
+  const openMerge = () => {
+    setMergeSourceId(mergeCandidates[0]?.id)
+    setMergeOpen(true)
+  }
   const updateFindingStage = (findingId: string, stage: FindingStage) => {
     if (selectedQueue === 'auto_observe') setQueueFilter('manual')
     onSetFindingStage(selected.id, findingId, stage)
@@ -433,7 +521,19 @@ export default function InvestigationsPage({
           ) : (
             <div className="mc-stage-list">
               {items.map((item, index) => (
-                <div className="mc-stage-item" key={item.id}>
+                <div
+                  className="mc-stage-item"
+                  key={item.id}
+                  draggable={stage === 'main'}
+                  onDragStart={(event) => { if (stage === 'main') event.dataTransfer.setData('text/plain', item.id) }}
+                  onDragOver={(event) => { if (stage === 'main') event.preventDefault() }}
+                  onDrop={(event) => {
+                    if (stage !== 'main') return
+                    event.preventDefault()
+                    const sourceId = event.dataTransfer.getData('text/plain')
+                    if (sourceId) onReorderEvidence(selected.id, sourceId, item.id)
+                  }}
+                >
                   <div className="mc-stage-item-marker">
                     <StageIcon />
                     {stage === 'main' && <span>{index + 1}</span>}
@@ -444,6 +544,7 @@ export default function InvestigationsPage({
                         <Text strong className="mc-stage-item-title">
                           <ExplainableText fallback={item.title} context={{ caseId: selected.id, windowIds: [item.id], entityIds: [item.entity] }} onExplain={onExplain}>{item.title}</ExplainableText>
                         </Text>
+                        {stage === 'main' && <Text type="secondary" className="mc-stage-drag-hint">拖动调整主链顺序</Text>}
                         <div className="mc-row-id">{item.start}</div>
                       </div>
                       <RiskBadge value={item.risk} />
@@ -474,7 +575,7 @@ export default function InvestigationsPage({
 
   return (
     <>
-      <PageTitle title="链路与案件调查" subtitle="M5 长程关联将相关异常窗口聚类为攻击候选链，由分析员逐条核验主链证据并完成研判处置。" extra={<Space>{(selectedQueue === 'resolved' ? <Button onClick={() => { setQueueFilter('manual'); onReopenCase(selected.id) }}>移回待研判</Button> : <Button type="primary" onClick={() => { setQueueFilter('resolved'); onCompleteCase(selected.id) }}>完成研判</Button>)}<Button type="primary" icon={<RobotOutlined />} onClick={submitCase}>小影</Button><Button danger icon={<DeleteOutlined />} onClick={() => onDeleteCase(selected.id)}>删除</Button></Space>} />
+      <PageTitle title="链路与案件调查" subtitle="M5 长程关联将相关异常窗口聚类为攻击候选链，由分析员逐条核验主链证据并完成研判处置。" extra={<Space><Button icon={<SearchOutlined />} onClick={openEventPicker}>添加发现事件</Button><Button icon={<EditOutlined />} onClick={() => openRename(selected)}>重命名</Button><Button disabled={!mergeCandidates.length || selectedQueue === 'resolved'} onClick={openMerge}>合并案件</Button>{(selectedQueue === 'resolved' ? <Button onClick={() => { setQueueFilter('manual'); onReopenCase(selected.id) }}>移回待研判</Button> : <Button type="primary" onClick={() => { setQueueFilter('resolved'); onCompleteCase(selected.id) }}>完成研判</Button>)}<Button type="primary" icon={<RobotOutlined />} onClick={submitCase}>小影</Button><Button danger icon={<DeleteOutlined />} onClick={() => onDeleteCase(selected.id)}>删除</Button></Space>} />
       <Row gutter={[12, 12]}>
         <Col xs={24} xl={6}>
           <Card title="链路队列" className="mc-investigation-list">
@@ -505,7 +606,7 @@ export default function InvestigationsPage({
             <List
               dataSource={visibleCases}
               renderItem={(item) => (
-                <List.Item className={item.id === selected?.id ? 'active' : ''} onClick={() => setSelectedId(item.id)} actions={[<Button key="delete" danger type="text" size="small" icon={<DeleteOutlined />} aria-label={`删除案件 ${item.title}`} onClick={(event) => { event.stopPropagation(); onDeleteCase(item.id) }} />]}>
+                <List.Item className={item.id === selected?.id ? 'active' : ''} onClick={() => setSelectedId(item.id)} actions={[<Button key="rename" type="text" size="small" icon={<EditOutlined />} aria-label={`重命名案件 ${item.title}`} onClick={(event) => { event.stopPropagation(); openRename(item) }} />, <Button key="delete" danger type="text" size="small" icon={<DeleteOutlined />} aria-label={`删除案件 ${item.title}`} onClick={(event) => { event.stopPropagation(); onDeleteCase(item.id) }} />]}>
                   <List.Item.Meta title={<Text strong>{item.title}</Text>} description={<Space size={4} wrap><Text type="secondary">{item.createdAt}</Text><Tag color={investigationQueueMeta[investigationQueueStatus(item)].color}>{investigationQueueMeta[investigationQueueStatus(item)].label}</Tag></Space>} />
                   <span className={`mc-severity-chip ${item.severity}`}>{severityLabel[item.severity]}</span>
                 </List.Item>
@@ -536,7 +637,7 @@ export default function InvestigationsPage({
 
           <Row gutter={[12, 12]}>
             <Col span={24}>
-              {datasetName && <Card title={<HelpTitle title={`${datasetName} · 攻击链路研判`} description={`上方红色为已确认的主链证据窗口，按时间顺序构成单向链。下方黄色虚线为候选证据自由池，等待人工核验。拖拽候选到主链任意节点前后即可插入，拖到右上角排除区即可移除。${datasetName === 'Long' ? 'Long 长程窗口主链更长、候选更多，体现长周期关联能召回短窗口看不到的早期阶段。' : ''}`} />} extra={<Button type="primary" icon={<RobotOutlined />} size="small" onClick={sendChainReconstruction}>小影</Button>} className="mc-panel">
+              {datasetName && <Card title={<HelpTitle title={`${datasetName} · 攻击链路研判`} description={`红色节点为已确认主链，黄色虚线节点为候选证据。下方“主链证据”卡片可直接拖动调整顺序；加入候选或排除证据后，上方链路图会立即同步重建。候选节点可拖到主链节点前后插入，拖到右上角排除区即可移除。${datasetName === 'Long' ? 'Long 长程窗口主链更长、候选更多，体现长周期关联能召回短窗口看不到的早期阶段。' : ''}`} />} extra={<Button type="primary" icon={<RobotOutlined />} size="small" onClick={sendChainReconstruction}>小影</Button>} className="mc-panel">
                 {autoChain && (
                   <div style={{ marginBottom: 12 }}>
                     <Space wrap size={6}>
@@ -569,12 +670,13 @@ export default function InvestigationsPage({
                   candidateIds={candidateIdSet}
                   onInsertAtGap={(sourceId, afterId) => onInsertEvidence(selected.id, sourceId, afterId)}
                   onExcludeNode={(nodeId) => onExcludeEvidence(selected.id, nodeId)}
+                  onMoveChainNode={(sourceId, afterId) => onMoveEvidenceAfter(selected.id, sourceId, afterId)}
                   nodeLegend={[
                     { color: '#dc2626', label: '已确认主链' },
                     { color: '#f59e0b', label: '候选证据（待研判）' },
                   ]}
                   onNodeClick={(node) => {
-                    setGraphDetail({ title: node.name, kind: candidateIdSet.has(node.id) ? '候选证据' : '主链证据窗口', description: node.description || '暂无补充说明', details: node.details, source: node.timestamp })
+                    setGraphDetail({ title: node.originalName || node.name, kind: candidateIdSet.has(node.id) ? '候选证据' : '主链证据窗口', description: node.description || '暂无补充说明', originalName: node.originalName, details: node.details, source: node.timestamp })
                   }}
                   onEdgeClick={(edge) => {
                     const sourceNode = assemblyNodes.find((node) => node.id === edge.source)
@@ -620,7 +722,7 @@ export default function InvestigationsPage({
           </Row>
 
           <Row gutter={[12, 12]}>
-            {renderStage('main', main)}
+            {renderStage('main', mainOrdered)}
             {renderStage('candidate', candidate)}
             {renderStage('excluded', excluded)}
           </Row>
@@ -710,6 +812,115 @@ export default function InvestigationsPage({
           </>
         )}
       </Drawer>
+      <Modal
+        open={renameOpen}
+        title="重命名案件"
+        okText="保存名称"
+        cancelText="取消"
+        onCancel={() => setRenameOpen(false)}
+        onOk={() => {
+          const title = renameValue.trim()
+          if (!selected || !title) return
+          onRenameCase(selected.id, title)
+          setRenameOpen(false)
+        }}
+      >
+        <Input
+          value={renameValue}
+          onChange={(event) => setRenameValue(event.target.value)}
+          maxLength={120}
+          showCount
+          placeholder="输入便于识别和讨论的案件名称"
+          onPressEnter={() => {
+            const title = renameValue.trim()
+            if (!selected || !title) return
+            onRenameCase(selected.id, title)
+            setRenameOpen(false)
+          }}
+        />
+      </Modal>
+      <Modal
+        open={mergeOpen}
+        title="合并到当前案件"
+        okText="合并证据"
+        cancelText="取消"
+        okButtonProps={{ disabled: !mergeSourceId }}
+        onCancel={() => setMergeOpen(false)}
+        onOk={() => {
+          if (!selected || !mergeSourceId) return
+          onMergeCases(selected.id, mergeSourceId)
+          setMergeOpen(false)
+          setMergeSourceId(undefined)
+        }}
+      >
+        <Paragraph type="secondary">当前案件将保留名称和处置状态，并合并另一个案件的主链、候选证据、排除状态和已保存 M3 窗口。</Paragraph>
+        <Select
+          style={{ width: '100%' }}
+          value={mergeSourceId}
+          onChange={setMergeSourceId}
+          placeholder="选择要合并进当前案件的调查事项"
+          options={mergeCandidates.map((item) => ({
+            value: item.id,
+            label: `${item.title} · ${item.windowIds.length} 条证据`,
+          }))}
+        />
+      </Modal>
+      <Modal
+        open={eventPickerOpen}
+        title="从异常发现添加事件"
+        width={1080}
+        okText={`添加为候选证据${pickedEventIds.length ? `（${pickedEventIds.length}）` : ''}`}
+        cancelText="取消"
+        okButtonProps={{ disabled: !pickedEventIds.length }}
+        onCancel={() => setEventPickerOpen(false)}
+        onOk={() => {
+          if (!selected || !pickedEventIds.length) return
+          onAddFindings(selected.id, pickedEventIds)
+          setEventPickerOpen(false)
+        }}
+      >
+        <Paragraph type="secondary" style={{ marginBottom: 10 }}>
+          默认不显示当前案件已经包含的事件。添加后保留原始日志源、风险等级、实体和事件内容，并先进入“候选证据”。
+        </Paragraph>
+        <Input
+          prefix={<SearchOutlined />}
+          value={eventQuery}
+          onChange={(event) => setEventQuery(event.target.value)}
+          placeholder="关键词搜索：aaa bbb ccc（以空格分隔，需同时命中）"
+          style={{ marginBottom: 10 }}
+        />
+        <Space size={[6, 8]} wrap style={{ marginBottom: 12 }}>
+          <Text type="secondary">风险：</Text>
+          {(['all', 'critical', 'high', 'medium', 'low'] as const).map((value) => (
+            <Tag.CheckableTag key={value} checked={eventSeverity === value} onChange={() => setEventSeverity(value)}>
+              {value === 'all' ? '全部' : severityLabel[value]}
+            </Tag.CheckableTag>
+          ))}
+          <Text type="secondary" style={{ marginLeft: 10 }}>日志源：</Text>
+          <Tag.CheckableTag checked={eventSource === 'all'} onChange={() => setEventSource('all')}>全部</Tag.CheckableTag>
+          {availableFindingSources.map((value) => (
+            <Tag.CheckableTag key={value} checked={eventSource === value} onChange={() => setEventSource(value)}>{value}</Tag.CheckableTag>
+          ))}
+        </Space>
+        <Table
+          size="small"
+          rowKey="id"
+          dataSource={pickerFindings}
+          pagination={{ pageSize: 8, showSizeChanger: false, showTotal: (total) => `共 ${total} 条可添加事件` }}
+          scroll={{ x: 980, y: 420 }}
+          rowSelection={{
+            selectedRowKeys: pickedEventIds,
+            onChange: (keys) => setPickedEventIds(keys.map(String)),
+          }}
+          columns={[
+            { title: '事件', key: 'event', width: 270, render: (_: unknown, row: FindingRecord) => <div><Text strong>{row.title}</Text><div className="mc-row-id">{row.start}</div></div> },
+            { title: '来源', key: 'source', width: 130, render: (_: unknown, row: FindingRecord) => <Space size={[3, 3]} wrap>{(row.sourceTypes.length ? row.sourceTypes : [row.source]).map((value) => <Tag key={value}>{value}</Tag>)}</Space> },
+            { title: '风险', key: 'risk', width: 90, render: (_: unknown, row: FindingRecord) => <RiskBadge value={row.risk} /> },
+            { title: '实体 / 主机', key: 'entity', width: 190, render: (_: unknown, row: FindingRecord) => <div>{row.entity}<div className="mc-row-id">{row.host || '主机待解析'}</div></div> },
+            { title: '关注原因', key: 'summary', render: (_: unknown, row: FindingRecord) => <Text>{row.summary}</Text> },
+          ]}
+        />
+      </Modal>
     </>
   )
 }

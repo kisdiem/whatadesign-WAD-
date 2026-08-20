@@ -1,0 +1,28 @@
+{
+  "schema_version": "apt-two-chain-v1",
+  "description": "Stable initial case state restored whenever the demo data is loaded.",
+  "cases": [
+    {
+      "case_id": "APT-SCRIPT-CANDIDATE-001",
+      "stage": "main",
+      "ordered_event_ids": [
+        "APT-SCRIPT-001",
+        "APT-SCRIPT-002",
+        "APT-SCRIPT-003",
+        "APT-SCRIPT-004"
+      ]
+    },
+    {
+      "case_id": "APT-RECON-CASE-001",
+      "stage": "main",
+      "ordered_event_ids": [
+        "APT-SCRIPT-005",
+        "APT-SCRIPT-006",
+        "APT-SCRIPT-007",
+        "APT-SCRIPT-009",
+        "APT-SCRIPT-010"
+      ]
+    }
+  ],
+  "excluded_from_initial_cases": ["APT-SCRIPT-008"]
+}

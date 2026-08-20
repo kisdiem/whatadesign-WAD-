@@ -31,6 +31,7 @@ import {
   type SecurityEvent,
 } from './mocks/data'
 import { loadDemoDataset, type DemoDatasetId } from './services/demoData'
+import { APT_DEMO_BASELINE_VERSION, isFixedAptDemoCase } from './services/aptDemoBaseline'
 import { deleteIngestedSource, getIngestionSnapshot, uploadLogFile, type IngestResult } from './services/ingestion'
 import {
   askAssistant,
@@ -79,13 +80,25 @@ const { Header, Sider, Content } = Layout
 const { Text, Paragraph } = Typography
 const PERSISTED_CASES_KEY = 'wad-demo-case-items-v5'
 const PERSISTED_CASE_BOARDS_KEY = 'wad-demo-case-boards-v4'
+const APT_FIXED_CHAIN_MIGRATION_KEY = `wad-${APT_DEMO_BASELINE_VERSION}`
 
 function readPersistedCases() {
   try { return JSON.parse(window.localStorage.getItem(PERSISTED_CASES_KEY) || '[]') as Investigation[] } catch { return [] }
 }
 
 function readPersistedCaseBoards() {
-  try { return JSON.parse(window.localStorage.getItem(PERSISTED_CASE_BOARDS_KEY) || '{}') as Record<string, CaseBoard> } catch { return {} }
+  try {
+    const boards = JSON.parse(window.localStorage.getItem(PERSISTED_CASE_BOARDS_KEY) || '{}') as Record<string, CaseBoard>
+    // Remove only the stale board state created by the old two-main-node
+    // default. Other cases and later analyst edits remain persisted.
+    if (window.localStorage.getItem(APT_FIXED_CHAIN_MIGRATION_KEY) !== 'complete') {
+      Object.keys(boards).filter(isFixedAptDemoCase).forEach((caseId) => delete boards[caseId])
+      window.localStorage.setItem(APT_FIXED_CHAIN_MIGRATION_KEY, 'complete')
+    }
+    return boards
+  } catch {
+    return {}
+  }
 }
 
 function mergePersistedCases(baseCases: Investigation[]) {
@@ -107,7 +120,25 @@ function mergePersistedCases(baseCases: Investigation[]) {
         escalationReasons: item.escalationReasons || base.escalationReasons,
       })
     })
-  return Array.from(merged.values()).filter((item) => !item.id.startsWith('CASE-XLOG-'))
+  return Array.from(merged.values())
+    .filter((item) => !item.id.startsWith('CASE-XLOG-'))
+    .map((item) => {
+      const isResolved = item.queueStatus === 'resolved' || item.status === 'contained' || item.status === 'closed'
+      if (!isResolved) return item
+      // Legacy browser state could mark a short review chain as resolved. It
+      // must return to review instead of appearing as a non-compliant final case.
+      const minimumNodes = item.id.startsWith('SHORT-') ? 4 : 7
+      if (item.windowIds.length < minimumNodes) {
+        return {
+          ...item,
+          status: 'investigating' as const,
+          queueStatus: 'manual_review' as const,
+          decisionSource: 'analyst' as const,
+          decisionAt: undefined,
+        }
+      }
+      return { ...item, gapEvidenceIds: [], gapDistractorIds: [] }
+    })
 }
 
 const preparedDemoSources: LogSource[] = [
@@ -291,7 +322,7 @@ export default function MissionControlApp() {
     return map
   }, [windowItems])
   const onlineSources = sourceItems.filter((source) => source.status === 'online').length
-  const saveM3Graph = (finding: FindingRecord) => {
+  const saveM3Graph = (finding: FindingRecord, targetCaseId: string | null = null) => {
     const anchorTimestamp = Date.parse(finding.anchorEvent?.time || finding.start)
     const sourceTypes = new Set(finding.sourceTypes)
     const timeContextEvents = demoEvents.filter((event) => {
@@ -310,7 +341,9 @@ export default function MissionControlApp() {
     const next = persistM3GraphSnapshot({ ...snapshot, nodes: laidOut.nodes })
     setM3GraphSnapshots(next)
     setCaseItems((current) => {
-      const existingIndex = current.findIndex((item) => item.id === finding.caseId || item.windowIds.includes(finding.id))
+      const existingIndex = targetCaseId
+        ? current.findIndex((item) => item.id === targetCaseId)
+        : current.findIndex((item) => item.id === finding.caseId || item.windowIds.includes(finding.id))
       if (existingIndex >= 0) {
         const nextCases = [...current]
         const existing = nextCases[existingIndex]
@@ -319,16 +352,17 @@ export default function MissionControlApp() {
       }
       return [...current, {
         id: `CASE-${finding.id}`,
-        title: `${finding.title} · 30分钟调查窗口`,
+        title: `${finding.source} · ${finding.title} · ${finding.host || finding.entity || '待核查主机'} · 待研判`,
         severity: finding.severity,
         status: 'investigating',
         windowIds: [finding.id],
         owner: 'WAD 分析台',
         createdAt: finding.start,
-        summary: `以事件 ${finding.id} 为锚点建立的 30 分钟调查窗口：${finding.summary}`,
+        summary: `案件名称：${finding.source} · ${finding.title}。以当前事件为锚点建立 30 分钟调查窗口：${finding.summary}`,
       }]
     })
-    message.success(`已将 ${finding.id} 加入案件，并保存其前 30 分钟 M3 事件关联图`)
+    message.success(`${targetCaseId ? '已合并到已有调查事项' : '已创建新的调查事项'}：${finding.id}，并保存其前 30 分钟 M3 事件关联图`)
+    navigate('/investigations')
   }
   const assistantVisible = location.pathname !== '/assistant' && (assistantSending || assistantChat.length > 0)
   const assistantPreview = [...assistantChat].reverse().find((item) => item.role === 'assistant')?.content
@@ -430,6 +464,16 @@ export default function MissionControlApp() {
           if (findingId in next[caseId]) next[caseId][findingId] = stage
         }
       }
+      // The two scripted APT cases are authoritative demo chains. Stale
+      // browser state from the generic board initializer must not split their
+      // prescribed members into candidate/excluded groups.
+      for (const investigation of caseItems) {
+        const isResolved = investigationQueueStatus(investigation) === 'resolved'
+        if (!isFixedAptDemoCase(investigation.id) && !isResolved) continue
+        investigation.windowIds.forEach((findingId) => {
+          next[investigation.id][findingId] = 'main'
+        })
+      }
       return next
     })
   }, [caseItems])
@@ -460,6 +504,70 @@ export default function MissionControlApp() {
   const selectedMenu = ['/overview', '/findings', '/entities', '/investigations', '/logs', '/sources', '/assistant', '/evaluation']
     .find((key) => location.pathname.startsWith(key)) || '/overview'
 
+  const withProcessedLogSnapshot = (context: AssistantContext): AssistantContext => {
+    const investigation = context.caseId ? caseItems.find((item) => item.id === context.caseId) : undefined
+    const evidenceIds = Array.from(new Set([
+      ...(context.windowIds || []),
+      ...(investigation?.windowIds || []),
+    ])).slice(0, 60)
+    const selectedFindings = evidenceIds
+      .map((id) => allFindings.find((finding) => finding.id === id))
+      .filter((finding): finding is FindingRecord => Boolean(finding))
+    const selectedEntities = (context.entityIds || [])
+      .map((id) => entityProfiles.find((entity) => entity.id === id))
+      .filter((entity): entity is EntityProfile => Boolean(entity))
+    if (!investigation && !selectedFindings.length && !selectedEntities.length) return context
+
+    return {
+      ...context,
+      evidenceSnapshot: {
+        evidence_type: 'wad_processed_real_logs',
+        statement: '以下证据来自 WAD 当前前端所展示的系统实际处理日志。Investigation 仅为组织形式。',
+        evidence_ids: selectedFindings.map((finding) => finding.id),
+        investigation: investigation ? {
+          investigation_id: investigation.id,
+          title: investigation.title,
+          status: investigation.status,
+          queue_status: investigationQueueStatus(investigation),
+          ordered_finding_ids: investigation.windowIds,
+          summary: investigation.summary,
+        } : null,
+        findings: selectedFindings.map((finding) => ({
+          finding_id: finding.id,
+          title: finding.title,
+          severity: finding.severity,
+          risk: finding.risk,
+          start: finding.start,
+          end: finding.end,
+          entities: finding.entities,
+          hosts: finding.host ? [finding.host] : [],
+          source_types: finding.sourceTypes,
+          summary: finding.summary,
+          raw_logs: finding.events.slice(0, 12).map((event) => ({
+            event_id: event.id,
+            timestamp: event.time,
+            source: event.source,
+            actor: event.actor,
+            host: event.host,
+            process: event.process,
+            ip: event.ip,
+            raw: event.raw,
+          })),
+        })),
+        entities: selectedEntities.map((entity) => ({
+          entity_id: entity.id,
+          entity_type: entity.type,
+          first_seen: entity.firstSeen,
+          last_seen: entity.lastSeen,
+          event_count: entity.thirtyDayEvents,
+          rare_relations: entity.rareRelations,
+          current_activity: entity.currentActivity,
+          related_finding_ids: entity.findingIds.slice(0, 60),
+        })),
+      },
+    }
+  }
+
   const runAssistant = async (
     text: string,
     context: AssistantContext,
@@ -472,7 +580,7 @@ export default function MissionControlApp() {
     }
     setAssistantSending(true)
     try {
-      const answer = await askAssistant(trimmed, context)
+      const answer = await askAssistant(trimmed, withProcessedLogSnapshot(context))
       setAssistantChat((current) => [...current, {
         role: 'assistant',
         content: answer.answer,
@@ -636,13 +744,35 @@ export default function MissionControlApp() {
   }
 
   const completeInvestigation = (caseId: string) => {
+    const target = caseItems.find((item) => item.id === caseId)
+    if (!target) return
+    const board = caseBoards[caseId] || {}
+    const mainIds = target.windowIds.filter((findingId) => (board[findingId] || 'main') === 'main')
+    const minimumNodes = target.id.startsWith('SHORT-') ? 4 : 7
+    if (mainIds.length < minimumNodes) {
+      message.warning(`该类已定案攻击链至少需要 ${minimumNodes} 个确认主链节点；当前只有 ${mainIds.length} 个。`)
+      return
+    }
     setCaseItems((current) => current.map((item) => item.id === caseId ? {
       ...item,
       queueStatus: 'resolved',
       decisionSource: 'analyst',
       decisionAt: new Date().toISOString(),
+      gapEvidenceIds: [],
+      gapDistractorIds: [],
     } : item))
+    setCaseBoards((current) => ({
+      ...current,
+      [caseId]: Object.fromEntries(target.windowIds.map((findingId) => [findingId, 'main' as FindingStage])),
+    }))
     message.success('已完成研判：完整攻击链路已确定')
+  }
+
+  const renameInvestigation = (caseId: string, title: string) => {
+    const normalized = title.trim()
+    if (!normalized) return
+    setCaseItems((current) => current.map((item) => item.id === caseId ? { ...item, title: normalized } : item))
+    message.success(`案件已重命名为“${normalized}”`)
   }
 
   const reopenInvestigation = (caseId: string) => {
@@ -664,6 +794,10 @@ export default function MissionControlApp() {
       decisionAt: new Date().toISOString(),
       owner: '待分配分析员',
     } : item))
+    setCaseItems((current) => current.map((item) => {
+      if (item.id !== caseId || stage !== 'main' || item.windowIds.includes(findingId)) return item
+      return { ...item, windowIds: [...item.windowIds, findingId] }
+    }))
     setCaseBoards((current) => ({
       ...current,
       [caseId]: {
@@ -671,6 +805,86 @@ export default function MissionControlApp() {
         [findingId]: stage,
       },
     }))
+  }
+
+  const addFindingsToInvestigation = (caseId: string, findingIds: string[]) => {
+    const uniqueIds = Array.from(new Set(findingIds))
+    if (!uniqueIds.length) return
+    setCaseItems((current) => current.map((item) => {
+      if (item.id !== caseId) return item
+      return {
+        ...item,
+        queueStatus: investigationQueueStatus(item) === 'auto_observe' ? 'manual_review' : item.queueStatus,
+        decisionSource: investigationQueueStatus(item) === 'auto_observe' ? 'analyst' : item.decisionSource,
+        decisionAt: investigationQueueStatus(item) === 'auto_observe' ? new Date().toISOString() : item.decisionAt,
+        owner: investigationQueueStatus(item) === 'auto_observe' ? '待分配分析员' : item.owner,
+        windowIds: Array.from(new Set([...item.windowIds, ...uniqueIds])),
+      }
+    }))
+    setCaseBoards((current) => ({
+      ...current,
+      [caseId]: {
+        ...(current[caseId] || {}),
+        ...Object.fromEntries(uniqueIds.map((id) => [id, 'candidate' as FindingStage])),
+      },
+    }))
+    message.success(`已添加 ${uniqueIds.length} 条发现为候选证据`)
+  }
+
+  const reorderCaseEvidence = (caseId: string, sourceId: string, targetId: string) => {
+    if (sourceId === targetId) return
+    setCaseItems((current) => current.map((item) => {
+      if (item.id !== caseId) return item
+      const order = item.windowIds.filter((id) => id !== sourceId)
+      const targetIndex = order.indexOf(targetId)
+      if (targetIndex < 0) return item
+      order.splice(targetIndex, 0, sourceId)
+      return { ...item, windowIds: order }
+    }))
+    message.success('主链证据顺序已更新')
+  }
+
+  const moveCaseEvidenceAfter = (caseId: string, sourceId: string, afterId: string) => {
+    setCaseItems((current) => current.map((item) => {
+      if (item.id !== caseId) return item
+      const without = item.windowIds.filter((id) => id !== sourceId)
+      if (afterId === 'start') return { ...item, windowIds: [sourceId, ...without] }
+      const index = without.indexOf(afterId)
+      if (index < 0) return item
+      return { ...item, windowIds: [...without.slice(0, index + 1), sourceId, ...without.slice(index + 1)] }
+    }))
+    message.success('主链证据顺序已更新')
+  }
+
+  const mergeInvestigations = (targetCaseId: string, sourceCaseId: string) => {
+    if (targetCaseId === sourceCaseId) return
+    const source = caseItems.find((item) => item.id === sourceCaseId)
+    const target = caseItems.find((item) => item.id === targetCaseId)
+    if (!source || !target) return
+    const sourceIsOpen = investigationQueueStatus(source) !== 'resolved' && (investigationQueueStatus(source) === 'manual_review' || source.status === 'investigating')
+    const targetIsOpen = investigationQueueStatus(target) !== 'resolved' && (investigationQueueStatus(target) === 'manual_review' || target.status === 'investigating')
+    if (!sourceIsOpen || !targetIsOpen) {
+      message.error('只能合并待研判或研判中的案件')
+      return
+    }
+    const mergedWindowIds = Array.from(new Set([...target.windowIds, ...source.windowIds]))
+    setCaseItems((current) => current
+      .filter((item) => item.id !== sourceCaseId)
+      .map((item) => item.id === targetCaseId ? {
+        ...item,
+        windowIds: mergedWindowIds,
+        gapEvidenceIds: Array.from(new Set([...(item.gapEvidenceIds || []), ...(source.gapEvidenceIds || [])])).filter((id) => !mergedWindowIds.includes(id)),
+        gapDistractorIds: Array.from(new Set([...(item.gapDistractorIds || []), ...(source.gapDistractorIds || [])])).filter((id) => !mergedWindowIds.includes(id)),
+        summary: `${item.summary} 已合并“${source.title}”的关联证据，待人工继续核验。`,
+      } : item))
+    setCaseBoards((current) => {
+      const targetBoard = current[targetCaseId] || {}
+      const sourceBoard = current[sourceCaseId] || {}
+      const next = { ...current, [targetCaseId]: { ...sourceBoard, ...targetBoard } }
+      delete next[sourceCaseId]
+      return next
+    })
+    message.success(`已将“${source.title}”合并到当前案件`)
   }
 
   const insertEvidenceAt = (caseId: string, findingId: string, afterId: string) => {
@@ -771,9 +985,9 @@ export default function MissionControlApp() {
           <Suspense fallback={<div style={{ padding: 24 }}>加载中…</div>}>
             <Routes>
               <Route path="/overview" element={<OverviewPage findings={findings} cases={filteredCaseItems} caseBoards={caseBoards} timeRange={timeRange} inputOverviewSeries={demoOverviewSeries} />} />
-              <Route path="/findings" element={<FindingsPage findings={findings} evidenceByFinding={evidenceByFinding} onOpenAssistant={openFindingAssistant} onOpenEntity={(entityId) => navigate(`/entities?entity=${encodeURIComponent(entityId)}`)} onOpenInvestigation={() => navigate('/investigations')} />} />
+              <Route path="/findings" element={<FindingsPage findings={findings} evidenceByFinding={evidenceByFinding} investigations={caseItems} onOpenAssistant={openFindingAssistant} onOpenEntity={(entityId) => navigate(`/entities?entity=${encodeURIComponent(entityId)}`)} onSaveToInvestigation={saveM3Graph} />} />
               <Route path="/entities" element={<EntityInvestigationPage profiles={entityProfiles} findings={findings} timeRange={timeRange} onSubmitBatch={submitBatchToAssistant} onExplain={explainWithAssistant} onOpenFinding={() => navigate('/findings')} />} />
-              <Route path="/investigations" element={<InvestigationsPage cases={caseItems} findings={allFindings} evidenceByFinding={allEvidenceByFinding} caseBoards={caseBoards} activeFindingIds={filteredWindowIds} timeRange={timeRange} m3GraphSnapshots={m3GraphSnapshots} moduleScoresByEvent={moduleScoresByEvent} onDeleteCase={deleteCase} onCompleteCase={completeInvestigation} onReopenCase={reopenInvestigation} onSetFindingStage={setFindingStage} onInsertEvidence={insertEvidenceAt} onExcludeEvidence={excludeGapEvidence} onSubmitBatch={submitBatchToAssistant} onExplain={explainWithAssistant} onOpenEntity={(entityId) => navigate(`/entities?entity=${encodeURIComponent(entityId)}`)} />} />
+              <Route path="/investigations" element={<InvestigationsPage cases={caseItems} findings={allFindings} evidenceByFinding={allEvidenceByFinding} caseBoards={caseBoards} activeFindingIds={filteredWindowIds} timeRange={timeRange} m3GraphSnapshots={m3GraphSnapshots} moduleScoresByEvent={moduleScoresByEvent} onDeleteCase={deleteCase} onCompleteCase={completeInvestigation} onReopenCase={reopenInvestigation} onRenameCase={renameInvestigation} onMergeCases={mergeInvestigations} onAddFindings={addFindingsToInvestigation} onSetFindingStage={setFindingStage} onReorderEvidence={reorderCaseEvidence} onMoveEvidenceAfter={moveCaseEvidenceAfter} onInsertEvidence={insertEvidenceAt} onExcludeEvidence={excludeGapEvidence} onSubmitBatch={submitBatchToAssistant} onExplain={explainWithAssistant} onOpenEntity={(entityId) => navigate(`/entities?entity=${encodeURIComponent(entityId)}`)} />} />
               <Route path="/logs" element={<LogsPage findings={findings} evidenceByFinding={evidenceByFinding} demoEvents={demoEvents} timeRange={timeRange} onSubmitBatch={submitBatchToAssistant} onExplain={explainWithAssistant} onSaveM3Graph={saveM3Graph} />} />
               <Route path="/sources" element={<SourcesPage sources={sourceItems} onDeleteSource={deleteLogSource} onRefresh={async () => setIngestionRevision((current) => current + 1)} onImportFile={importLogFile} />} />
               <Route

@@ -1,4 +1,5 @@
 import type { AnomalyWindow, Investigation, LogSource, SecurityEvent, Severity } from '../mocks/data'
+import { APT_RECON_CASE_ID, APT_RECON_EVENT_IDS } from './aptDemoBaseline'
 
 export type DemoDatasetId = 'Short' | 'Long' | 'APT'
 
@@ -203,7 +204,9 @@ function logKindForEvent(event: { source_file?: string; raw?: string }) {
 
 function eventAction(raw: string) {
   const message = raw.split(': ').slice(1).join(': ').trim()
-  return message ? message.slice(0, 68) : raw.slice(0, 68)
+  // Keep the event summary useful in tables. The original raw event remains
+  // unchanged in `raw` and is shown in the expandable detail view.
+  return message ? message.slice(0, 160) : raw.slice(0, 160)
 }
 
 function normalizeAssetPath(value: string) {
@@ -259,7 +262,8 @@ const AUTO_CASE_LIMIT = 2
 const AUTO_CASE_EVIDENCE_LIMIT: Record<DemoDatasetId, number> = { Short: 4, Long: 8, APT: 10 }
 // 自动处置链聚合约束：只在 24 小时时间窗内聚类，防止高频共享实体把整个数据集串成一条巨型链。
 const AUTO_RESOLVE_CHAIN_LIMIT = 20
-const AUTO_RESOLVE_CHAIN_MAX_MEMBERS: Record<DemoDatasetId, number> = { Short: 5, Long: 10, APT: 10 }
+const AUTO_RESOLVE_CHAIN_MIN_MEMBERS: Record<DemoDatasetId, number> = { Short: 4, Long: 7, APT: 7 }
+const AUTO_RESOLVE_CHAIN_MAX_MEMBERS: Record<DemoDatasetId, number> = { Short: 6, Long: 12, APT: 10 }
 const AUTO_RESOLVE_TIME_GAP = 24 * HOUR
 
 function windowActionFamily(window: AnomalyWindow) {
@@ -535,13 +539,19 @@ function buildAutomaticResolutions(
   for (const seed of candidates) {
     if (resolutions.length >= AUTO_RESOLVE_CHAIN_LIMIT) break
     if (assigned.has(seed.id)) continue
+    const minMembers = AUTO_RESOLVE_CHAIN_MIN_MEMBERS[dataset]
+    const maxMembers = AUTO_RESOLVE_CHAIN_MAX_MEMBERS[dataset]
+    const targetMembers = minMembers + (resolutions.length % (maxMembers - minMembers + 1))
     const related = windows
       .filter((window) => window.id !== seed.id && !assigned.has(window.id))
       .map((window) => correlateWindows(seed, window, frequencies, windows.length))
-      .filter((item) => item.score >= 0.45 && Number.isFinite(item.timeGapMs) && item.timeGapMs <= AUTO_RESOLVE_TIME_GAP)
+      .filter((item) => item.score >= 0.32 && Number.isFinite(item.timeGapMs) && item.timeGapMs <= AUTO_RESOLVE_TIME_GAP)
       .sort((left, right) => right.score - left.score || left.timeGapMs - right.timeGapMs || left.window.id.localeCompare(right.window.id))
-      .slice(0, AUTO_RESOLVE_CHAIN_MAX_MEMBERS[dataset] - 1)
-    if (!related.length) continue
+      .slice(0, targetMembers - 1)
+    // A finalized chain must be a complete, reviewable sequence rather than a
+    // two-node correlation. Seeds without the dataset-specific minimum number
+    // of supporting events remain outside the resolved queue.
+    if (related.length < minMembers - 1) continue
 
     const members = [seed, ...related.map((item) => item.window)]
       .sort((left, right) => Date.parse(left.start) - Date.parse(right.start))
@@ -590,13 +600,25 @@ export async function loadDemoDataset(dataset: DemoDatasetId): Promise<{
   overviewSeries: Array<{ time: string; logs: number; anomalies: number }>
 }> {
   const base = `/demo-data/${dataset}`
-  const [timeline, detections, chain, manifest, moduleScores] = await Promise.all([
-    fetch(`${base}/timeline.json`).then((response) => response.json() as Promise<DemoTimelineEvent[]>),
-    fetch(`${base}/detection_results.json`).then((response) => response.json() as Promise<DemoDetection[]>),
-    fetch(`${base}/attack_chain.json`).then((response) => response.json() as Promise<DemoChain>),
-    fetch(`${base}/manifest.json`).then((response) => response.json() as Promise<{ source_slice?: string; event_count?: number }>),
-    fetch(`${base}/module_scores.json`).then((response) => response.json() as Promise<Record<string, Record<'M0' | 'M1' | 'M2' | 'M3' | 'M4' | 'M5' | 'M6', number>>>),
+  const loadJson = <T,>(file: string) => fetch(`${base}/${file}?revision=apt-script-10`, { cache: 'no-store' }).then((response) => response.json() as Promise<T>)
+  const [rawTimeline, rawDetections, rawChain, manifest, rawModuleScores] = await Promise.all([
+    loadJson<DemoTimelineEvent[]>('timeline.json'),
+    loadJson<DemoDetection[]>('detection_results.json'),
+    loadJson<DemoChain>('attack_chain.json'),
+    loadJson<{ source_slice?: string; event_count?: number }>('manifest.json'),
+    loadJson<Record<string, Record<'M0' | 'M1' | 'M2' | 'M3' | 'M4' | 'M5' | 'M6', number>>>('module_scores.json'),
   ])
+  // 防御旧浏览器缓存或旧静态文件：APT 九分钟剧本严格只保留前十步。
+  const isRetiredAptScript = (id: string) => dataset === 'APT' && /^APT-SCRIPT-01[1-8]$/.test(id)
+  const timeline = rawTimeline.filter((item) => !isRetiredAptScript(item.event_id))
+  const detections = rawDetections.filter((item) => !isRetiredAptScript(item.event_id))
+  const chain: DemoChain = dataset === 'APT'
+    ? {
+        ...rawChain,
+        steps: (rawChain.steps || []).filter((step) => step.evidence_event_ids.every((id) => !isRetiredAptScript(id))),
+      }
+    : rawChain
+  const moduleScores = Object.fromEntries(Object.entries(rawModuleScores).filter(([id]) => !isRetiredAptScript(id))) as Record<string, Record<'M0' | 'M1' | 'M2' | 'M3' | 'M4' | 'M5' | 'M6', number>>
 
   const replayTimeline = projectReplayTimeline(timeline, chain, dataset)
   const detectionById = new Map(detections.map((item) => [item.event_id, item]))
@@ -647,9 +669,9 @@ export async function loadDemoDataset(dataset: DemoDatasetId): Promise<{
   const chainSeverity = severity([...chainWindows].sort((left, right) => right.score - left.score)[0]?.severity)
   // 基准链同样截断为骨架链，保留首尾/关键段、中间作为缺口，使待研判队列案件形态一致；
   // 完整基准链仍保留在 attack_chain 证据文件中，用于和自动关联结果对照。
-  // 演示优化：APT 基准链提前补全到只剩最后一步（数据渗出），现场只需连接最后一个节点，避免逐个补全浪费时间。
+  // APT 演示固定拆成两个调查事项：边界初始线索与工作站侦察线索，避免自动聚类把后续步骤提前并入首个案件。
   const { kept: curatedKept, gaps: curatedGaps } = dataset === 'APT'
-    ? { kept: chainWindows.slice(0, -1), gaps: chainWindows.slice(-1) }
+    ? { kept: chainWindows, gaps: [] as AnomalyWindow[] }
     : truncateChainForReview(chainWindows, 1)
   const curatedDistractorIds = dataset === 'APT' ? [] : selectDistractorIds(chainWindows, anomalyWindows, new Set(), 2)
   const curatedInvestigation: Investigation = {
@@ -666,17 +688,51 @@ export async function loadDemoDataset(dataset: DemoDatasetId): Promise<{
     gapDistractorIds: curatedDistractorIds,
     owner: 'analyst-01',
     createdAt: events[0]?.time || new Date().toISOString(),
-    summary: `由独立攻击链证据文件整理的基准候选链（完整 ${chainWindows.length} 个关键窗口），截断为骨架链后供研判补全，用于和自动关联拆案结果对照；真实标签不参与检测。`,
+    summary: dataset === 'APT'
+      ? '边界初始调查事项只保留公网扫描、管理接口操作、VPN 账户创建和首次 VPN 登录四个早期证据；后续工作站活动另立调查事项，避免提前合并。'
+      : `由独立攻击链证据文件整理的基准候选链（完整 ${chainWindows.length} 个关键窗口），截断为骨架链后供研判补全，用于和自动关联拆案结果对照；真实标签不参与检测。`,
   }
-  const curatedReservedIds = new Set([...curatedInvestigation.windowIds, ...(curatedInvestigation.gapEvidenceIds || []), ...(curatedInvestigation.gapDistractorIds || [])])
-  const autoManualInvestigations = buildAutomaticInvestigations(dataset, anomalyWindows, curatedReservedIds)
-  const autoResolvedInvestigations = buildAutomaticResolutions(
-    dataset,
-    anomalyWindows,
-    new Set([...curatedReservedIds, ...autoManualInvestigations.flatMap((item) => item.windowIds)]),
-  )
+  const aptReconWindows = dataset === 'APT'
+    ? APT_RECON_EVENT_IDS
+        .map((eventId) => anomalyWindows.find((window) => window.id === `WIN-${eventId}`))
+        .filter((window): window is AnomalyWindow => Boolean(window))
+    : []
+  const aptReconInvestigation: Investigation | null = dataset === 'APT' && aptReconWindows.length
+    ? {
+        id: APT_RECON_CASE_ID,
+        title: 'APT · 工作站侦察调查',
+        severity: highestSeverity(aptReconWindows),
+        status: 'investigating',
+        queueStatus: 'manual_review',
+        escalationScore: Math.round(Math.max(...aptReconWindows.map((window) => window.score)) * 100),
+        escalationReasons: ['同一 svc-netops 账户连续活动', '工作站侦察与后续主机切换需要人工核验'],
+        decisionSource: 'analyst',
+        windowIds: aptReconWindows.map((window) => window.id),
+        gapEvidenceIds: [],
+        gapDistractorIds: [],
+        owner: 'analyst-01',
+        createdAt: aptReconWindows[0].start,
+        summary: '固定主链顺序为工作站身份与网络侦察、进程与在线用户枚举、域账户结构枚举、远程服务执行、计划任务持久化；RDP 事件不属于该初始链。',
+      }
+    : null
+  const curatedReservedIds = new Set([
+    ...curatedInvestigation.windowIds,
+    ...(curatedInvestigation.gapEvidenceIds || []),
+    ...(curatedInvestigation.gapDistractorIds || []),
+    ...(aptReconInvestigation?.windowIds || []),
+    ...(aptReconInvestigation?.gapEvidenceIds || []),
+  ])
+  const autoManualInvestigations = dataset === 'APT' ? [] : buildAutomaticInvestigations(dataset, anomalyWindows, curatedReservedIds)
+  const autoResolvedInvestigations = dataset === 'APT'
+    ? []
+    : buildAutomaticResolutions(
+        dataset,
+        anomalyWindows,
+        new Set([...curatedReservedIds, ...autoManualInvestigations.flatMap((item) => item.windowIds)]),
+      )
   const investigations: Investigation[] = [
     curatedInvestigation,
+    ...(aptReconInvestigation ? [aptReconInvestigation] : []),
     ...autoManualInvestigations,
     ...autoResolvedInvestigations,
   ]

@@ -364,7 +364,7 @@ export default function EntityInvestigationPage({
                   pagination={{ pageSize: 5, hideOnSinglePage: true }}
                   columns={[
                     { title: '时间', dataIndex: 'start', key: 'start', width: 155, render: (value: string) => <Text strong className="mc-finding-time">{value}</Text> },
-                    { title: '发生了什么', key: 'action', width: 230, render: (_: unknown, row: FindingRecord) => <div><Text strong>{readableAction(`${row.anchorEvent.action} ${row.anchorEvent.raw || ''}`)}</Text><div className="mc-finding-summary">{row.summary}</div></div> },
+                    { title: '发生了什么', key: 'action', width: 230, render: (_: unknown, row: FindingRecord) => <div title={row.anchorEvent.raw || row.anchorEvent.action}><Text strong>{readableAction(row.anchorEvent.action)}</Text><div className="mc-finding-summary">{row.summary}</div></div> },
                     { title: '关联主机', dataIndex: 'host', key: 'host', width: 140, render: (value: string) => <Tag color="blue" className="mc-finding-host-tag">{value || '待解析'}</Tag> },
                     { title: '为什么关联', key: 'reason', render: (_: unknown, row: FindingRecord) => <Space size={[4, 4]} wrap>{row.reasons.slice(0, 2).map((reason) => <ReasonTag key={reason} reason={reason} />)}</Space> },
                     { title: '风险', dataIndex: 'risk', key: 'risk', width: 100, render: (value: number) => <Tag color={riskTagColor(value)} className={`mc-finding-risk-tag ${value >= 75 ? 'high' : value >= 50 ? 'review' : 'low'}`}>{value >= 75 ? '高风险' : value >= 50 ? '需核查' : '低风险'} · {value}</Tag> },

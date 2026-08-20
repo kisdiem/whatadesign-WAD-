@@ -6,6 +6,7 @@ import {
   type SecurityEvent,
   type Severity,
 } from '../mocks/data'
+import { isFixedAptDemoCase } from './aptDemoBaseline'
 
 export type EntityKind = 'User' | 'Host' | 'Process' | 'IP' | 'Asset'
 export type FindingStage = 'main' | 'candidate' | 'excluded'
@@ -471,6 +472,22 @@ export function buildEntityProfiles(findings: FindingRecord[], events: SecurityE
 export function initialCaseBoards(cases: Investigation[] = investigations) {
   return cases.reduce<Record<string, CaseBoard>>((result, investigation) => {
     result[investigation.id] = {}
+    // Finalized cases expose only the confirmed chain. They never reuse the
+    // review-board split that creates candidate and excluded nodes.
+    if (investigation.queueStatus === 'resolved' || investigation.status === 'contained' || investigation.status === 'closed') {
+      investigation.windowIds.forEach((findingId) => {
+        result[investigation.id][findingId] = 'main'
+      })
+      return result
+    }
+    // These two curated APT demo cases already contain analyst-confirmed chain
+    // members. Do not apply the generic "first two main, rest candidates" rule.
+    if (isFixedAptDemoCase(investigation.id)) {
+      investigation.windowIds.forEach((findingId) => {
+        result[investigation.id][findingId] = 'main'
+      })
+      return result
+    }
     // 待人工研判案件：windowIds 是已确认的骨架段，全部归入主链；缺失环节由 gapEvidenceIds 单独呈现。
     if (investigation.gapEvidenceIds?.length) {
       investigation.windowIds.forEach((findingId) => {

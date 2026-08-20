@@ -876,4 +876,12 @@ def build_repository() -> SecurityRepository:
     root = os.getenv("WAD_AGENT_DATA_DIR")
     if root and Path(root).exists():
         return JsonDirectoryRepository(root)
+    # The checked-in Short/Long/APT demo corpus is a read-only security
+    # repository, not a model mock. This keeps the Agent connected to the
+    # same investigation data shown by the frontend when no external export
+    # directory has been configured.
+    bundled_dataset = Path(__file__).resolve().parents[1] / "frontend" / "src" / "mocks" / "generatedDataset.json"
+    bundled_demo_data = Path(__file__).resolve().parents[1] / "frontend" / "public" / "demo-data"
+    if bundled_dataset.exists() and bundled_demo_data.exists():
+        return DemoRepository()
     return UnavailableRepository()

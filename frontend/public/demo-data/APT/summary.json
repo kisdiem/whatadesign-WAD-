@@ -9,11 +9,13 @@
   "threat_level_counts": {
     "info": 0,
     "low": 7268,
-    "medium": 13,
-    "high": 15,
-    "critical": 2
+    "medium": 12,
+    "high": 14,
+    "critical": 4
   },
-  "time_range": "2022-01-24T13:30:00.000000Z/2022-01-31T13:30:00.000000Z",
-  "candidate_chain_id": "APT-CANDIDATE-001",
-  "candidate_chain_status": "candidate"
+  "time_range": "2022-01-24T13:30:00.000Z/2022-01-31T13:19:00.000Z",
+  "candidate_chain_id": "APT-SCRIPT-CANDIDATE-001",
+  "candidate_chain_status": "candidate",
+  "initial_visible_steps": 4,
+  "deferred_candidate_steps": 6
 }

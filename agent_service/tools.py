@@ -7,7 +7,7 @@ from typing import Any
 
 from agents import RunContextWrapper, function_tool
 
-from .models import ToolEvent
+from .models import RepositoryResult, ToolEvent
 from .repository import SecurityRepository
 
 StatusCallback = Callable[[str], Awaitable[None]]
@@ -24,6 +24,7 @@ class AgentContext:
     investigation_id: str | None = None
     entity_ids: list[str] = field(default_factory=list)
     requested_time_range: str | None = None
+    submitted_evidence_snapshot: dict[str, Any] | None = None
     status_callback: StatusCallback | None = None
     tool_call_limit: int = 8
     tool_call_count: int = 0
@@ -79,6 +80,25 @@ class AgentContext:
         self.tool_events.append(ToolEvent(tool=tool, ok=result.ok, message=result.message or ("ok" if result.ok else "failed"), evidence_refs=refs))
         payload = {"ok": result.ok, "message": result.message, "data": result.data, "evidence_refs": refs}
         return json.dumps(payload, ensure_ascii=False)
+
+
+@function_tool
+async def security_get_submitted_log_snapshot(wrapper: RunContextWrapper[AgentContext]) -> str:
+    """Read the real processed log evidence submitted by the current WAD frontend selection."""
+    if not await wrapper.context.begin_tool("security.get_submitted_log_snapshot", "正在读取当前提交的真实日志证据"):
+        return wrapper.context.blocked_payload(wrapper.context.tool_call_limit)
+    snapshot = wrapper.context.submitted_evidence_snapshot
+    if not snapshot:
+        result = RepositoryResult(ok=False, message="当前请求未附带前端真实日志证据快照。")
+        return wrapper.context.record("security.get_submitted_log_snapshot", result)
+    refs = list(dict.fromkeys(str(value) for value in snapshot.get("evidence_ids", []) if value))
+    result = RepositoryResult(
+        ok=True,
+        data=snapshot,
+        message="已读取当前前端提交的真实处理日志证据。",
+        evidence_refs=refs,
+    )
+    return wrapper.context.record("security.get_submitted_log_snapshot", result)
 
 
 @function_tool
@@ -193,6 +213,7 @@ async def knowledge_search(
 
 
 SECURITY_TOOLS = [
+    security_get_submitted_log_snapshot,
     security_get_finding,
     security_search_logs,
     security_get_entity,

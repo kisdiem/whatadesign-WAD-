@@ -238,6 +238,7 @@ export interface AssistantContext {
   caseId?: string
   entityIds?: string[]
   timeRange?: string
+  evidenceSnapshot?: Record<string, unknown>
 }
 
 export type AgentMode = 'auto' | 'security' | 'knowledge' | 'general'
@@ -632,6 +633,7 @@ function buildAgentPayload(question: string, context: AssistantContext) {
       investigation_id: context.caseId || null,
       entity_ids: context.entityIds || [],
       time_range: context.timeRange || null,
+      evidence_snapshot: context.evidenceSnapshot || null,
     },
   }
 }
@@ -734,19 +736,28 @@ function friendlyAgentError(error: unknown): string {
 }
 
 export async function askAssistant(question: string, context: AssistantContext = {}): Promise<AssistantAnswer> {
+  const hasSystemEvidence = Boolean(
+    context.caseId
+    || context.windowIds?.length
+    || context.entityIds?.length,
+  )
+  const realLogNotice = '以下内容来自系统实际处理的真实日志。Investigation 仅是这些真实日志证据的组织形式；请以原始日志事实为分析依据，不要把案件名称、界面摘要或系统研判直接当作原始事实。'
+  const preparedQuestion = hasSystemEvidence && !question.includes(realLogNotice)
+    ? `${realLogNotice}\n${question}`
+    : question
   if (!AGENT_USE_MOCKS) {
     try {
-      return await askRealAgent(question, context)
+      return await askRealAgent(preparedQuestion, context)
     } catch (error) {
       const reason = friendlyAgentError(error)
       publishAgentStatus(reason)
-      const fallback = await askAssistantDemo(question, context, reason)
+      const fallback = await askAssistantDemo(preparedQuestion, context, reason)
       publishAgentStatus('')
       return fallback
     }
   }
 
-  return askAssistantDemo(question, context)
+  return askAssistantDemo(preparedQuestion, context)
 }
 
 async function askAssistantDemo(

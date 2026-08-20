@@ -27,6 +27,7 @@ export default function InteractiveCaseGraph({
   candidateIds,
   onInsertAtGap,
   onExcludeNode,
+  onMoveChainNode,
   staticView,
 }: {
   nodes: CaseGraphNode[]
@@ -42,6 +43,7 @@ export default function InteractiveCaseGraph({
   candidateIds?: Set<string>
   onInsertAtGap?: (sourceId: string, afterId: string) => void
   onExcludeNode?: (nodeId: string) => void
+  onMoveChainNode?: (sourceId: string, afterId: string) => void
   // 静态只读模式：图自动居中，不提供缩放/平移/节点拖动（如 M3 关联图）。
   staticView?: boolean
 }) {
@@ -50,6 +52,7 @@ export default function InteractiveCaseGraph({
   const [staticViewTransform, setStaticViewTransform] = useState<{ x: number; y: number; scale: number } | null>(null)
   const [hoveredLink, setHoveredLink] = useState<{ link: CaseGraphLink; x: number; y: number } | null>(null)
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null)
+  const [hoveredNode, setHoveredNode] = useState<{ node: CaseGraphNode; x: number; y: number } | null>(null)
   const dragRef = useRef<{ id: string; offset: Point; moved: boolean } | null>(null)
   const panRef = useRef<{ start: Point; origin: Point; moved: boolean } | null>(null)
   const positionsRef = useRef<Record<string, Point>>({})
@@ -59,6 +62,7 @@ export default function InteractiveCaseGraph({
   // 链模式：攻击链路研判图启用端口连线 + 候选拖拽到缝隙/排除区。
   const chainMode = Boolean(onInsertAtGap && onExcludeNode)
   const candidateDragRef = useRef<{ id: string; moved: boolean } | null>(null)
+  const mainChainDragRef = useRef<{ id: string; moved: boolean } | null>(null)
   const dropTargetRef = useRef<{ kind: 'insert' | 'exclude'; afterId?: string } | null>(null)
   const [dragPoint, setDragPoint] = useState<Point | null>(null)
   const [dropTarget, setDropTarget] = useState<{ kind: 'insert' | 'exclude'; afterId?: string } | null>(null)
@@ -133,9 +137,13 @@ export default function InteractiveCaseGraph({
     const startPoint = pointFromEvent(event as unknown as React.PointerEvent<SVGSVGElement>)
     suppressClickRef.current = false
     if (chainMode) {
-      // 候选证据在链模式下拖拽到缝隙/排除区，而非移动节点位置；主链节点保持固定。
       if (candidateIds?.has(node.id)) {
         candidateDragRef.current = { id: node.id, moved: false }
+        dropTargetRef.current = null
+        setDragPoint(startPoint)
+        setDropTarget(null)
+      } else if (onMoveChainNode) {
+        mainChainDragRef.current = { id: node.id, moved: false }
         dropTargetRef.current = null
         setDragPoint(startPoint)
         setDropTarget(null)
@@ -147,29 +155,39 @@ export default function InteractiveCaseGraph({
   }
 
   const moveDrag = (event: React.PointerEvent<SVGSVGElement>) => {
-    if (candidateDragRef.current) {
-      candidateDragRef.current.moved = true
+    const candidateDrag = candidateDragRef.current
+    const mainChainDrag = mainChainDragRef.current
+    if (candidateDrag || mainChainDrag) {
+      const activeDrag = candidateDrag || mainChainDrag
+      if (!activeDrag) return
+      activeDrag.moved = true
       const dragPointNow = pointFromEvent(event)
       setDragPoint(dragPointNow)
-      const inExcludeZone = dragPointNow.x >= EXCLUDE_ZONE.x && dragPointNow.x <= EXCLUDE_ZONE.x + EXCLUDE_ZONE.width
+      const inExcludeZone = Boolean(candidateDrag) && dragPointNow.x >= EXCLUDE_ZONE.x && dragPointNow.x <= EXCLUDE_ZONE.x + EXCLUDE_ZONE.width
         && dragPointNow.y >= EXCLUDE_ZONE.y && dragPointNow.y <= EXCLUDE_ZONE.y + EXCLUDE_ZONE.height
       let nextDrop: { kind: 'insert' | 'exclude'; afterId?: string } | null = null
       if (inExcludeZone) {
         nextDrop = { kind: 'exclude' }
       } else if (chainNodes.length) {
+        const targetNodes = mainChainDrag ? chainNodes.filter((node) => node.id !== mainChainDrag.id) : chainNodes
+        if (!targetNodes.length) {
+          dropTargetRef.current = null
+          setDropTarget(null)
+          return
+        }
         // 找最近的链节点，按指针在其左/右决定插到它之前还是之后。
-        let nearest = chainNodes[0]
+        let nearest = targetNodes[0]
         let bestDist = Infinity
-        chainNodes.forEach((node) => {
+        targetNodes.forEach((node) => {
           const pos = point(node.id)
           const dist = Math.hypot(dragPointNow.x - pos.x, dragPointNow.y - pos.y)
           if (dist < bestDist) { bestDist = dist; nearest = node }
         })
         if (bestDist < 84) {
-          const idx = chainNodes.findIndex((node) => node.id === nearest.id)
+          const idx = targetNodes.findIndex((node) => node.id === nearest.id)
           const nearestPos = point(nearest.id)
           const afterId = dragPointNow.x < nearestPos.x
-            ? (idx === 0 ? 'start' : chainNodes[idx - 1].id)
+            ? (idx === 0 ? 'start' : targetNodes[idx - 1].id)
             : nearest.id
           nextDrop = { kind: 'insert', afterId }
         }
@@ -213,6 +231,20 @@ export default function InteractiveCaseGraph({
         window.setTimeout(() => { suppressClickRef.current = false }, 80)
       }
       candidateDragRef.current = null
+      dropTargetRef.current = null
+      setDragPoint(null)
+      setDropTarget(null)
+      return
+    }
+    const mainChainDrag = mainChainDragRef.current
+    if (mainChainDrag) {
+      const target = dropTargetRef.current
+      if (mainChainDrag.moved && target?.kind === 'insert' && target.afterId) {
+        onMoveChainNode?.(mainChainDrag.id, target.afterId)
+        suppressClickRef.current = true
+        window.setTimeout(() => { suppressClickRef.current = false }, 80)
+      }
+      mainChainDragRef.current = null
       dropTargetRef.current = null
       setDragPoint(null)
       setDropTarget(null)
@@ -401,8 +433,15 @@ export default function InteractiveCaseGraph({
                   key={node.id}
                   transform={`translate(${position.x},${position.y})`}
                   onPointerDown={(event) => startDrag(event, node)}
-                  onPointerEnter={() => setHoveredNodeId(node.id)}
-                  onPointerLeave={() => setHoveredNodeId(null)}
+                  onPointerEnter={(event) => {
+                    setHoveredNodeId(node.id)
+                    setHoveredNode({ node, x: event.clientX, y: event.clientY })
+                  }}
+                  onPointerMove={(event) => setHoveredNode({ node, x: event.clientX, y: event.clientY })}
+                  onPointerLeave={() => {
+                    setHoveredNodeId(null)
+                    setHoveredNode(null)
+                  }}
                   onClick={(event) => { event.stopPropagation(); if (!suppressClickRef.current) onNodeClick(node) }}
                   style={{ cursor: staticView ? 'pointer' : 'grab' }}
                 >
@@ -429,13 +468,13 @@ export default function InteractiveCaseGraph({
               <text x={EXCLUDE_ZONE.width / 2} y={EXCLUDE_ZONE.height / 2 + 4} textAnchor="middle" fontSize="13" fontWeight="600" fill={dropTarget?.kind === 'exclude' ? '#b91c1c' : '#dc2626'}>拖到此处排除</text>
             </g>
           )}
-          {candidateDragRef.current && dragPoint && (
+          {(candidateDragRef.current || mainChainDragRef.current) && dragPoint && (
             <g className="mc-graph-drag-ghost" transform={`translate(${dragPoint.x},${dragPoint.y})`} style={{ pointerEvents: 'none' }}>
               <circle r="24" fill="rgba(148,163,184,0.92)" stroke="#64748b" strokeWidth="2" strokeDasharray="5 4" />
-              <text y="4" textAnchor="middle" fill="#ffffff" fontSize="11" fontWeight="600">{nodeById.get(candidateDragRef.current?.id || '')?.name || '候选证据'}</text>
+              <text y="4" textAnchor="middle" fill="#ffffff" fontSize="11" fontWeight="600">{nodeById.get(candidateDragRef.current?.id || mainChainDragRef.current?.id || '')?.name || '链路证据'}</text>
             </g>
           )}
-          {candidateDragRef.current && dragPoint && indicatorPos && (
+          {(candidateDragRef.current || mainChainDragRef.current) && dragPoint && indicatorPos && (
             <g className="mc-graph-insert-indicator" transform={`translate(${indicatorPos.x},${indicatorPos.y})`} style={{ pointerEvents: 'none' }}>
               <circle r="13" fill="#10b981" stroke="#ffffff" strokeWidth="2" />
               <text y="4" textAnchor="middle" fill="#ffffff" fontSize="14" fontWeight="700">＋</text>
@@ -450,6 +489,14 @@ export default function InteractiveCaseGraph({
             <span key={index}>{line}</span>
           ))}
           {!hoveredLink.link.evidence && <span>{hoveredLink.link.explanation || '点击连线查看详细解释。'}</span>}
+        </div>
+      )}
+      {hoveredNode && !hoveredLink && (
+        <div className="mc-graph-edge-tip mc-graph-node-tip" style={{ left: hoveredNode.x + 14, top: hoveredNode.y - 12 }}>
+          <strong>{hoveredNode.node.originalName || hoveredNode.node.name}</strong>
+          {hoveredNode.node.timestamp && <span>时间：{hoveredNode.node.timestamp}</span>}
+          {hoveredNode.node.description && <span>{hoveredNode.node.description}</span>}
+          <span>点击查看完整事件、来源、风险和原始日志。</span>
         </div>
       )}
     </div>

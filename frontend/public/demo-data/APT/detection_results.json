@@ -1,225 +1,5 @@
 [
   {
-    "event_id": "APT-000001",
-    "timestamp": "2022-01-24T13:30:00.000000Z",
-    "threat_level": "medium",
-    "alert_level": "medium",
-    "final_score": 0.7032,
-    "raw_event_score": 0.84,
-    "micro_window_score": 0.6,
-    "macro_window_score": 0.6,
-    "long_horizon_score": 0.6,
-    "reasons": [
-      "外部地址对 Web 主机发起端口扫描",
-      "IDS 命中 nmap 扫描规则"
-    ],
-    "module_projection": {},
-    "provenance": {
-      "kind": "analyst_curated_demo_projection",
-      "model_execution": false,
-      "synthetic_scores": true,
-      "formal_evaluation": false
-    }
-  },
-  {
-    "event_id": "APT-000002",
-    "timestamp": "2022-01-25T09:30:00.000000Z",
-    "threat_level": "high",
-    "alert_level": "high",
-    "final_score": 0.8092,
-    "raw_event_score": 0.88,
-    "micro_window_score": 0.72,
-    "macro_window_score": 0.72,
-    "long_horizon_score": 0.72,
-    "reasons": [
-      "Web 目录出现 shell.php 脚本",
-      "php-fpm 创建脚本文件"
-    ],
-    "module_projection": {},
-    "provenance": {
-      "kind": "analyst_curated_demo_projection",
-      "model_execution": false,
-      "synthetic_scores": true,
-      "formal_evaluation": false
-    }
-  },
-  {
-    "event_id": "APT-000003",
-    "timestamp": "2022-01-25T09:42:00.000000Z",
-    "threat_level": "high",
-    "alert_level": "high",
-    "final_score": 0.8156,
-    "raw_event_score": 0.88,
-    "micro_window_score": 0.72,
-    "macro_window_score": 0.72,
-    "long_horizon_score": 0.76,
-    "reasons": [
-      "Shell 下载并执行外部脚本",
-      "命令与控制回连外网地址"
-    ],
-    "module_projection": {},
-    "provenance": {
-      "kind": "analyst_curated_demo_projection",
-      "model_execution": false,
-      "synthetic_scores": true,
-      "formal_evaluation": false
-    }
-  },
-  {
-    "event_id": "APT-000004",
-    "timestamp": "2022-01-26T09:30:00.000000Z",
-    "threat_level": "high",
-    "alert_level": "high",
-    "final_score": 0.8088,
-    "raw_event_score": 0.88,
-    "micro_window_score": 0.7,
-    "macro_window_score": 0.7,
-    "long_horizon_score": 0.78,
-    "reasons": [
-      "创建新本地账户 svc_backup",
-      "持久化账户用于后续登录"
-    ],
-    "module_projection": {},
-    "provenance": {
-      "kind": "analyst_curated_demo_projection",
-      "model_execution": false,
-      "synthetic_scores": true,
-      "formal_evaluation": false
-    }
-  },
-  {
-    "event_id": "APT-000005",
-    "timestamp": "2022-01-26T09:36:00.000000Z",
-    "threat_level": "high",
-    "alert_level": "high",
-    "final_score": 0.7828,
-    "raw_event_score": 0.88,
-    "micro_window_score": 0.7,
-    "macro_window_score": 0.7,
-    "long_horizon_score": 0.82,
-    "reasons": [
-      "sudo 将新账户加入管理员组",
-      "权限提升以扩大控制范围"
-    ],
-    "module_projection": {},
-    "provenance": {
-      "kind": "analyst_curated_demo_projection",
-      "model_execution": false,
-      "synthetic_scores": true,
-      "formal_evaluation": false
-    }
-  },
-  {
-    "event_id": "APT-000006",
-    "timestamp": "2022-01-27T09:30:00.000000Z",
-    "threat_level": "high",
-    "alert_level": "high",
-    "final_score": 0.7756,
-    "raw_event_score": 0.86,
-    "micro_window_score": 0.66,
-    "macro_window_score": 0.66,
-    "long_horizon_score": 0.8,
-    "reasons": [
-      "对数据库主机发起 SSH 爆破",
-      "认证失败指向凭据猜测"
-    ],
-    "module_projection": {},
-    "provenance": {
-      "kind": "analyst_curated_demo_projection",
-      "model_execution": false,
-      "synthetic_scores": true,
-      "formal_evaluation": false
-    }
-  },
-  {
-    "event_id": "APT-000007",
-    "timestamp": "2022-01-27T09:42:00.000000Z",
-    "threat_level": "high",
-    "alert_level": "high",
-    "final_score": 0.8148,
-    "raw_event_score": 0.88,
-    "micro_window_score": 0.74,
-    "macro_window_score": 0.74,
-    "long_horizon_score": 0.88,
-    "reasons": [
-      "持久化账户登录数据库主机",
-      "横向移动到内部核心资产"
-    ],
-    "module_projection": {},
-    "provenance": {
-      "kind": "analyst_curated_demo_projection",
-      "model_execution": false,
-      "synthetic_scores": true,
-      "formal_evaluation": false
-    }
-  },
-  {
-    "event_id": "APT-000008",
-    "timestamp": "2022-01-28T09:30:00.000000Z",
-    "threat_level": "critical",
-    "alert_level": "critical",
-    "final_score": 0.8624,
-    "raw_event_score": 0.92,
-    "micro_window_score": 0.78,
-    "macro_window_score": 0.78,
-    "long_horizon_score": 0.9,
-    "reasons": [
-      "PowerShell 编码命令执行",
-      "可疑进程由持久化账户启动"
-    ],
-    "module_projection": {},
-    "provenance": {
-      "kind": "analyst_curated_demo_projection",
-      "model_execution": false,
-      "synthetic_scores": true,
-      "formal_evaluation": false
-    }
-  },
-  {
-    "event_id": "APT-000009",
-    "timestamp": "2022-01-30T09:30:00.000000Z",
-    "threat_level": "high",
-    "alert_level": "high",
-    "final_score": 0.8152,
-    "raw_event_score": 0.94,
-    "micro_window_score": 0.8,
-    "macro_window_score": 0.8,
-    "long_horizon_score": 0.92,
-    "reasons": [
-      "DNS 隧道域名特征",
-      "疑似数据外传通道建立"
-    ],
-    "module_projection": {},
-    "provenance": {
-      "kind": "analyst_curated_demo_projection",
-      "model_execution": false,
-      "synthetic_scores": true,
-      "formal_evaluation": false
-    }
-  },
-  {
-    "event_id": "APT-000010",
-    "timestamp": "2022-01-31T09:30:00.000000Z",
-    "threat_level": "critical",
-    "alert_level": "critical",
-    "final_score": 0.8644,
-    "raw_event_score": 0.98,
-    "micro_window_score": 0.9,
-    "macro_window_score": 0.9,
-    "long_horizon_score": 0.98,
-    "reasons": [
-      "大量外传字节流向攻击者 IP",
-      "外联流量与数据渗出特征吻合"
-    ],
-    "module_projection": {},
-    "provenance": {
-      "kind": "analyst_curated_demo_projection",
-      "model_execution": false,
-      "synthetic_scores": true,
-      "formal_evaluation": false
-    }
-  },
-  {
     "event_id": "APT-000011",
     "timestamp": "2022-01-24T16:30:00.000000Z",
     "threat_level": "medium",
@@ -153264,6 +153044,296 @@
     "module_projection": {},
     "provenance": {
       "kind": "analyst_curated_demo_projection",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "APT-SCRIPT-001",
+    "timestamp": "2022-01-24T13:30:00.000Z",
+    "threat_level": "high",
+    "alert_level": "high",
+    "final_score": 0.88,
+    "raw_event_score": 0.91,
+    "micro_window_score": 0.78,
+    "macro_window_score": 0.8200000000000001,
+    "long_horizon_score": 0.86,
+    "reasons": [
+      "公网源地址",
+      "集中扫描管理接口"
+    ],
+    "module_projection": {
+      "M1": "演示：事件语义归一化",
+      "M2": "演示：实体关系解析",
+      "M3": "演示：窗口因果关联",
+      "M4": "演示：当前事件异常",
+      "M5": "演示：长程证据关联",
+      "M6": "演示：融合风险 0.88"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_script_v2",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "APT-SCRIPT-002",
+    "timestamp": "2022-01-24T13:30:28.000Z",
+    "threat_level": "critical",
+    "alert_level": "critical",
+    "final_score": 0.97,
+    "raw_event_score": 0.99,
+    "micro_window_score": 0.87,
+    "macro_window_score": 0.9099999999999999,
+    "long_horizon_score": 0.95,
+    "reasons": [
+      "管理接口出现异常命令执行",
+      "与前一公网扫描源一致"
+    ],
+    "module_projection": {
+      "M1": "演示：事件语义归一化",
+      "M2": "演示：实体关系解析",
+      "M3": "演示：窗口因果关联",
+      "M4": "演示：当前事件异常",
+      "M5": "演示：长程证据关联",
+      "M6": "演示：融合风险 0.97"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_script_v2",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "APT-SCRIPT-003",
+    "timestamp": "2022-01-24T13:31:01.000Z",
+    "threat_level": "critical",
+    "alert_level": "critical",
+    "final_score": 0.96,
+    "raw_event_score": 0.99,
+    "micro_window_score": 0.86,
+    "macro_window_score": 0.8999999999999999,
+    "long_horizon_score": 0.94,
+    "reasons": [
+      "管理设备新增 VPN 账户",
+      "创建来源为异常管理接口会话"
+    ],
+    "module_projection": {
+      "M1": "演示：事件语义归一化",
+      "M2": "演示：实体关系解析",
+      "M3": "演示：窗口因果关联",
+      "M4": "演示：当前事件异常",
+      "M5": "演示：长程证据关联",
+      "M6": "演示：融合风险 0.96"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_script_v2",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "APT-SCRIPT-004",
+    "timestamp": "2022-01-25T07:38:00.000Z",
+    "threat_level": "high",
+    "alert_level": "high",
+    "final_score": 0.9,
+    "raw_event_score": 0.93,
+    "micro_window_score": 0.8,
+    "macro_window_score": 0.8400000000000001,
+    "long_horizon_score": 0.88,
+    "reasons": [
+      "使用刚创建的本地账户",
+      "通道和流量外观正常"
+    ],
+    "module_projection": {
+      "M1": "演示：事件语义归一化",
+      "M2": "演示：实体关系解析",
+      "M3": "演示：窗口因果关联",
+      "M4": "演示：当前事件异常",
+      "M5": "演示：长程证据关联",
+      "M6": "演示：融合风险 0.9"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_script_v2",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "APT-SCRIPT-005",
+    "timestamp": "2022-01-25T07:40:00.000Z",
+    "threat_level": "high",
+    "alert_level": "high",
+    "final_score": 0.91,
+    "raw_event_score": 0.9400000000000001,
+    "micro_window_score": 0.81,
+    "macro_window_score": 0.8500000000000001,
+    "long_horizon_score": 0.89,
+    "reasons": [
+      "远程会话首次进入工作站",
+      "连续执行身份和网络枚举"
+    ],
+    "module_projection": {
+      "M1": "演示：事件语义归一化",
+      "M2": "演示：实体关系解析",
+      "M3": "演示：窗口因果关联",
+      "M4": "演示：当前事件异常",
+      "M5": "演示：长程证据关联",
+      "M6": "演示：融合风险 0.91"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_script_v2",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "APT-SCRIPT-006",
+    "timestamp": "2022-01-25T07:44:00.000Z",
+    "threat_level": "high",
+    "alert_level": "high",
+    "final_score": 0.93,
+    "raw_event_score": 0.9600000000000001,
+    "micro_window_score": 0.8300000000000001,
+    "macro_window_score": 0.8700000000000001,
+    "long_horizon_score": 0.91,
+    "reasons": [
+      "同一远程账户连续侦察",
+      "同时获取进程、域主机和在线用户信息"
+    ],
+    "module_projection": {
+      "M1": "演示：事件语义归一化",
+      "M2": "演示：实体关系解析",
+      "M3": "演示：窗口因果关联",
+      "M4": "演示：当前事件异常",
+      "M5": "演示：长程证据关联",
+      "M6": "演示：融合风险 0.93"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_script_v2",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "APT-SCRIPT-007",
+    "timestamp": "2022-01-25T07:51:00.000Z",
+    "threat_level": "high",
+    "alert_level": "high",
+    "final_score": 0.94,
+    "raw_event_score": 0.97,
+    "micro_window_score": 0.84,
+    "macro_window_score": 0.8799999999999999,
+    "long_horizon_score": 0.9199999999999999,
+    "reasons": [
+      "读取域用户和高权限组",
+      "与上一条域枚举连续发生"
+    ],
+    "module_projection": {
+      "M1": "演示：事件语义归一化",
+      "M2": "演示：实体关系解析",
+      "M3": "演示：窗口因果关联",
+      "M4": "演示：当前事件异常",
+      "M5": "演示：长程证据关联",
+      "M6": "演示：融合风险 0.94"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_script_v2",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "APT-SCRIPT-008",
+    "timestamp": "2022-01-26T22:50:00.000Z",
+    "threat_level": "high",
+    "alert_level": "high",
+    "final_score": 0.92,
+    "raw_event_score": 0.9500000000000001,
+    "micro_window_score": 0.8200000000000001,
+    "macro_window_score": 0.8600000000000001,
+    "long_horizon_score": 0.9,
+    "reasons": [
+      "从已侦察工作站转向业务主机",
+      "使用合法账户和标准 RDP 通道"
+    ],
+    "module_projection": {
+      "M1": "演示：事件语义归一化",
+      "M2": "演示：实体关系解析",
+      "M3": "演示：窗口因果关联",
+      "M4": "演示：当前事件异常",
+      "M5": "演示：长程证据关联",
+      "M6": "演示：融合风险 0.92"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_script_v2",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "APT-SCRIPT-009",
+    "timestamp": "2022-01-26T22:53:00.000Z",
+    "threat_level": "critical",
+    "alert_level": "critical",
+    "final_score": 0.95,
+    "raw_event_score": 0.98,
+    "micro_window_score": 0.85,
+    "macro_window_score": 0.8899999999999999,
+    "long_horizon_score": 0.9299999999999999,
+    "reasons": [
+      "RDP 后在目标业务主机创建自动启动服务",
+      "服务名称伪装成运维组件"
+    ],
+    "module_projection": {
+      "M1": "演示：事件语义归一化",
+      "M2": "演示：实体关系解析",
+      "M3": "演示：窗口因果关联",
+      "M4": "演示：当前事件异常",
+      "M5": "演示：长程证据关联",
+      "M6": "演示：融合风险 0.95"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_script_v2",
+      "model_execution": false,
+      "synthetic_scores": true,
+      "formal_evaluation": false
+    }
+  },
+  {
+    "event_id": "APT-SCRIPT-010",
+    "timestamp": "2022-01-26T22:58:00.000Z",
+    "threat_level": "critical",
+    "alert_level": "critical",
+    "final_score": 0.96,
+    "raw_event_score": 0.99,
+    "micro_window_score": 0.86,
+    "macro_window_score": 0.8999999999999999,
+    "long_horizon_score": 0.94,
+    "reasons": [
+      "创建 SYSTEM 权限计划任务",
+      "执行时间落在工作日运维时段"
+    ],
+    "module_projection": {
+      "M1": "演示：事件语义归一化",
+      "M2": "演示：实体关系解析",
+      "M3": "演示：窗口因果关联",
+      "M4": "演示：当前事件异常",
+      "M5": "演示：长程证据关联",
+      "M6": "演示：融合风险 0.96"
+    },
+    "provenance": {
+      "kind": "analyst_curated_demo_script_v2",
       "model_execution": false,
       "synthetic_scores": true,
       "formal_evaluation": false

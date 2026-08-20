@@ -342,6 +342,17 @@ body,
   white-space: nowrap;
 }
 
+.mc-workspace .mc-raw-event-detail {
+  margin: 0;
+  padding: 8px 10px;
+  color: #1e293b;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .mc-workspace .mc-finding-host-tag,
 .mc-workspace .mc-finding-risk-tag,
 .mc-workspace .mc-explainable-tag {
@@ -548,6 +559,15 @@ body,
   background: #f5f8ff !important;
 }
 
+/* 所有可点击事件行统一使用浅灰悬停态，避免旧深色主题残留导致文字不可读。 */
+.mc-workspace .ant-table-wrapper .ant-table-tbody > tr.ant-table-row:hover > td,
+.ant-modal .ant-table-wrapper .ant-table-tbody > tr.ant-table-row:hover > td,
+.mc-workspace .ant-list .ant-list-item:hover,
+.ant-modal .ant-list .ant-list-item:hover {
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+}
+
 .mc-workspace .ant-btn:not(.ant-btn-primary),
 .mc-chat-card .ant-btn-default {
   background: #ffffff !important;
@@ -665,6 +685,21 @@ body,
   background: #ffffff !important;
   border-color: var(--wad-border) !important;
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.035);
+}
+
+.mc-stage-item[draggable='true'] {
+  cursor: grab;
+}
+
+.mc-stage-item[draggable='true']:active {
+  cursor: grabbing;
+}
+
+.mc-stage-drag-hint {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: #64748b !important;
 }
 
 .mc-stage-main .mc-stage-item {

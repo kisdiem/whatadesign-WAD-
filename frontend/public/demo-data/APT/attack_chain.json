@@ -1,82 +1,101 @@
 {
-  "chain_id": "APT-CANDIDATE-001",
+  "chain_id": "APT-SCRIPT-CANDIDATE-001",
   "status": "candidate",
-  "claim_type": "analyst_curated_replay",
+  "claim_type": "analyst_curated_demo_script_v2",
+  "title": "九分钟演示：从公网边界到 OT 拓扑的跨十二天调查剧本",
+  "narrative": "演示汇报控制在约九分钟，但底层日志时间跨度为十二天。初始告警只暴露了公网管理接口异常、VPN 账户创建和一次远程登录。调查员先确认边界设备与账户实体，再沿实体检索工作站侦察、横向移动、代理和 OT 访问证据，逐步补齐攻击链。",
+  "initial_view": {
+    "visible_event_ids": [
+      "APT-SCRIPT-001",
+      "APT-SCRIPT-002",
+      "APT-SCRIPT-003",
+      "APT-SCRIPT-004"
+    ],
+    "note": "首次发现阶段只展示前四步，后续步骤保留为候选证据，不预先合并。"
+  },
   "steps": [
     {
       "sequence": 1,
-      "label": "T1046 网络服务扫描：外部 IP 扫描 Web 主机",
+      "label": "T1046 公网管理接口扫描",
       "evidence_event_ids": [
-        "APT-000001"
-      ]
+        "APT-SCRIPT-001"
+      ],
+      "status": "confirmed_in_demo"
     },
     {
       "sequence": 2,
-      "label": "T1505.003 Web Shell：shell.php 落地",
+      "label": "T1190 管理接口异常命令执行",
       "evidence_event_ids": [
-        "APT-000002"
-      ]
+        "APT-SCRIPT-002"
+      ],
+      "status": "confirmed_in_demo"
     },
     {
       "sequence": 3,
-      "label": "T1059.004 Unix Shell：下载并执行外部脚本",
+      "label": "T1136.003 创建 VPN 本地账户",
       "evidence_event_ids": [
-        "APT-000003"
-      ]
+        "APT-SCRIPT-003"
+      ],
+      "status": "confirmed_in_demo"
     },
     {
       "sequence": 4,
-      "label": "T1136.001 创建本地账户：svc_backup",
+      "label": "T1078 SSL-VPN 正常远程登录",
       "evidence_event_ids": [
-        "APT-000004"
-      ]
-    },
-    {
-      "sequence": 5,
-      "label": "T1548.003 Sudo 提权：账户加入 sudo 组",
-      "evidence_event_ids": [
-        "APT-000005"
-      ]
-    },
-    {
-      "sequence": 6,
-      "label": "T1110.001 密码猜测：SSH 爆破数据库主机",
-      "evidence_event_ids": [
-        "APT-000006"
-      ]
-    },
-    {
-      "sequence": 7,
-      "label": "T1078 有效账户：持久化账户横向移动登录",
-      "evidence_event_ids": [
-        "APT-000007"
-      ]
-    },
-    {
-      "sequence": 8,
-      "label": "T1059.001 PowerShell：编码命令执行",
-      "evidence_event_ids": [
-        "APT-000008"
-      ]
-    },
-    {
-      "sequence": 9,
-      "label": "T1071.001 DNS 隧道：命令与控制通道建立",
-      "evidence_event_ids": [
-        "APT-000009"
-      ]
-    },
-    {
-      "sequence": 10,
-      "label": "T1041 数据渗出：大量字节流向攻击者 IP",
-      "evidence_event_ids": [
-        "APT-000010"
-      ]
+        "APT-SCRIPT-004"
+      ],
+      "status": "confirmed_in_demo"
     }
   ],
+  "discovered_candidates": [
+    {
+      "event_id": "APT-SCRIPT-005",
+      "label": "T1033/T1016 主机身份与网络侦察",
+      "reason": "远程会话首次进入工作站；连续执行身份和网络枚举",
+      "status": "candidate_pending_human_review"
+    },
+    {
+      "event_id": "APT-SCRIPT-006",
+      "label": "T1057/T1033 进程与在线用户枚举",
+      "reason": "同一远程账户连续侦察；同时获取进程、域主机和在线用户信息",
+      "status": "candidate_pending_human_review"
+    },
+    {
+      "event_id": "APT-SCRIPT-007",
+      "label": "T1087.002 域账户结构枚举",
+      "reason": "读取域用户和高权限组；与上一条域枚举连续发生",
+      "status": "candidate_pending_human_review"
+    },
+    {
+      "event_id": "APT-SCRIPT-008",
+      "label": "T1021.001 合法凭据 RDP 到新主机",
+      "reason": "从已侦察工作站转向业务主机；使用合法账户和标准 RDP 通道",
+      "status": "candidate_pending_human_review"
+    },
+    {
+      "event_id": "APT-SCRIPT-009",
+      "label": "T1569.002 远程服务执行",
+      "reason": "RDP 后在目标业务主机创建自动启动服务；服务名称伪装成运维组件",
+      "status": "candidate_pending_human_review"
+    },
+    {
+      "event_id": "APT-SCRIPT-010",
+      "label": "T1053.005 计划任务持久化",
+      "reason": "创建 SYSTEM 权限计划任务；执行时间落在工作日运维时段",
+      "status": "candidate_pending_human_review"
+    }
+  ],
+  "investigation_flow": [
+    "发现高危边界事件",
+    "确认设备、账户和来源 IP 实体",
+    "按实体回查工作站与域活动",
+    "补充横向移动和持久化证据",
+    "沿代理实体进入 OT 网络",
+    "提交当前已纳入链路给小影总结"
+  ],
   "limitations": [
-    "这是基于原始日志的演示回放，不是模型预测。",
-    "候选关联只供人工调查，不是攻击事实。",
-    "未读取 AIT 标签或场景真值。"
+    "这是人工编排的九分钟演示剧本，不是模型预测结果。",
+    "初始链路故意不完整，候选步骤需要调查员逐步加入。",
+    "当前证据支持“预留长期访问能力”的判断，不足以证明已执行破坏。"
   ]
 }

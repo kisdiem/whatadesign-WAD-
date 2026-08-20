@@ -108,6 +108,15 @@ security_agent = Agent[AgentContext](
         "Do not equate a high risk score with confirmed compromise. Distinguish observed facts, inference and uncertainty. "
         "For a normal request, use at most four short Chinese bullets headed 结论, 依据, 关注点, 下一步 as needed. "
         "For a selected log/excerpt, prefer one short paragraph plus at most two bullets. "
+        "For multi-event or candidate-chain review, use this readable structure and no other preamble: "
+        "一、结论（先说明是否纳入主链及置信度）；二、事实（按时间列出必要事件，说明时间、主机、实体和行为）； "
+        "三、关联依据（分别说明同主机、同实体、时间衔接或行为衔接）；四、排除项（逐项说明为什么不纳入）； "
+        "五、待确认（只列需要补查的证据）。每个事件单独成行，使用完整句子。 "
+        "Do not output bare epoch numbers, internal IDs, or duplicated evidence references at the end. "
+        "Show an internal ID only in parentheses after the related event, and omit it when it adds no investigative value. "
+        "Convert epoch timestamps to readable date-time with seconds; never expose fractional epoch values. "
+        "Separate observed fact from inference with the labels 事实 and 判断. "
+        "Do not call unrelated events an attack chain merely because they have high scores. "
         "For an explicit [WAD_REPORT_SNAPSHOT] request, the attached snapshot is the user-submitted report source: do not require a tool call, "
         "do not add facts outside it, and return all five Chinese sections exactly: 概况, 链路判断, 关键证据, 不确定项, 处置建议. "
         "Each section must contain concrete, concise snapshot-grounded content rather than generic investigation advice. "
@@ -164,7 +173,10 @@ repair_agent = Agent(
     instructions=(
         "Rewrite the supplied Chinese security answer so every important claim is supported by the verifier result and evidence. "
         "Remove or downgrade unsupported claims using phrases such as '存在迹象', '与……一致', or '目前尚不能确认'. "
-        "Preserve the structure: 结论, 主要证据, 判断依据, 建议下一步. Do not add new facts."
+        "Preserve a readable Chinese structure: 结论、事实、关联依据、排除项、待确认。 "
+        "Put each event on its own line with readable time, host, entity and behavior. "
+        "Remove bare epoch numbers, duplicate internal IDs and raw evidence dumps. "
+        "Keep IDs only in parentheses after the event they identify. Do not add new facts."
     ),
 )
 
@@ -243,6 +255,7 @@ class AgentRuntime:
             investigation_id=request.context.investigation_id,
             entity_ids=request.context.entity_ids,
             requested_time_range=request.context.time_range,
+            submitted_evidence_snapshot=request.context.evidence_snapshot,
             status_callback=status_callback,
             tool_call_limit=tool_call_limit,
         )
@@ -254,6 +267,7 @@ class AgentRuntime:
             "investigation_id": request.context.investigation_id,
             "entity_ids": request.context.entity_ids,
             "time_range": request.context.time_range,
+            "submitted_real_log_snapshot": bool(request.context.evidence_snapshot),
         }
         return json.dumps(payload, ensure_ascii=False)
 
@@ -303,6 +317,8 @@ class AgentRuntime:
             prompt = (
                 f"用户问题：{request.message}\n"
                 f"当前前端安全上下文：{self._context_hint(request)}\n"
+                "如果上下文标记 submitted_real_log_snapshot=true，必须优先调用 security_get_submitted_log_snapshot；"
+                "该工具返回的是前端当前选择所对应的系统实际处理日志证据。不要因后端静态仓库未命中动态 ID 而声称没有真实日志。\n"
                 f"其他模式中用户已经看过的最近对话（仅用于指代和连续表达，不可代替安全工具证据）：\n{cross_mode_history}"
             )
             result = await Runner.run(

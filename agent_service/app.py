@@ -30,7 +30,7 @@ allowed_origins = [
     origin.strip()
     for origin in os.getenv(
         "WAD_AGENT_CORS_ORIGINS",
-        "http://localhost:5173,http://127.0.0.1:5173",
+        "http://localhost:5173,http://127.0.0.1:5173,http://localhost:5179,http://127.0.0.1:5179",
     ).split(",")
     if origin.strip()
 ]
@@ -321,6 +321,7 @@ async def health() -> dict[str, Any]:
         "provider": _runtime_provider if _runtime_provider != "none" else "openai",
         "model": _runtime_model or os.getenv("WAD_GENERAL_MODEL", "gpt-4o-mini"),
         "base_url": _runtime_base_url,
+        "repository_type": type(runtime.repository).__name__,
         "modes": ["auto", "security", "knowledge", "general"],
         "production_mock_fallback": False,
         "ingestion_pipeline": ingestion["pipeline"],
@@ -712,6 +713,7 @@ async def legacy_query(request: LegacyAssistantRequest):
             investigation_id=context.get("caseId") or context.get("investigation_id"),
             entity_ids=list(context.get("entityIds") or context.get("entity_ids") or []),
             time_range=context.get("time_range"),
+            evidence_snapshot=context.get("evidenceSnapshot") or context.get("evidence_snapshot"),
         ),
     )
     response = await query(normalized)

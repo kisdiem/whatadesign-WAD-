@@ -8,13 +8,13 @@
     "gather/windows/2022-01-24..31-Security.evtx",
     "gather/dns/dnsteal.log"
   ],
-  "source_slice": "2022-01-24T13:30:00.000000Z/2022-01-31T13:30:00.000000Z",
+  "source_slice": "2022-01-24T13:30:00.000Z/2022-01-31T13:19:00.000Z",
   "event_count": 7298,
-  "sha256_events_log": "b506f1b6d4fa541f1f21e93b9ca86fb6ef188d0fc15fe66ceaef1ddba941fefb",
+  "sha256_events_log": "b03e025930802161b2b8111882dac341e35157d9c4f7e85775cc1e786c4aad26",
   "contains_labels": false,
   "contains_facts_json": false,
   "preserves_real_source_timestamps": true,
   "generated_at": "2026-08-18T19:29:54.106978Z",
   "apt_narrative": true,
-  "note": "为 10 分钟演示剧本设计的跨源 APT 攻击叙事集；分数由与上传链路一致的 M6 融合公式合成，不读标签。"
+  "note": "九分钟人工编排演示剧本：首次仅展示部分攻击链，后续通过实体调查和候选证据逐步补链；不代表模型预测或真实入侵。"
 }

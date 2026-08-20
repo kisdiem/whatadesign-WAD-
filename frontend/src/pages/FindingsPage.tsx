@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Card, Col, Descriptions, Divider, Drawer, Input, List, Progress, Row, Select, Space, Statistic, Table, Typography } from 'antd'
+import { Button, Card, Col, Descriptions, Divider, Drawer, Input, List, Modal, Progress, Radio, Row, Select, Space, Statistic, Table, Typography } from 'antd'
 import { RobotOutlined, SearchOutlined } from '@ant-design/icons'
 import type { EvidenceRecord, FindingRecord } from '../services/investigationDomain'
+import type { Investigation } from '../mocks/data'
 import { buildM3GraphSnapshot, layoutForceDirected } from '../services/caseGraphs'
 import InteractiveCaseGraph from '../InteractiveCaseGraph'
 import {
@@ -13,12 +14,13 @@ import {
   findingSortOptions,
   parseAbsoluteDateTime,
   readableAction,
+  investigationQueueStatus,
   scoreTone,
   severityLabel,
   type FindingSortMode,
 } from './shared'
 
-const { Text } = Typography
+const { Paragraph, Text } = Typography
 
 function riskMetricClass(value: number) {
   return value >= 80 ? 'critical' : value >= 65 ? 'high' : 'medium'
@@ -29,15 +31,23 @@ export default function FindingsPage({
   evidenceByFinding,
   onOpenAssistant,
   onOpenEntity,
-  onOpenInvestigation,
+  investigations,
+  onSaveToInvestigation,
 }: {
   findings: FindingRecord[]
   evidenceByFinding: Record<string, EvidenceRecord[]>
   onOpenAssistant: (finding: FindingRecord) => void
   onOpenEntity: (entityId: string) => void
-  onOpenInvestigation: () => void
+  investigations: Investigation[]
+  onSaveToInvestigation: (finding: FindingRecord, investigationId: string | null) => void
 }) {
   const [selected, setSelected] = useState<FindingRecord | null>(null)
+  const [investigationPickerOpen, setInvestigationPickerOpen] = useState(false)
+  const [investigationTarget, setInvestigationTarget] = useState<string>('new')
+  const pendingInvestigations = useMemo(
+    () => investigations.filter((item) => investigationQueueStatus(item) === 'manual_review' || item.status === 'investigating'),
+    [investigations],
+  )
   const [query, setQuery] = useState('')
   const [severity, setSeverity] = useState('all')
   const [source, setSource] = useState('all')
@@ -115,6 +125,15 @@ export default function FindingsPage({
             <Card size="small" className="mc-investigation-brief" title="调查摘要">
               <Descriptions size="small" column={1}>
                 <Descriptions.Item label="发生了什么"><Text strong>{readableAction(selected.anchorEvent.action)}</Text> · {selected.summary}</Descriptions.Item>
+                <Descriptions.Item label="原始事件">
+                  <Paragraph
+                    className="mc-raw-event-detail"
+                    copyable
+                    ellipsis={{ rows: 4, expandable: true, symbol: '展开原文' }}
+                  >
+                    {selected.anchorEvent.raw || selected.anchorEvent.action || '暂无原始事件'}
+                  </Paragraph>
+                </Descriptions.Item>
                 <Descriptions.Item label="重点对象">{selected.entity} · {selected.host || '主机待解析'}</Descriptions.Item>
                 <Descriptions.Item label="调查范围">{selected.start} 至 {selected.end} · {selected.events.length} 条事件</Descriptions.Item>
                 <Descriptions.Item label="当前结论"><Text type="secondary">这是需要优先核验的异常线索，不等同于已确认攻击。</Text></Descriptions.Item>
@@ -196,12 +215,38 @@ export default function FindingsPage({
 
             <Space wrap>
               <Button onClick={() => onOpenEntity(selected.entity)}>实体画像</Button>
-              <Button onClick={onOpenInvestigation}>案件调查</Button>
+              <Button onClick={() => { setInvestigationTarget('new'); setInvestigationPickerOpen(true) }}>案件调查</Button>
                 <Button type="primary" icon={<RobotOutlined />} onClick={() => onOpenAssistant(selected)}>小影</Button>
             </Space>
           </div>
         )}
       </Drawer>
+      <Modal
+        open={investigationPickerOpen}
+        title="加入案件调查"
+        okText="保存并查看案件"
+        cancelText="取消"
+        onCancel={() => setInvestigationPickerOpen(false)}
+        onOk={() => {
+          if (!selected) return
+          onSaveToInvestigation(selected, investigationTarget === 'new' ? null : investigationTarget)
+          setInvestigationPickerOpen(false)
+          setSelected(null)
+        }}
+      >
+        <Radio.Group
+          value={investigationTarget}
+          onChange={(event) => setInvestigationTarget(event.target.value)}
+          style={{ width: '100%' }}
+        >
+          <Space direction="vertical" style={{ width: '100%' }}>
+            <Radio value="new">创建新的调查事项</Radio>
+            {pendingInvestigations.length > 0 && <Typography.Text type="secondary">合并到待研判或调查中的事项：</Typography.Text>}
+            {pendingInvestigations.map((item) => <Radio key={item.id} value={item.id}>{item.title} · {item.windowIds.length} 个事件 · {item.owner}</Radio>)}
+          </Space>
+        </Radio.Group>
+        {pendingInvestigations.length === 0 && <Typography.Text type="secondary" style={{ display: 'block', marginTop: 12 }}>当前没有可合并的待研判或调查中事项。</Typography.Text>}
+      </Modal>
     </>
   )
 }

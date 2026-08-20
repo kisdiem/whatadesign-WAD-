@@ -13,6 +13,7 @@ class AgentRequestContext(BaseModel):
     investigation_id: str | None = None
     entity_ids: list[str] = Field(default_factory=list)
     time_range: str | None = None
+    evidence_snapshot: dict[str, Any] | None = None
 
 
 class AgentQueryRequest(BaseModel):
